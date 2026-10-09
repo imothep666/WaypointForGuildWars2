@@ -1,0 +1,86 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                xmlns:services="using:GuildWarsCompanion.Services"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
+                x:Class="GuildWarsCompanion.Ava.Views.EmotesView"
+                x:DataType="vm:EmotesViewModel">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- The search stays put while the list scrolls under it: this screen is used with the
+             game running, and re-finding the box costs more than the scroll it saves. -->
+        <StackPanel Margin="20,12,20,12" Spacing="10">
+            <TextBox Text="{Binding Search}" PlaceholderText="dance, grill, thanks…" />
+
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Text="{Binding Summary}" Classes="caption" VerticalAlignment="Center" />
+
+                <!-- Stays until the next copy. A message that vanishes is a message missed by
+                     someone who was looking at the game. -->
+                <TextBlock Grid.Column="1" Text="{Binding Copied}" IsVisible="{Binding HasCopied}"
+                           Classes="caption" Foreground="{StaticResource BrassBrush}"
+                           VerticalAlignment="Center" />
+            </Grid>
+        </StackPanel>
+
+        <RefreshContainer Grid.Row="1" RefreshRequested="OnPullRefresh">
+            <ScrollViewer>
+                <StackPanel Margin="20,0,20,32" Spacing="12">
+
+                    <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
+                    <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+
+                    <TextBlock Text="{Binding EmptyMessage}" Classes="caption"
+                               IsVisible="{Binding Emotes.Count, Converter={x:Static ui:Counts.IsZero}}" />
+
+                    <ItemsControl ItemsSource="{Binding Emotes}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:EmoteRow">
+                                <!-- A tap is the whole interaction: the command goes to the PC's
+                                     clipboard where a bridge is set up, and to this device's where
+                                     there is none. -->
+                                <Button Classes="row" Click="OnEmoteClicked" Margin="0,0,0,2">
+                                    <!-- One row, so the spine is the height of the row rather than
+                                         the height of its text: an emote with nothing on its third
+                                         line is still an emote. -->
+                                    <Grid ColumnDefinitions="4,*" MinHeight="58">
+                                        <!-- Brass where it can be typed today. -->
+                                        <Border Background="{Binding EdgeColor, Converter={x:Static ui:Paint.Brush}}" />
+
+                                        <StackPanel Grid.Column="1" Spacing="1" Margin="16,9,0,9"
+                                                    VerticalAlignment="Center">
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <TextBlock Text="{Binding Command}" Classes="figure" />
+
+                                                <!-- On the command's own line, so it stays put
+                                                     whether or not there is a third line below. -->
+                                                <TextBlock Grid.Column="1" Text="{Binding StateText}"
+                                                           Classes="caption small"
+                                                           VerticalAlignment="Center" />
+                                            </Grid>
+
+                                            <TextBlock Text="{Binding Does}" Classes="caption" />
+
+                                            <!-- How it behaves, its other spellings, and the tome
+                                                 it comes out of. Kept in the layout when it has
+                                                 nothing to say rather than collapsed: an empty line
+                                                 still holds its height, so every row is three lines
+                                                 tall at any font size. -->
+                                            <TextBlock Text="{Binding Detail}" Classes="caption small"
+                                                       Foreground="{StaticResource BrassDimBrush}"
+                                                       MinHeight="14" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Text="{Binding Footnote}" Classes="caption small" Margin="0,6,0,0" />
+                </StackPanel>
+            </ScrollViewer>
+        </RefreshContainer>
+    </Grid>
+</shell:PageView>

@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!--
+            The Avalonia app on a desktop: Windows, and Linux under X11 or (with dash-dash-wayland)
+            natively on Wayland, which is what Ubuntu Touch's Lomiri speaks. Plain net10.0, as
+            the bridge is: Avalonia.Desktop picks its backend at runtime, so one build serves both.
+        -->
+        <TargetFramework>net10.0</TargetFramework>
+        <OutputType>WinExe</OutputType>
+        <RootNamespace>GuildWarsCompanion.Ava.Desktop</RootNamespace>
+        <AssemblyName>GuildWarsCompanion.Desktop</AssemblyName>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <!-- Explorer's, the taskbar pin's and the shortcut's: the launcher icon's emblem, made by
+             tools/render-desktop-icon.py. The running window takes its own from app_icon.png. -->
+        <ApplicationIcon>Assets\waypoint.ico</ApplicationIcon>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GuildWarsCompanion.Avalonia\GuildWarsCompanion.Avalonia.csproj" />
+    </ItemGroup>
+
+    <!--
+        Where updates come from: a GitHub repository whose releases the pipeline publishes, given
+        as -p:WaypointReleases=https://github.com/owner/repo. Only the pipeline sets it, so a build
+        made anywhere else has no address and never updates itself. See VelopackUpdates.
+    -->
+    <ItemGroup Condition="'$(WaypointReleases)' != ''">
+        <AssemblyMetadata Include="WaypointReleases" Value="$(WaypointReleases)" />
+    </ItemGroup>
+
+    <!-- The menu entry's icon on Linux; see LinuxMenuEntry. -->
+    <ItemGroup>
+        <EmbeddedResource Include="..\GuildWarsCompanion.Avalonia\Assets\Images\app_icon.png" LogicalName="waypoint.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Desktop" Version="12.1.2" />
+        <!-- Native Wayland, off unless asked for: experimental in 12.1, and not picked by
+             UsePlatformDetect. See Program. -->
+        <PackageReference Include="Avalonia.Wayland" Version="12.1.2" />
+        <!-- Windows' own per-user encryption for the API key; see FileSecrets. -->
+        <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.0" />
+        <!-- Installing and updating; see VelopackUpdates. Keep in step with the vpk version in
+             azure-pipelines.yml. -->
+        <PackageReference Include="Velopack" Version="1.2.161" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,127 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:controls="using:GuildWarsCompanion.Ava.Controls"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                xmlns:services="using:GuildWarsCompanion.Services"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
+                x:Class="GuildWarsCompanion.Ava.Views.WatchView"
+                x:DataType="vm:WatchViewModel"
+                ShowsWash="True">
+
+    <Grid>
+        <Grid RowDefinitions="Auto,*">
+            <controls:AreaTabStrip Area="tradingpost" Current="watch" />
+
+            <ScrollViewer Grid.Row="1">
+                <StackPanel Margin="20,14,20,28" Spacing="12">
+                    <TextBlock Text="PRICE WATCH" Classes="heading" />
+                    <TextBlock Classes="caption small"
+                               Text="Checked with the background poll, so it works even with no API key — market prices are public. You are told once when a price arrives, and again if it comes back." />
+
+                    <!-- Existing watches -->
+                    <TextBlock Text="{Binding EmptyMessage}" IsVisible="{Binding HasNoWatches}"
+                               Classes="caption" Margin="0,6" />
+
+                    <ItemsControl ItemsSource="{Binding Watches}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:WatchRow">
+                                <Button Classes="row" Click="OnWatchClicked" Margin="0,0,0,8">
+                                    <Grid ColumnDefinitions="4,40,*,Auto" RowDefinitions="Auto,*" MinHeight="62">
+                                        <!-- Brass once the price has arrived. -->
+                                        <Border Grid.RowSpan="2"
+                                                Background="{Binding EdgeColor, Converter={x:Static ui:Paint.Brush}}" />
+                                        <Image Grid.RowSpan="2" Grid.Column="1" ui:WebImage.Url="{Binding IconUrl}"
+                                               Width="28" Height="28" VerticalAlignment="Center" Margin="12,0,0,0" />
+                                        <TextBlock Grid.Column="2" Text="{Binding Name}" Margin="14,12,8,0"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Grid.Column="3" Text="{Binding Current}" Classes="figure"
+                                                   Margin="0,12,0,0" />
+                                        <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2"
+                                                   Text="{Binding Condition}" Classes="caption" Margin="14,2,0,12" />
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
+                    <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+
+                    <Border Classes="rule" Margin="0,8,0,0" />
+
+                    <!-- Adding one: search, then a price -->
+                    <TextBlock Text="ADD A WATCH" Classes="heading small" Margin="0,4,0,0" />
+
+                    <TextBox Text="{Binding Search}" PlaceholderText="Item name">
+                        <TextBox.KeyBindings>
+                            <KeyBinding Gesture="Enter" Command="{Binding FindCommand}" />
+                        </TextBox.KeyBindings>
+                    </TextBox>
+
+                    <Button Content="FIND" Command="{Binding FindCommand}" Classes="quiet"
+                            HorizontalAlignment="Left" />
+
+                    <TextBlock Text="{Binding SearchNote}" Classes="caption small" />
+
+                    <ItemsControl ItemsSource="{Binding Results}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:WatchCandidate">
+                                <Button Classes="row" Click="OnCandidateClicked" Margin="0,0,0,6">
+                                    <Grid ColumnDefinitions="4,38,*,Auto" MinHeight="44">
+                                        <Border Background="{Binding RarityColor, Converter={x:Static ui:Paint.Brush}}" />
+                                        <Image Grid.Column="1" ui:WebImage.Url="{Binding IconUrl}" Width="26"
+                                               Height="26" Margin="12,0,0,0" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="2" Text="{Binding Name}" Margin="14,0,8,0"
+                                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                        <!-- What sellers ask now: the baseline, without opening the game. -->
+                                        <TextBlock Grid.Column="3" Text="{Binding AskingText}" Classes="figure"
+                                                   VerticalAlignment="Center" Margin="0,0,12,0" />
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Chosen item, then the price and which side of the market to watch -->
+                    <StackPanel IsVisible="{Binding HasCandidate}" Spacing="10" Margin="0,4,0,0">
+                        <TextBlock Text="{Binding CandidateName}" Classes="figure" />
+                        <TextBlock Text="{Binding CandidateBaseline}" Classes="caption" TextWrapping="Wrap" />
+
+                        <Grid ColumnDefinitions="*,12,Auto">
+                            <TextBox Text="{Binding Threshold}" PlaceholderText="1g 20s" />
+                            <Button Grid.Column="2" Content="WATCH" Command="{Binding AddCommand}" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock VerticalAlignment="Center" Classes="caption"
+                                       Text="Tell me when I can buy it (sell price falls). Off: when it is worth selling (buy price rises)." />
+                            <ToggleSwitch Grid.Column="1" IsChecked="{Binding WatchSellPrice}"
+                                          OnContent="" OffContent="" Margin="12,0,0,0" />
+                        </Grid>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <!--
+            "Stop watching this?" with its two answers. The shell's alert has a single button that
+            only dismisses, and a deletion needs a way to say no, so the page carries its own —
+            drawn the same way.
+        -->
+        <Grid x:Name="ConfirmLayer" IsVisible="False" Background="#B0000000">
+            <Border Background="{StaticResource SlateBrush}" BorderBrush="{StaticResource BrassDimBrush}"
+                    BorderThickness="1" CornerRadius="2" Margin="28" Padding="22,20,22,12"
+                    MaxWidth="460" VerticalAlignment="Center">
+                <StackPanel Spacing="12">
+                    <TextBlock x:Name="ConfirmTitle" Classes="heading" TextWrapping="Wrap" />
+                    <TextBlock x:Name="ConfirmMessage" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                        <Button Content="Keep" Classes="quiet" Click="OnKeepClicked" />
+                        <Button Content="Stop watching" Click="OnStopClicked" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</shell:PageView>

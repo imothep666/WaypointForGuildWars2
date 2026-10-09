@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- What the share sheet may be handed: the app's own files folder, where the diagnostic log
+     lives. Nothing else is exposed, and only for the one share it is granted to. -->
+<paths>
+    <files-path name="files" path="." />
+</paths>

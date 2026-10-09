@@ -1,0 +1,15 @@
+{
+    "name": "gw2companion.mpsoft",
+    "description": "Waypoint, an unofficial companion for Guild Wars 2: daily progress, wallet, trading post, compass and map, with a PC bridge for the game.",
+    "architecture": "@ARCH@",
+    "title": "Waypoint",
+    "hooks": {
+        "gw2companion": {
+            "apparmor": "gw2companion.apparmor",
+            "desktop": "gw2companion.desktop"
+        }
+    },
+    "version": "@VERSION@",
+    "maintainer": "@MAINTAINER@",
+    "framework": "ubuntu-touch-24.04-1.x"
+}

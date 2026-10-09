@@ -1,0 +1,13 @@
+{
+  "name": "Waypoint",
+  "version": "0.0.0",
+  "namespace": "gw2companion.bridge",
+  "package": "GuildWarsCompanion.Blish.dll",
+  "manifest_version": 1,
+
+  "description": "Does the emotes you tap in the Waypoint phone app, one tap for one emote. Needs the Waypoint bridge running on this PC; it starts Blish HUD with this module loaded.",
+  "dependencies": {
+    "bh.blishhud": ">=1.3.0"
+  },
+  "enabled_without_gw2": false
+}

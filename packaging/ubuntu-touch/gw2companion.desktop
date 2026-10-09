@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Waypoint
+Comment=Guild Wars 2 companion
+Exec=launcher.sh
+Icon=icon.png
+Terminal=false
+Type=Application
+X-Lomiri-Touch=true

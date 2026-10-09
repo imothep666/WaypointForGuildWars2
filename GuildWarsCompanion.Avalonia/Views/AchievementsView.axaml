@@ -1,0 +1,69 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                xmlns:services="using:GuildWarsCompanion.Services"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
+                x:Class="GuildWarsCompanion.Ava.Views.AchievementsView"
+                x:DataType="vm:AchievementsViewModel">
+
+    <Grid RowDefinitions="Auto,*">
+        <StackPanel Margin="20,12,20,0" Spacing="8">
+            <!-- The screen's statement: these are the ones within reach. -->
+            <TextBlock Text="CLOSEST TO FINISHING" Classes="heading" />
+            <TextBlock Text="{Binding Summary}" Classes="caption" />
+            <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
+            <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+        </StackPanel>
+
+        <RefreshContainer Grid.Row="1" Margin="0,10,0,0" RefreshRequested="OnPullRefresh">
+            <ScrollViewer>
+                <StackPanel>
+                    <TextBlock Text="{Binding EmptyMessage}" Classes="caption"
+                               IsVisible="{Binding Rows.Count, Converter={x:Static ui:Counts.IsZero}}"
+                               HorizontalAlignment="Center" Margin="0,32" />
+
+                    <ItemsControl ItemsSource="{Binding Rows}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:AchievementRow">
+                                <Button Classes="row" Click="OnRowClicked">
+                                    <Grid ColumnDefinitions="4,*,Auto" RowDefinitions="Auto,Auto,Auto,*"
+                                          Margin="20,0" MinHeight="86">
+                                        <!-- Brass throughout: everything here is unfinished. -->
+                                        <Border Grid.RowSpan="4" Background="{StaticResource BrassBrush}" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="16,13,10,0"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <!-- What actually has to be done. -->
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                                                   Text="{Binding Requirement}"
+                                                   IsVisible="{Binding HasRequirement}"
+                                                   Classes="caption small" Margin="16,3,0,0" />
+                                        <TextBlock Grid.Column="2" Text="{Binding PointsText}"
+                                                   IsVisible="{Binding HasPoints}" Classes="figure"
+                                                   Foreground="{StaticResource BrassBrush}"
+                                                   Margin="0,13,0,0" />
+                                        <ProgressBar Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
+                                                     Minimum="0" Maximum="1" Value="{Binding Fraction}"
+                                                     Margin="16,7,0,0" />
+                                        <!-- Counts rather than a percentage. -->
+                                        <StackPanel Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"
+                                                    Orientation="Horizontal" Spacing="10"
+                                                    Margin="16,5,0,13">
+                                            <TextBlock Text="{Binding ProgressText}" Classes="caption small" />
+                                            <TextBlock Text="{Binding RemainingText}" Classes="caption small"
+                                                       Foreground="{StaticResource VellumBrush}" />
+                                            <!-- Only collections lead anywhere; say which ones do. -->
+                                            <TextBlock Text="{Binding ChecklistHint}"
+                                                       IsVisible="{Binding HasChecklist}" Classes="caption small"
+                                                       Foreground="{StaticResource BrassBrush}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </RefreshContainer>
+    </Grid>
+</shell:PageView>

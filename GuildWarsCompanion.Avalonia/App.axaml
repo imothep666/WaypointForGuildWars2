@@ -1,0 +1,234 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="GuildWarsCompanion.Ava.App"
+             RequestedThemeVariant="Dark">
+
+    <!--
+        One dark Tyrian look, two faces — Marcellus SC names things, Barlow does the reading and
+        the numbers.
+    -->
+    <Application.Resources>
+        <Color x:Key="Obsidian">#0F141B</Color>
+        <Color x:Key="Slate">#18212C</Color>
+        <Color x:Key="SlateDeep">#131A23</Color>
+        <Color x:Key="Brass">#C8A34E</Color>
+        <Color x:Key="BrassDim">#6E5A2E</Color>
+        <Color x:Key="Vellum">#E6DECB</Color>
+        <Color x:Key="Mist">#7E8B9B</Color>
+        <Color x:Key="Banked">#2C3946</Color>
+        <Color x:Key="Hairline">#1F2A36</Color>
+        <Color x:Key="Ember">#C0453B</Color>
+
+        <SolidColorBrush x:Key="ObsidianBrush" Color="{StaticResource Obsidian}" />
+        <SolidColorBrush x:Key="SlateBrush" Color="{StaticResource Slate}" />
+        <SolidColorBrush x:Key="SlateDeepBrush" Color="{StaticResource SlateDeep}" />
+        <SolidColorBrush x:Key="BrassBrush" Color="{StaticResource Brass}" />
+        <SolidColorBrush x:Key="BrassDimBrush" Color="{StaticResource BrassDim}" />
+        <SolidColorBrush x:Key="VellumBrush" Color="{StaticResource Vellum}" />
+        <SolidColorBrush x:Key="MistBrush" Color="{StaticResource Mist}" />
+        <SolidColorBrush x:Key="BankedBrush" Color="{StaticResource Banked}" />
+        <SolidColorBrush x:Key="HairlineBrush" Color="{StaticResource Hairline}" />
+        <SolidColorBrush x:Key="EmberBrush" Color="{StaticResource Ember}" />
+
+        <!-- The area's own colour, which the shell sets for the area on screen; brass where there
+             is none. Ask for it with DynamicResource. -->
+        <SolidColorBrush x:Key="AreaTintBrush" Color="{StaticResource Brass}" />
+
+        <!-- A dry-brush stroke, for under whatever it marks: the live tab, a section's heading,
+             the bar's live entry. The hairs of a brush loaded at its heart: in the middle every
+             one carries paint, towards each end they run out one by one. Painted once by
+             tools/render-brushstroke.html, white on clear, and laid as the opacity mask of a
+             block of the area's tint, so one painting serves every colour. -->
+        <ImageBrush x:Key="BrushStrokeMask" Source="/Assets/Images/brushstroke.png" Stretch="Fill" />
+
+        <!-- Coin, in its three metals. The game shows every price this way. Coin only: Acclaim,
+             achievement points and every other count are brass, so gold always means gold. -->
+        <SolidColorBrush x:Key="MetalGoldBrush" Color="#D9A441" />
+        <SolidColorBrush x:Key="MetalSilverBrush" Color="#B9C3CC" />
+        <SolidColorBrush x:Key="MetalCopperBrush" Color="#B4703C" />
+
+        <!-- Fluent's time picker, in this look rather than its own grey: the field dressed as a
+             TextBox is, the drum on slate with the chosen row banked, divided in tarnished
+             brass. The accept and dismiss bar is already brass through the Button style. -->
+        <StaticResource x:Key="TimePickerButtonBackground" ResourceKey="SlateBrush" />
+        <StaticResource x:Key="TimePickerButtonBorderBrush" ResourceKey="BrassDimBrush" />
+        <StaticResource x:Key="TimePickerButtonForeground" ResourceKey="VellumBrush" />
+        <StaticResource x:Key="TimePickerSpacerFill" ResourceKey="BrassDimBrush" />
+        <StaticResource x:Key="TimePickerFlyoutPresenterBackground" ResourceKey="SlateBrush" />
+        <StaticResource x:Key="TimePickerFlyoutPresenterBorderBrush" ResourceKey="BrassDimBrush" />
+        <StaticResource x:Key="TimePickerFlyoutPresenterHighlightFill" ResourceKey="BankedBrush" />
+        <StaticResource x:Key="TimePickerFlyoutPresenterSpacerFill" ResourceKey="BrassDimBrush" />
+
+        <!-- One resource per Barlow weight, each naming its own file. A folder-wide "#Barlow" cannot tell them apart: all three files call their
+             style "Regular", and two of them call themselves Barlow only in the typographic
+             family field, so FontWeight picked whichever file came first. -->
+        <FontFamily x:Key="Barlow">avares://GuildWarsCompanion.Avalonia/Assets/Fonts/Barlow-Regular.ttf#Barlow</FontFamily>
+        <FontFamily x:Key="BarlowMedium">avares://GuildWarsCompanion.Avalonia/Assets/Fonts/Barlow-Medium.ttf#Barlow Medium</FontFamily>
+        <FontFamily x:Key="BarlowSemiBold">avares://GuildWarsCompanion.Avalonia/Assets/Fonts/Barlow-SemiBold.ttf#Barlow SemiBold</FontFamily>
+        <FontFamily x:Key="Marcellus">avares://GuildWarsCompanion.Avalonia/Assets/Fonts/MarcellusSC-Regular.ttf#Marcellus SC</FontFamily>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+
+        <!-- Body copy. Everything inherits this unless it asks to be a heading. -->
+        <Style Selector="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource Barlow}" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="Foreground" Value="{StaticResource VellumBrush}" />
+        </Style>
+
+        <!-- The one voice that shouts: page titles. -->
+        <Style Selector="TextBlock.inscription">
+            <Setter Property="FontFamily" Value="{StaticResource Marcellus}" />
+            <Setter Property="FontSize" Value="19" />
+            <Setter Property="LetterSpacing" Value="3" />
+        </Style>
+
+        <Style Selector="TextBlock.heading">
+            <Setter Property="FontFamily" Value="{StaticResource Marcellus}" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="Foreground" Value="{StaticResource BrassBrush}" />
+            <Setter Property="LetterSpacing" Value="2" />
+        </Style>
+
+        <!-- A heading a size down: the label on a card, or a part within a page. -->
+        <Style Selector="TextBlock.heading.small">
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+
+        <Style Selector="TextBlock.caption">
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="Foreground" Value="{StaticResource MistBrush}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+
+        <!-- The third line of a row, and the footnote under a list. -->
+        <Style Selector="TextBlock.caption.small">
+            <Setter Property="FontSize" Value="11" />
+        </Style>
+
+        <!-- Counts and balances. Medium weight so figures hold their own against the label. -->
+        <Style Selector="TextBlock.figure">
+            <Setter Property="FontFamily" Value="{StaticResource BarlowMedium}" />
+        </Style>
+
+        <Style Selector="TextBlock.error">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="{StaticResource EmberBrush}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+
+        <Style Selector="TextBlock.chevron">
+            <Setter Property="Text" Value="›" />
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Foreground" Value="{StaticResource BrassBrush}" />
+        </Style>
+
+        <!-- A hairline of tarnished brass; the only divider in the app. -->
+        <Style Selector="Border.rule">
+            <Setter Property="Height" Value="1" />
+            <Setter Property="Background" Value="{StaticResource BrassDimBrush}" />
+        </Style>
+
+        <!-- The panel a page leads with — coin, Acclaim, what a pile is worth. -->
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="{StaticResource SlateBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrassDimBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="2" />
+            <Setter Property="Padding" Value="18,16" />
+        </Style>
+
+        <Style Selector="Border.hairline">
+            <Setter Property="Height" Value="1" />
+            <Setter Property="Background" Value="{StaticResource HairlineBrush}" />
+        </Style>
+
+        <!-- The brass button: the one thing on a screen the player is meant to press. -->
+        <Style Selector="Button">
+            <Setter Property="FontFamily" Value="{StaticResource BarlowSemiBold}" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="{StaticResource ObsidianBrush}" />
+            <Setter Property="Background" Value="{StaticResource BrassBrush}" />
+            <Setter Property="CornerRadius" Value="2" />
+            <Setter Property="Padding" Value="20,12" />
+        </Style>
+
+        <Style Selector="Button:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#D8B666" />
+            <Setter Property="Foreground" Value="{StaticResource ObsidianBrush}" />
+        </Style>
+
+        <Style Selector="Button:disabled /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource BrassDimBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource MistBrush}" />
+        </Style>
+
+        <Style Selector="Button.quiet">
+            <Setter Property="Foreground" Value="{StaticResource MistBrush}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrassDimBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style Selector="Button.quiet:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource SlateBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource VellumBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrassBrush}" />
+        </Style>
+
+        <!-- A whole row that is tapped, rather than a button inside it. -->
+        <Style Selector="Button.row">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="CornerRadius" Value="0" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Foreground" Value="{StaticResource VellumBrush}" />
+        </Style>
+
+        <Style Selector="Button.row:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource SlateDeepBrush}" />
+        </Style>
+
+        <Style Selector="Button.row:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource SlateBrush}" />
+        </Style>
+
+        <Style Selector="TextBox">
+            <Setter Property="FontFamily" Value="{StaticResource Barlow}" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="Foreground" Value="{StaticResource VellumBrush}" />
+            <Setter Property="Background" Value="{StaticResource SlateBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrassDimBrush}" />
+            <Setter Property="CornerRadius" Value="2" />
+        </Style>
+
+        <!-- On in brass, with a vellum thumb. -->
+        <Style Selector="ToggleSwitch:checked /template/ Border#SwitchKnobBounds">
+            <Setter Property="Background" Value="{StaticResource BrassBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrassBrush}" />
+        </Style>
+
+        <Style Selector="ToggleSwitch:checked /template/ Ellipse#SwitchKnobOn">
+            <Setter Property="Fill" Value="{StaticResource VellumBrush}" />
+        </Style>
+
+        <Style Selector="ProgressBar">
+            <Setter Property="Foreground" Value="{StaticResource BrassBrush}" />
+            <Setter Property="Background" Value="{StaticResource HairlineBrush}" />
+            <Setter Property="MinHeight" Value="5" />
+            <Setter Property="Height" Value="5" />
+            <Setter Property="CornerRadius" Value="0" />
+        </Style>
+
+        <!-- The fill ends in a lit tip, so how far along reads at a glance even where the bar is
+             short. -->
+        <Style Selector="ProgressBar:not(:indeterminate) /template/ Border#PART_Indicator">
+            <Setter Property="BorderBrush" Value="#F2D68C" />
+            <Setter Property="BorderThickness" Value="0,0,3,0" />
+        </Style>
+    </Application.Styles>
+
+</Application>

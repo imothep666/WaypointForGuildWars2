@@ -1,0 +1,201 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                xmlns:services="using:GuildWarsCompanion.Services"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
+                x:Class="GuildWarsCompanion.Ava.Views.ItemView"
+                x:DataType="vm:ItemViewModel"
+                PageTitle="{Binding Item.Name}">
+
+    <ScrollViewer>
+        <StackPanel Margin="20,18,20,32" Spacing="14">
+            <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
+            <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+
+            <StackPanel IsVisible="{Binding HasItem}" Spacing="14">
+                <!-- The item itself, on its rarity spine. -->
+                <Grid ColumnDefinitions="4,64,*" MinHeight="72">
+                    <Border Background="{Binding Item.RarityColor, Converter={x:Static ui:Paint.Brush}}" />
+                    <Image Grid.Column="1" ui:WebImage.Url="{Binding Item.IconUrl}" Width="52" Height="52"
+                           VerticalAlignment="Center" Margin="12,0,0,0" />
+                    <StackPanel Grid.Column="2" Spacing="3" VerticalAlignment="Center" Margin="14,0,0,0">
+                        <TextBlock Text="{Binding Item.Name}" FontSize="17" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding Item.Kind}" Classes="caption" />
+                        <TextBlock Text="{Binding Item.Facts}" IsVisible="{Binding Item.HasFacts}"
+                                   Classes="caption small" Foreground="{StaticResource BrassBrush}" />
+                    </StackPanel>
+                </Grid>
+
+                <TextBlock Text="{Binding Item.Description}" IsVisible="{Binding Item.HasDescription}"
+                           Classes="caption" />
+
+                <!-- For chat in the game: lands on the PC's clipboard when a bridge is paired. -->
+                <StackPanel Spacing="4">
+                    <WrapPanel>
+                        <Button Content="COPY CHAT LINK" Command="{Binding CopyChatLinkCommand}" Classes="quiet"
+                                Margin="0,0,10,0" />
+                        <!-- Onto Today, counted against everything held all the way down its recipe. -->
+                        <Button Content="{Binding GoalLabel}" Command="{Binding ToggleGoalCommand}" Classes="quiet" />
+                    </WrapPanel>
+                    <!-- A row of its own, and the count a fixed width: in the wrapping row above, the
+                         stepper jumped to the next line as "× 1" became "× 2", and the second tap on
+                         + landed on nothing. -->
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <StackPanel Orientation="Horizontal" IsVisible="{Binding IsGoal}" Spacing="6">
+                            <Button Content="−" Command="{Binding FewerCommand}" Classes="quiet" MinWidth="44" />
+                            <TextBlock Text="{Binding GoalQuantityText}" Classes="figure" VerticalAlignment="Center"
+                                       Width="48" TextAlignment="Center" />
+                            <Button Content="+" Command="{Binding MoreCommand}" Classes="quiet" MinWidth="44" />
+                        </StackPanel>
+                        <!-- Only for what the trading post sells. -->
+                        <Button Content="WATCH PRICE" Command="{Binding WatchPriceCommand}" Classes="quiet"
+                                IsVisible="{Binding Item.HasMarket}" />
+                    </StackPanel>
+                    <TextBlock Text="{Binding Linked}" IsVisible="{Binding HasLinked}" Classes="caption small"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+
+                <Border Classes="rule" />
+
+                <!-- The market, both sides. -->
+                <TextBlock Text="TRADING POST" Classes="heading small" />
+
+                <Grid ColumnDefinitions="*,14,*" IsVisible="{Binding Item.HasMarket}">
+                    <StackPanel Spacing="3">
+                        <TextBlock Text="Buy order" Classes="caption" />
+                        <TextBlock Text="{Binding Item.BuyText}" Classes="figure" FontSize="18" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Spacing="3">
+                        <TextBlock Text="Sell listing" Classes="caption" />
+                        <TextBlock Text="{Binding Item.SellText}" Classes="figure" FontSize="18" />
+                    </StackPanel>
+                </Grid>
+
+                <TextBlock Text="{Binding Item.MarketNote}" Classes="caption small" />
+
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Vendor" Classes="caption" />
+                    <TextBlock Text="{Binding Item.VendorText}" Classes="caption" />
+                </StackPanel>
+
+                <!-- What makes this, and whether you can make it now. -->
+                <StackPanel Spacing="8" IsVisible="{Binding Item.HasCraft}">
+                    <Border Classes="rule" />
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="CRAFTING" Classes="heading small" />
+                        <TextBlock Grid.Column="1" Text="{Binding Item.Craft.Heading}" Classes="caption small"
+                                   VerticalAlignment="Bottom" />
+                    </Grid>
+
+                    <!-- The one sentence the section exists for. -->
+                    <TextBlock Text="{Binding Item.Craft.Verdict}" Classes="figure"
+                               Foreground="{StaticResource BrassBrush}" Margin="0,2,0,4" TextWrapping="Wrap" />
+
+                    <ItemsControl ItemsSource="{Binding Item.Craft.Lines}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:CraftLineView">
+                                <Button Classes="row" Click="OnIngredientClicked" Margin="0,0,0,6">
+                                    <Grid ColumnDefinitions="4,34,*,Auto,88" MinHeight="40">
+                                        <Border Background="{Binding EdgeColor, Converter={x:Static ui:Paint.Brush}}" />
+                                        <Image Grid.Column="1" ui:WebImage.Url="{Binding IconUrl}" Width="24"
+                                               Height="24" VerticalAlignment="Center" Margin="10,0,0,0" />
+                                        <TextBlock Grid.Column="2" Text="{Binding Name}" VerticalAlignment="Center"
+                                                   Margin="12,0,8,0" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Grid.Column="3" Text="{Binding NeededText}" Classes="caption small"
+                                                   VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="4" Text="{Binding HeldText}" Classes="figure"
+                                                   FontSize="12" VerticalAlignment="Center"
+                                                   HorizontalAlignment="Right" />
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- The two questions the numbers can actually settle. -->
+                    <TextBlock Text="{Binding Item.Craft.MakeOrBuy}" IsVisible="{Binding Item.Craft.HasMakeOrBuy}"
+                               Classes="caption" Foreground="{StaticResource VellumBrush}" />
+                    <TextBlock Text="{Binding Item.Craft.Margin}" IsVisible="{Binding Item.Craft.HasMargin}"
+                               Classes="caption" />
+                    <TextBlock Text="{Binding Item.Craft.ShortfallCost}"
+                               IsVisible="{Binding Item.Craft.HasShortfallCost}" Classes="caption" />
+                    <TextBlock Text="{Binding Item.Craft.SourceNote}" Classes="caption small" />
+
+                    <!-- The whole chain, when it says more than the line above it. -->
+                    <StackPanel Spacing="6" IsVisible="{Binding Item.Craft.HasMaterials}" Margin="0,8,0,0">
+                        <TextBlock Text="ALL THE WAY DOWN" Classes="heading small" />
+
+                        <ItemsControl ItemsSource="{Binding Item.Craft.Materials}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="services:CraftLineView">
+                                    <Button Classes="row" Click="OnIngredientClicked" Margin="0,0,0,4">
+                                        <Grid ColumnDefinitions="4,28,*,Auto" MinHeight="34">
+                                            <Border Background="{Binding EdgeColor, Converter={x:Static ui:Paint.Brush}}" />
+                                            <Image Grid.Column="1" ui:WebImage.Url="{Binding IconUrl}" Width="20"
+                                                   Height="20" VerticalAlignment="Center" Margin="8,0,0,0" />
+                                            <TextBlock Grid.Column="2" Text="{Binding Name}" FontSize="13"
+                                                       VerticalAlignment="Center" Margin="10,0,8,0"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Grid.Column="3" Text="{Binding NeededText}" Classes="figure"
+                                                       FontSize="12" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="{Binding Item.Craft.MaterialsNote}"
+                                   IsVisible="{Binding Item.Craft.HasMaterialsNote}" Classes="caption small" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- The other direction: what this turns into. -->
+                <StackPanel Spacing="8" IsVisible="{Binding Item.HasUsedIn}">
+                    <Border Classes="rule" />
+                    <TextBlock Text="USED IN" Classes="heading small" />
+                    <TextBlock Text="{Binding Item.UsedInSummary}" Classes="caption" />
+
+                    <ItemsControl ItemsSource="{Binding Item.UsedIn}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:UsedInItemRow">
+                                <Button Classes="row" Click="OnUsedInClicked" Margin="0,0,0,2">
+                                    <Grid ColumnDefinitions="4,*,Auto" RowDefinitions="Auto,*" MinHeight="50">
+                                        <Border Grid.RowSpan="2" Background="{StaticResource BrassDimBrush}" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="14,8,8,0"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Grid.Column="2" Grid.RowSpan="2" Classes="chevron"
+                                                   VerticalAlignment="Center" Margin="8,0,0,0" />
+                                        <!-- How many it takes, and who can make it. -->
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Detail}"
+                                                   Classes="caption small" Margin="14,2,8,8" />
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <!-- Where yours are, when storage has been read this run. -->
+                <StackPanel Spacing="6" IsVisible="{Binding Item.HasWhere}">
+                    <Border Classes="rule" />
+                    <TextBlock Text="YOURS" Classes="heading small" />
+                    <TextBlock Text="{Binding Item.WhereText}" TextWrapping="Wrap" />
+                </StackPanel>
+
+                <Border Classes="rule" />
+
+                <!-- Everything the API cannot answer lives on the wiki. -->
+                <TextBlock Text="{Binding Item.Acquisition}" Classes="caption"
+                           Foreground="{StaticResource VellumBrush}" />
+
+                <TextBlock Classes="caption small"
+                           Text="The API has no drop tables, no salvage results and no gathering locations — it knows what an item is, what it costs, and what makes it. The wiki knows the rest." />
+
+                <Button Content="{Binding Item.WikiLabel}" Command="{Binding OpenWikiCommand}"
+                        Classes="quiet" HorizontalAlignment="Left" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</shell:PageView>

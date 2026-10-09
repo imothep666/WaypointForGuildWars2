@@ -1,0 +1,113 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                xmlns:services="using:GuildWarsCompanion.Services"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
+                x:Class="GuildWarsCompanion.Ava.Views.EventsView"
+                x:DataType="vm:EventsViewModel">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+        <StackPanel Margin="20,0" Spacing="8">
+            <TextBlock Text="{Binding ForCharacter}" IsVisible="{Binding HasCharacter}"
+                       Classes="caption" Margin="0,12,0,0" />
+            <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}"
+                       Classes="error" Margin="0,12,0,0" />
+        </StackPanel>
+
+        <RefreshContainer Grid.Row="1" RefreshRequested="OnPullRefresh">
+            <ScrollViewer>
+                <StackPanel>
+                    <TextBlock Text="{Binding EmptyMessage}" Classes="caption"
+                               IsVisible="{Binding Bosses.Count, Converter={x:Static ui:Counts.IsZero}}"
+                               HorizontalAlignment="Center" Margin="0,32" />
+
+                    <ItemsControl ItemsSource="{Binding Bosses}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:EventRow">
+                                <!-- A tap opens the map this boss is fought on. -->
+                                <Button Classes="row" Click="OnRowClicked">
+                                    <!-- Spine: brass when it is about to start, dim when killed. -->
+                                    <Grid ColumnDefinitions="4,*,Auto" RowDefinitions="Auto,*"
+                                          Margin="20,0" MinHeight="64">
+                                        <Border Grid.RowSpan="2"
+                                                Background="{Binding EdgeColor, Converter={x:Static ui:Paint.Brush}}" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Name}"
+                                                   Margin="16,13,10,0" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Grid.Column="2" Text="{Binding Countdown}"
+                                                   Classes="figure" Margin="0,13,0,0"
+                                                   HorizontalAlignment="Right" />
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Subtitle}"
+                                                   Classes="caption" Margin="16,2,10,13" />
+                                        <StackPanel Grid.Row="1" Grid.Column="2" Spacing="1"
+                                                    Margin="0,2,0,13">
+                                            <TextBlock Text="{Binding LocalTime}" Classes="caption"
+                                                       HorizontalAlignment="Right" />
+                                            <TextBlock Text="{Binding LevelNote}" Classes="caption"
+                                                       FontSize="10.5" HorizontalAlignment="Right" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Map metas: on now first, then by how soon. Brass while on or about to be. -->
+                    <StackPanel IsVisible="{Binding Metas.Count, Converter={x:Static ui:Counts.IsAny}}" Margin="0,18,0,0">
+                        <TextBlock Text="MAP METAS" Classes="heading" Margin="20,0,20,8" />
+                        <ItemsControl ItemsSource="{Binding Metas}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="services:MetaRow">
+                                    <StackPanel>
+                                        <!-- A tap opens the map's events, each with its own reminder. -->
+                                        <Button Classes="row" Command="{Binding ToggleOpenCommand}">
+                                            <Grid ColumnDefinitions="4,*,Auto" RowDefinitions="Auto,Auto,*"
+                                                  Margin="20,0" MinHeight="64">
+                                                <Border Grid.RowSpan="3"
+                                                        Background="{Binding EdgeColor, Converter={x:Static ui:Paint.Brush}}" />
+                                                <TextBlock Grid.Column="1" Text="{Binding Name}"
+                                                           Margin="16,13,10,0" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Grid.Column="2" Text="{Binding Countdown}"
+                                                           Classes="figure" Margin="0,13,0,0"
+                                                           HorizontalAlignment="Right" />
+                                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Subtitle}"
+                                                           Classes="caption" Margin="16,2,10,0" TextWrapping="Wrap" />
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding LocalTime}"
+                                                           Classes="caption" Margin="0,2,0,0"
+                                                           HorizontalAlignment="Right" />
+                                                <TextBlock Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
+                                                           Text="{Binding Reminding}" Classes="caption small"
+                                                           Foreground="{StaticResource BrassBrush}"
+                                                           Margin="16,2,0,13" TextWrapping="Wrap" />
+                                            </Grid>
+                                        </Button>
+                                        <!-- Outside the row's button, so a switch is never also a tap on the row. -->
+                                        <ItemsControl ItemsSource="{Binding Choices}" IsVisible="{Binding IsOpen}"
+                                                      Margin="40,0,20,10">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="services:MetaChoice">
+                                                    <Grid ColumnDefinitions="*,Auto" Margin="0,4">
+                                                        <TextBlock Text="{Binding Name}" Classes="caption"
+                                                                   VerticalAlignment="Center" TextWrapping="Wrap" />
+                                                        <Button Grid.Column="1" Content="{Binding Label}"
+                                                                Command="{Binding ToggleCommand}" Classes="quiet"
+                                                                Margin="10,0,0,0" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                    <TextBlock Text="{Binding MetaNote}" IsVisible="{Binding MetaNote, Converter={x:Static ObjectConverters.IsNotNull}}"
+                               Classes="caption small" Margin="20,8,20,0" TextWrapping="Wrap" />
+                </StackPanel>
+            </ScrollViewer>
+        </RefreshContainer>
+
+        <TextBlock Grid.Row="2" Text="{Binding Footnote}" Classes="caption small"
+                   Margin="20,10,20,14" />
+    </Grid>
+</shell:PageView>

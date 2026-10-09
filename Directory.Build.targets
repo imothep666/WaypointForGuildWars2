@@ -1,0 +1,87 @@
+<Project>
+
+    <!--
+        One version for everything built from this repository: the app, the bridge and the Blish HUD
+        module all come out of the same commit, and the three of them talk to each other, so the
+        question that matters is "are these from the same source" rather than "which has moved on".
+
+            1.0.42+ee30fd6        built from commit ee30fd6, the 42nd on this branch
+            1.0.42+ee30fd6.dirty  the same, plus edits that were never committed
+
+        The first two parts are bumped by hand, below, when a release means something. The third
+        counts commits, so it moves by itself and never goes backwards — which is what Android needs
+        from a versionCode, since it refuses to install a smaller one over a larger one. The part
+        after the + is the answer to "is the phone running the latest build": compare it with
+        `git log -1`. `adb shell dumpsys package com.mpsoft.gw2companion` prints it as
+        versionName.
+
+        Worked out in a target, not at evaluation, because only a target can run git. That is late
+        enough for everything that reads the version: GetAssemblyVersion derives the assembly
+        attributes from $(Version), and the Android SDK copies ApplicationVersion and
+        ApplicationDisplayVersion into the manifest in _GetAndroidPackageName. A commit changes the
+        assembly attributes, which rebuilds the assembly, which is what makes an incremental Android
+        build regenerate its manifest instead of shipping the old number.
+
+        Without git — a source zip, a container with no git in it — the build still works and says
+        so: 1.0.0+nogit.
+    -->
+    <PropertyGroup>
+        <CompanionVersionMajorMinor>1.0</CompanionVersionMajorMinor>
+
+        <!-- The SDK would append the full commit hash itself. The short one, and the dirty flag it
+             does not know about, are composed below instead. -->
+        <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    </PropertyGroup>
+
+    <Target Name="CompanionVersion"
+            BeforeTargets="GetAssemblyVersion;_GetAndroidPackageName;PrepareForBuild"
+            Condition="'$(CompanionVersion)' == ''">
+
+        <Exec Command="git rev-list --count HEAD" WorkingDirectory="$(MSBuildThisFileDirectory)"
+              ConsoleToMSBuild="true" IgnoreExitCode="true" EchoOff="true"
+              StandardOutputImportance="low" StandardErrorImportance="low">
+            <Output TaskParameter="ConsoleOutput" PropertyName="_CompanionCommits" />
+            <Output TaskParameter="ExitCode" PropertyName="_CompanionGitExit" />
+        </Exec>
+
+        <Exec Command="git rev-parse --short HEAD" WorkingDirectory="$(MSBuildThisFileDirectory)"
+              Condition="'$(_CompanionGitExit)' == '0'"
+              ConsoleToMSBuild="true" IgnoreExitCode="true" EchoOff="true"
+              StandardOutputImportance="low" StandardErrorImportance="low">
+            <Output TaskParameter="ConsoleOutput" PropertyName="_CompanionCommit" />
+        </Exec>
+
+        <!-- Tracked files only: a stray log or scratch file is not a change to what was built. -->
+        <Exec Command="git status --porcelain --untracked-files=no" WorkingDirectory="$(MSBuildThisFileDirectory)"
+              Condition="'$(_CompanionGitExit)' == '0'"
+              ConsoleToMSBuild="true" IgnoreExitCode="true" EchoOff="true"
+              StandardOutputImportance="low" StandardErrorImportance="low">
+            <Output TaskParameter="ConsoleOutput" PropertyName="_CompanionChanges" />
+        </Exec>
+
+        <PropertyGroup>
+            <_CompanionCommits Condition="'$(_CompanionGitExit)' != '0'">0</_CompanionCommits>
+            <_CompanionBuild Condition="'$(_CompanionGitExit)' != '0'">nogit</_CompanionBuild>
+            <_CompanionBuild Condition="'$(_CompanionGitExit)' == '0'">$(_CompanionCommit)</_CompanionBuild>
+            <_CompanionBuild Condition="'$(_CompanionGitExit)' == '0' and '$(_CompanionChanges)' != ''">$(_CompanionBuild).dirty</_CompanionBuild>
+
+            <CompanionVersion>$(CompanionVersionMajorMinor).$(_CompanionCommits)</CompanionVersion>
+
+            <Version>$(CompanionVersion)</Version>
+            <VersionPrefix>$(CompanionVersion)</VersionPrefix>
+            <VersionSuffix />
+            <AssemblyVersion />
+            <FileVersion />
+            <InformationalVersion>$(CompanionVersion)+$(_CompanionBuild)</InformationalVersion>
+
+            <!-- Android: the commit count is the versionCode, the full string is the versionName.
+                 A versionCode has to be at least 1, which a build without git would not be. -->
+            <ApplicationVersion>$(_CompanionCommits)</ApplicationVersion>
+            <ApplicationVersion Condition="'$(_CompanionCommits)' == '0'">1</ApplicationVersion>
+            <ApplicationDisplayVersion>$(InformationalVersion)</ApplicationDisplayVersion>
+        </PropertyGroup>
+
+        <Message Importance="normal" Text="$(MSBuildProjectName) version $(InformationalVersion)" />
+    </Target>
+
+</Project>

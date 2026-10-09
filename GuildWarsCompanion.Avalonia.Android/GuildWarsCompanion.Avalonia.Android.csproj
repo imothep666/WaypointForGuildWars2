@@ -1,0 +1,74 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!-- The app on Android: the Avalonia front end, plus what only Android can do. -->
+        <TargetFramework>net10.0-android</TargetFramework>
+        <SupportedOSPlatformVersion>24</SupportedOSPlatformVersion>
+        <OutputType>Exe</OutputType>
+        <RootNamespace>GuildWarsCompanion.Ava.Droid</RootNamespace>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <ApplicationId>com.mpsoft.gw2companion</ApplicationId>
+        <ApplicationTitle>Waypoint</ApplicationTitle>
+        <!-- ApplicationVersion and ApplicationDisplayVersion come from git: see
+             Directory.Build.targets. -->
+        <AndroidPackageFormat>apk</AndroidPackageFormat>
+        <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+    </PropertyGroup>
+
+    <!--
+        Signed with the app's own key wherever that key is, so a build from any PC that holds it
+        installs over a build from any other. Android takes an update only from the signature the
+        app was installed with, and the debug key the SDK makes up is different on every machine.
+
+        The key lives outside the repository, in <user profile>\.android\gw2companion: the
+        keystore and a file holding its password. Neither may be committed; see
+        Properties\PublishProfiles\SideloadApk.md for where they come from and how to carry them
+        to another PC.
+    -->
+    <PropertyGroup>
+        <CompanionKeyDir>$([System.Environment]::GetFolderPath(SpecialFolder.UserProfile))\.android\gw2companion</CompanionKeyDir>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="Exists('$(CompanionKeyDir)\release.keystore')">
+        <AndroidKeyStore>true</AndroidKeyStore>
+        <AndroidSigningKeyStore>$(CompanionKeyDir)\release.keystore</AndroidSigningKeyStore>
+        <AndroidSigningKeyAlias>gw2companion</AndroidSigningKeyAlias>
+        <!-- file: makes apksigner read the passwords from the file, so they are never on a
+             command line. It reads one line per password, the store's then the key's, so the
+             file holds the same password twice: a PKCS12 key has no password of its own, but
+             the SDK insists on being given one, and with a single line apksigner fails with
+             "end of file reached". -->
+        <AndroidSigningStorePass>file:$(CompanionKeyDir)\release.password</AndroidSigningStorePass>
+        <AndroidSigningKeyPass>file:$(CompanionKeyDir)\release.password</AndroidSigningKeyPass>
+    </PropertyGroup>
+
+    <!-- A Release build is what goes on the phone. Signed with a debug key it would refuse to
+         update the installed app, and say so only on the phone. -->
+    <Target Name="CompanionRequireKey" BeforeTargets="Build"
+            Condition="'$(Configuration)' == 'Release' and !Exists('$(CompanionKeyDir)\release.keystore')">
+        <Error Text="No signing key at $(CompanionKeyDir)\release.keystore. Copy release.keystore and release.password there from the PC that has them; see Properties\PublishProfiles\SideloadApk.md." />
+    </Target>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GuildWarsCompanion.Avalonia\GuildWarsCompanion.Avalonia.csproj" />
+    </ItemGroup>
+
+    <!--
+        Wifi\, Alerts\ and Widgets\ came over from the MAUI app with their namespaces unchanged,
+        GuildWarsCompanion.Platforms.Android.*. Android knows those classes by Java names derived
+        from the namespace: WorkManager stores the worker's name with each scheduled job, and a
+        widget on the home screen is bound to its receiver's. Renaming the namespace orphans both.
+    -->
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Android" Version="12.1.2" />
+        <!-- The QR scanner's camera; see ScanActivity. -->
+        <PackageReference Include="Xamarin.AndroidX.Camera.Camera2" Version="1.6.2" />
+        <PackageReference Include="Xamarin.AndroidX.Camera.Lifecycle" Version="1.6.2" />
+        <PackageReference Include="Xamarin.AndroidX.Camera.View" Version="1.6.2" />
+        <!-- The reminder poll and the widget redraw. -->
+        <PackageReference Include="Xamarin.AndroidX.Work.Runtime" Version="2.11.2.1" />
+    </ItemGroup>
+
+</Project>

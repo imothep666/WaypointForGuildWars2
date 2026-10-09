@@ -1,0 +1,59 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                xmlns:services="using:GuildWarsCompanion.Services"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
+                x:Class="GuildWarsCompanion.Ava.Views.CharactersView"
+                x:DataType="vm:CharactersViewModel"
+                ShowsWash="True">
+
+    <Grid RowDefinitions="Auto,*">
+        <StackPanel Margin="20,0" Spacing="10">
+            <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption"
+                       Margin="0,12,0,0" />
+            <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error"
+                       Margin="0,12,0,0" />
+        </StackPanel>
+
+        <RefreshContainer Grid.Row="1" RefreshRequested="OnPullRefresh">
+            <ScrollViewer>
+                <StackPanel>
+                    <TextBlock Text="{Binding EmptyMessage}" Classes="caption"
+                               IsVisible="{Binding Characters.Count, Converter={x:Static ui:Counts.IsZero}}"
+                               HorizontalAlignment="Center" Margin="0,32" />
+
+                    <ItemsControl ItemsSource="{Binding Characters}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:CharacterRow">
+                                <Button Classes="row" Click="OnRowClicked">
+                                    <!-- The spine carries the profession, the way the game colours it. -->
+                                    <Grid ColumnDefinitions="4,44,*,Auto" Margin="20,0" MinHeight="70">
+                                        <Border Background="{Binding ProfessionColor, Converter={x:Static ui:Paint.Brush}}" />
+                                        <Image Grid.Column="1" ui:WebImage.Url="{Binding IconUrl}"
+                                               Width="30" Height="30" Margin="14,0,0,0"
+                                               VerticalAlignment="Center" />
+                                        <StackPanel Grid.Column="2" Margin="14,14,10,14" Spacing="3"
+                                                    VerticalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Text="{Binding Name}" FontFamily="{StaticResource BarlowMedium}"
+                                                           FontSize="16" VerticalAlignment="Center" />
+                                                <!-- A brass bead for the character the game says is
+                                                     being played; transparent for everyone else. -->
+                                                <Ellipse Width="7" Height="7" VerticalAlignment="Center"
+                                                         Fill="{Binding LiveColor, Converter={x:Static ui:Paint.Brush}}" />
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding Subtitle}" Classes="caption" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="3" Text="{Binding Playtime}" Classes="figure"
+                                                   VerticalAlignment="Center" />
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </RefreshContainer>
+    </Grid>
+</shell:PageView>

@@ -1,0 +1,90 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                xmlns:services="using:GuildWarsCompanion.Services"
+                xmlns:controls="using:GuildWarsCompanion.Ava.Controls"
+                x:Class="GuildWarsCompanion.Ava.Views.MapView"
+                x:DataType="vm:MapViewModel"
+                ShowsBand="True">
+
+    <Grid RowDefinitions="*,Auto">
+
+        <!-- The canvas fills the screen. Everything on it is drawn rather than composed: a map is
+             forty images and a few dozen markers, and a tree of views for that is how a pannable
+             screen becomes a warm phone. See MapCanvas. The gestures are pointer events, read in
+             the code-behind. -->
+        <controls:DrawableView x:Name="Surface" ClipToBounds="True" />
+
+        <!--
+            The controls on their own plate, not floating over the map: brass text on Queensdale's
+            grass is legible, on its cliffs is not, and it changes as the map is panned underneath.
+            Obsidian and a brass rule, the same two things every other panel is separated by.
+        -->
+        <Border Grid.Row="1" Background="{StaticResource ObsidianBrush}"
+                BorderBrush="{DynamicResource AreaTintBrush}" BorderThickness="0,1,0,0" Padding="16,12">
+            <StackPanel Spacing="8">
+                <TextBlock Text="{Binding MapLine}" Classes="caption" />
+
+                <TextBlock Text="{Binding ObjectiveLine}" Classes="inscription" FontSize="15"
+                           TextWrapping="Wrap" />
+
+                <TextBlock Text="{Binding ObjectiveDetail}" IsVisible="{Binding HasObjectiveDetail}"
+                           Classes="caption" />
+
+                <TextBlock Text="{Binding RouteLine}" IsVisible="{Binding HasRoute}"
+                           Foreground="{StaticResource BrassBrush}" FontSize="12" TextWrapping="Wrap" />
+
+                <!-- One flow rather than hand-cut rows: these buttons come and go with the state,
+                     and a wrap keeps them in a stable order and breaks the line where it must.
+                     Ordered by how often each is wanted. -->
+                <WrapPanel>
+                    <Button Content="RECENTRE" Command="{Binding RecentreCommand}" Classes="quiet"
+                            FontSize="11" Padding="16,10" Margin="0,0,10,8" />
+                    <Button Content="CHOOSE MAP" Command="{Binding ChooseMapCommand}" Classes="quiet"
+                            FontSize="11" Padding="16,10" Margin="0,0,10,8" />
+                    <Button Content="ROUTES" Command="{Binding ChooseRoutesCommand}"
+                            IsVisible="{Binding HasRoutes}" Classes="quiet" FontSize="11"
+                            Padding="16,10" Margin="0,0,10,8" />
+                    <Button Content="FOLLOW CHARACTER" Command="{Binding FollowCommand}"
+                            IsVisible="{Binding IsPinned}" Classes="quiet" FontSize="11"
+                            Padding="16,10" Margin="0,0,10,8" />
+                    <Button Content="CLEAR OBJECTIVE" Command="{Binding ClearObjectiveCommand}"
+                            IsVisible="{Binding HasObjective}" Classes="quiet" FontSize="11"
+                            Padding="16,10" Margin="0,0,10,8" />
+                </WrapPanel>
+
+                <!-- The routes a downloaded pack carries for this map. Bounded: a pack files thirty
+                     categories on one map, and an unbounded list grew this panel until it covered
+                     the map completely. About five rows. -->
+                <ScrollViewer IsVisible="{Binding ChoosingRoutes}" MaxHeight="240">
+                    <ItemsControl ItemsSource="{Binding RouteChoices}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:RouteChoice">
+                                <Button Classes="row" Click="OnRouteClicked" Margin="0,0,0,6">
+                                    <Grid ColumnDefinitions="4,*,Auto" MinHeight="44">
+                                        <!-- A brass spine for on, a dim one for off. -->
+                                        <Border Background="{StaticResource BrassBrush}"
+                                                IsVisible="{Binding Shown}" />
+                                        <Border Background="{StaticResource BrassDimBrush}"
+                                                IsVisible="{Binding Hidden}" />
+                                        <!-- Two lines, because these names come from a stranger's
+                                             file and run long. -->
+                                        <TextBlock Grid.Column="1" Text="{Binding Name}"
+                                                   VerticalAlignment="Center" TextWrapping="Wrap"
+                                                   MaxLines="2" FontSize="13" Margin="10,4" />
+                                        <TextBlock Grid.Column="2" Text="{Binding Lines}"
+                                                   Classes="caption" VerticalAlignment="Center" />
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <TextBlock Text="{Binding EmptyMessage}" Classes="caption" IsVisible="{Binding HasNotice}" />
+                <TextBlock Text="{Binding ErrorMessage}" Classes="caption" IsVisible="{Binding HasError}" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</shell:PageView>

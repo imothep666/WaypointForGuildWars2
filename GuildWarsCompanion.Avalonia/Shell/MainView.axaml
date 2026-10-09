@@ -1,0 +1,261 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+             x:Class="GuildWarsCompanion.Ava.Shell.MainView"
+             x:DataType="shell:MainView"
+             Background="{StaticResource ObsidianBrush}">
+
+    <!--
+        The shell: a bar with the page's inscription and, on a page opened from another, a back
+        arrow; the page; and under the thumb, a bar of the four areas played with most and More,
+        which raises a sheet of the rest. A window wide enough for it trades the bar for a rail of
+        every area down the left, the menu the app used to keep in a drawer.
+    -->
+    <UserControl.Styles>
+        <!-- A bar entry: the line drawing, a stroke of the area's tint under it when it is the
+             one on screen, and its name. -->
+        <Style Selector="Button.baritem">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="CornerRadius" Value="0" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Button.baritem:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource SlateDeepBrush}" />
+        </Style>
+        <Style Selector="Button.baritem:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource SlateBrush}" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid>
+        <SplitView x:Name="Split" DisplayMode="Inline" OpenPaneLength="248" IsPaneOpen="False"
+                   PaneBackground="{StaticResource SlateDeepBrush}">
+            <!-- The rail, for a wide window: every area, as the drawer used to list them. -->
+            <SplitView.Pane>
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Background="{StaticResource ObsidianBrush}" Spacing="6">
+                        <TextBlock Text="FOR GUILD WARS 2" Classes="heading small" Margin="20,24,20,0" />
+                        <TextBlock Text="WAYPOINT" Classes="inscription" FontSize="20" Margin="20,0" />
+                        <Border Classes="rule" Margin="20,10,20,12" />
+                    </StackPanel>
+
+                    <ScrollViewer>
+                        <ItemsControl x:Name="RailList">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="shell:AreaItem">
+                                    <Button Classes="row" Height="48" Padding="20,0" Click="OnAreaClicked">
+                                        <Grid ColumnDefinitions="3,Auto,*">
+                                            <Border Background="{Binding Tint}" IsVisible="{Binding IsSelected}" />
+                                            <Path Grid.Column="1" Data="{Binding Geometry}" Stroke="{Binding GlyphBrush}"
+                                                  StrokeThickness="1.6" StrokeLineCap="Round" StrokeJoin="Round"
+                                                  Width="24" Height="24" Stretch="None" Margin="14,0,0,0"
+                                                  VerticalAlignment="Center" />
+                                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" Margin="14,0,0,0">
+                                                <TextBlock Text="{Binding Title}" Foreground="{Binding LabelBrush}"
+                                                           VerticalAlignment="Center" />
+                                                <Ellipse Width="7" Height="7" Fill="{StaticResource BrassBrush}"
+                                                         VerticalAlignment="Center" IsVisible="{Binding HasDot}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DockPanel>
+            </SplitView.Pane>
+
+            <Grid RowDefinitions="56,Auto,*,Auto">
+                <!-- The area's painted wash, for a page that leads with a masthead: behind the bar
+                     and the top of the page, fading out into the obsidian below. -->
+                <!-- A page's landscape, under the wash: muted, so the headline still reads over
+                     a bright sky, and fading out with the wash. -->
+                <Image x:Name="SceneImage" Grid.RowSpan="3" Height="260" VerticalAlignment="Top"
+                       Stretch="UniformToFill" Opacity="0.4" IsHitTestVisible="False">
+                    <Image.OpacityMask>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                            <GradientStop Offset="0" Color="White" />
+                            <GradientStop Offset="0.55" Color="White" />
+                            <GradientStop Offset="1" Color="Transparent" />
+                        </LinearGradientBrush>
+                    </Image.OpacityMask>
+                </Image>
+
+                <Image x:Name="WashImage" Grid.RowSpan="3" Height="260" VerticalAlignment="Top"
+                       Stretch="Fill" IsVisible="False" IsHitTestVisible="False" />
+
+                <!-- The same wash as a band behind the bar alone: cropped, not squeezed, and over
+                     a rule of the area's tint where the page begins. -->
+                <Image x:Name="BandImage" Grid.RowSpan="2" Height="57" VerticalAlignment="Top"
+                       Stretch="UniformToFill" IsVisible="False" IsHitTestVisible="False" />
+
+                <!-- The same wash in a colour the page chooses: a block of it seen through the
+                     white wash_mask. -->
+                <Border x:Name="TintedWash" Grid.RowSpan="3" Height="260" VerticalAlignment="Top"
+                        IsVisible="False" IsHitTestVisible="False">
+                    <Border.OpacityMask>
+                        <ImageBrush Source="/Assets/Images/wash_mask.png" Stretch="Fill" />
+                    </Border.OpacityMask>
+                </Border>
+
+                <!-- A page's own painting over the wash, standing to the right and fading out on
+                     every side, so neither the page's first lines nor the edge of a painting whose
+                     paper was not quite white make a hard line. -->
+                <Image x:Name="ArtImage" Grid.RowSpan="3" Height="236" Margin="0,4,-24,0"
+                       VerticalAlignment="Top" HorizontalAlignment="Right" Stretch="Uniform"
+                       Opacity="0.8" IsHitTestVisible="False">
+                    <Image.OpacityMask>
+                        <RadialGradientBrush Center="58%,40%" GradientOrigin="58%,40%" RadiusX="62%" RadiusY="66%">
+                            <GradientStop Offset="0" Color="White" />
+                            <GradientStop Offset="0.55" Color="White" />
+                            <GradientStop Offset="1" Color="Transparent" />
+                        </RadialGradientBrush>
+                    </Image.OpacityMask>
+                </Image>
+
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <!-- Only on a page opened from another; an area's own page has nowhere to go back to. -->
+                    <Button x:Name="BackButton" Classes="row" Width="56" Height="56" IsVisible="False"
+                            HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                            Click="OnBackClicked">
+                        <Path Data="M20,7 H2 M8,1 L2,7 L8,13" Stroke="{StaticResource VellumBrush}" StrokeThickness="2" />
+                    </Button>
+
+                    <TextBlock x:Name="TitleText" Grid.Column="1" Classes="inscription"
+                               VerticalAlignment="Center" Margin="20,0,0,0"
+                               TextTrimming="CharacterEllipsis" />
+
+                    <Button x:Name="RefreshButton" Grid.Column="2" Classes="row" Width="56"
+                            Height="56" HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center" Click="OnRefreshClicked"
+                            ToolTip.Tip="Refresh">
+                        <Path Data="M16,4 A7,7 0 1 0 17,11 M16,0 V4 H12"
+                              Stroke="{StaticResource MistBrush}" StrokeThickness="1.6" />
+                    </Button>
+                </Grid>
+
+                <Border x:Name="BarRule" Grid.Row="1" Classes="rule" />
+                <Border x:Name="BandRule" Grid.Row="1" Height="1" IsVisible="False"
+                        Background="{DynamicResource AreaTintBrush}" />
+
+                <!-- While the page is fetching: a stroke of brass gliding under the bar, on every
+                     screen, so an empty page that is loading never looks like one that has
+                     nothing. Its own rather than an indeterminate ProgressBar, whose sweep is
+                     measured while it is hidden and so never showed once it was not. -->
+                <Border x:Name="BusyTrack" Grid.Row="1" Height="2" VerticalAlignment="Top"
+                        ClipToBounds="True" IsVisible="False" IsHitTestVisible="False">
+                    <Border x:Name="BusySweep" HorizontalAlignment="Left">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                                <GradientStop Offset="0" Color="#00C8A34E" />
+                                <GradientStop Offset="0.5" Color="#FFE2C27A" />
+                                <GradientStop Offset="1" Color="#00C8A34E" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.RenderTransform>
+                            <TranslateTransform />
+                        </Border.RenderTransform>
+                    </Border>
+                </Border>
+
+                <ContentControl x:Name="PageHost" Grid.Row="2" />
+
+                <!-- More: the rest of the areas, in a sheet over the page. The bar stays below it,
+                     so More can be tapped again to put it away. -->
+                <Grid x:Name="MoreLayer" Grid.Row="0" Grid.RowSpan="3" IsVisible="False">
+                    <Border Background="#A0050709" PointerPressed="OnMoreBackdropPressed" />
+                    <Border VerticalAlignment="Bottom" Background="{StaticResource SlateBrush}"
+                            BorderBrush="{StaticResource BrassDimBrush}" BorderThickness="0,1,0,0"
+                            CornerRadius="14,14,0,0" Padding="12,10,12,6">
+                        <StackPanel>
+                            <Border Width="38" Height="4" CornerRadius="2" Background="{StaticResource BankedBrush}"
+                                    Margin="0,0,0,10" />
+                            <ItemsControl x:Name="MoreList">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="2" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="shell:AreaItem">
+                                        <Button Classes="row" Height="56" Click="OnAreaClicked">
+                                            <Grid ColumnDefinitions="Auto,*" Margin="10,0">
+                                                <Path Data="{Binding Geometry}" Stroke="{StaticResource BrassBrush}"
+                                                      StrokeThickness="1.5" StrokeLineCap="Round" StrokeJoin="Round"
+                                                      Width="24" Height="24" Stretch="None" VerticalAlignment="Center" />
+                                                <StackPanel Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock Text="{Binding News}" IsVisible="{Binding HasNews}"
+                                                               Classes="caption small" TextWrapping="NoWrap"
+                                                               TextTrimming="CharacterEllipsis" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- The bar. -->
+                <Border x:Name="BottomBar" Grid.Row="3" Height="64" BorderBrush="{StaticResource BrassDimBrush}"
+                        BorderThickness="0,1,0,0" Background="#0C1016">
+                    <ItemsControl x:Name="BarList">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Rows="1" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="shell:AreaItem">
+                                <Button Classes="baritem" Click="OnBarClicked">
+                                    <StackPanel Spacing="4">
+                                        <Panel Width="34" Height="30">
+                                            <Path Data="{Binding Geometry}" Stroke="{Binding GlyphBrush}"
+                                                  StrokeThickness="1.6" StrokeLineCap="Round" StrokeJoin="Round"
+                                                  Width="24" Height="24" Stretch="None"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Top" />
+                                            <!-- A brass dot: something here is waiting for the player. -->
+                                            <Ellipse Width="8" Height="8" Fill="{StaticResource BrassBrush}"
+                                                     Stroke="#0C1016" StrokeThickness="2"
+                                                     HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                     Margin="0,-2,0,0" IsVisible="{Binding HasDot}" />
+                                            <!-- A dry-brush stroke of the area's tint under the live one. -->
+                                            <Border Height="7" Background="{Binding Tint}" IsVisible="{Binding IsSelected}"
+                                                    OpacityMask="{StaticResource BrushStrokeMask}"
+                                                    VerticalAlignment="Bottom" />
+                                        </Panel>
+                                        <TextBlock Text="{Binding Label}" Foreground="{Binding LabelBrush}" FontSize="11.5"
+                                                   HorizontalAlignment="Center" />
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+            </Grid>
+        </SplitView>
+
+        <!-- The one modal: a title, the text, and a single button that only dismisses. -->
+        <Grid x:Name="AlertLayer" IsVisible="False" Background="#B0000000"
+              PointerPressed="OnAlertBackdropPressed">
+            <Border Background="{StaticResource SlateBrush}" BorderBrush="{StaticResource BrassDimBrush}"
+                    BorderThickness="1" CornerRadius="2" Margin="28" Padding="22,20,22,12"
+                    MaxWidth="460" VerticalAlignment="Center">
+                <StackPanel Spacing="12">
+                    <TextBlock x:Name="AlertTitle" Classes="heading" TextWrapping="Wrap" />
+                    <ScrollViewer MaxHeight="420">
+                        <TextBlock x:Name="AlertMessage" TextWrapping="Wrap" />
+                    </ScrollViewer>
+                    <Button x:Name="AlertClose" Classes="quiet" HorizontalAlignment="Right"
+                            Click="OnAlertClosed" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

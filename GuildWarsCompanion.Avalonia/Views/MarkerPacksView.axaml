@@ -1,0 +1,80 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
+                x:Class="GuildWarsCompanion.Ava.Views.MarkerPacksView"
+                x:DataType="vm:MarkerPacksViewModel">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- The search stays put while the list scrolls under it, as on Emotes. -->
+        <StackPanel Margin="20,12,20,12" Spacing="10">
+            <TextBox Text="{Binding Search}" PlaceholderText="chests, jumping, Tekkit…" />
+
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Text="{Binding Summary}" Classes="caption" VerticalAlignment="Center" />
+                <Button Grid.Column="1" Content="STOP" Command="{Binding StopCommand}" Classes="quiet"
+                        FontSize="10" Padding="12,6" IsVisible="{Binding IsAdding}" />
+            </Grid>
+        </StackPanel>
+
+        <RefreshContainer Grid.Row="1" RefreshRequested="OnPullRefresh">
+            <ScrollViewer>
+                <StackPanel Margin="20,0,20,32" Spacing="12">
+
+                    <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+
+                    <TextBlock Text="{Binding EmptyMessage}" Classes="caption"
+                               IsVisible="{Binding Packs.Count, Converter={x:Static ui:Counts.IsZero}}" />
+
+                    <ItemsControl ItemsSource="{Binding Packs}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:PackRow">
+                                <StackPanel Spacing="4" Margin="0,6,0,10">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Text="{Binding Name}" Classes="figure" TextWrapping="Wrap"
+                                                   VerticalAlignment="Center" />
+
+                                        <!-- ADD where it can be added, the word where it is here
+                                             already: removing belongs to Settings, with UPDATE. -->
+                                        <Button Grid.Column="1" Content="ADD" Classes="quiet" FontSize="10"
+                                                Padding="14,6" Margin="10,0,0,0" Click="OnAddPack"
+                                                IsVisible="{Binding CanAdd}" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Mark}" Classes="caption small"
+                                                   Foreground="{StaticResource BrassBrush}"
+                                                   Margin="10,0,0,0" IsVisible="{Binding IsAdded}"
+                                                   VerticalAlignment="Center" />
+                                    </Grid>
+
+                                    <TextBlock Text="{Binding Byline}" Classes="caption" />
+                                    <TextBlock Text="{Binding Categories}" IsVisible="{Binding HasCategories}"
+                                               Classes="caption small"
+                                               Foreground="{StaticResource BrassDimBrush}" />
+                                    <TextBlock Text="{Binding Description}" IsVisible="{Binding HasDescription}"
+                                               Classes="caption" MaxLines="3" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding Status}" IsVisible="{Binding HasStatus}"
+                                               Classes="caption" Foreground="{StaticResource VellumBrush}" />
+
+                                    <Border Classes="hairline" Margin="0,8,0,0" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Where the list comes from. Blish HUD's by default; any list in its format
+                         or TacO's will do, for the day the default moves. -->
+                    <TextBlock Text="LIST" Classes="heading small" Margin="0,8,0,0" />
+                    <TextBox Text="{Binding Address}" />
+                    <WrapPanel>
+                        <Button Content="USE THIS LIST" Command="{Binding UseAddressCommand}" Classes="quiet"
+                                Margin="0,0,10,0" />
+                        <Button Content="BLISH HUD'S LIST" Command="{Binding UseDefaultCommand}" Classes="quiet" />
+                    </WrapPanel>
+                    <TextBlock Classes="caption"
+                               Text="The list only names each pack's own download address. Adding one fetches it from its author, as a pasted address does, and nothing is copied into the app." />
+                </StackPanel>
+            </ScrollViewer>
+        </RefreshContainer>
+    </Grid>
+</shell:PageView>

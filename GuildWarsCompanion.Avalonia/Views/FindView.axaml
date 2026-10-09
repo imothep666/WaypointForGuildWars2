@@ -1,0 +1,114 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:controls="using:GuildWarsCompanion.Ava.Controls"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                xmlns:services="using:GuildWarsCompanion.Services"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
+                x:Class="GuildWarsCompanion.Ava.Views.FindView"
+                x:DataType="vm:FindViewModel"
+                ShowsWash="True">
+
+    <Grid RowDefinitions="Auto,*">
+        <controls:AreaTabStrip Area="account" Current="find" />
+
+        <RefreshContainer Grid.Row="1" RefreshRequested="OnPullRefresh">
+            <ScrollViewer>
+                <StackPanel Margin="20,16,20,32" Spacing="12">
+                    <!-- The screen's one statement: where a thing is. -->
+                    <TextBlock Text="WHERE IS MY…" Classes="heading" />
+                    <TextBox Text="{Binding Search}" PlaceholderText="Item name" KeyDown="OnSearchKeyDown" />
+                    <TextBlock Text="{Binding SearchNote}" Classes="caption small" />
+                    <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+
+                    <!-- Results: the count and the answer, on one line each. -->
+                    <ItemsControl ItemsSource="{Binding Results}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:FoundItem">
+                                <Button Classes="row" Click="OnItemClicked" Margin="0,0,0,8">
+                                    <Grid ColumnDefinitions="4,40,*,Auto" RowDefinitions="Auto,*" MinHeight="62">
+                                        <Border Grid.RowSpan="2"
+                                                Background="{Binding RarityColor, Converter={x:Static ui:Paint.Brush}}" />
+                                        <Image Grid.RowSpan="2" Grid.Column="1" ui:WebImage.Url="{Binding IconUrl}"
+                                               Width="28" Height="28" VerticalAlignment="Center" Margin="12,0,0,0" />
+                                        <TextBlock Grid.Column="2" Text="{Binding Name}" Margin="14,12,8,0"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <StackPanel Grid.Column="3" Grid.RowSpan="2" Spacing="1"
+                                                    VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding CountText}" Classes="figure"
+                                                       HorizontalAlignment="Right" />
+                                            <TextBlock Text="{Binding ValueText}" Classes="caption small"
+                                                       HorizontalAlignment="Right" />
+                                        </StackPanel>
+                                        <!-- "250 in material storage, 12 on Imothep and 3 in the bank" -->
+                                        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding LocationText}"
+                                                   Classes="caption" Margin="14,2,8,12" />
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Matches from the catalogue that are not in your storage. -->
+                    <StackPanel Spacing="8" IsVisible="{Binding HasElsewhere}" Margin="0,4,0,0">
+                        <TextBlock Text="NOT IN YOUR STORAGE" Classes="heading small" />
+                        <ItemsControl ItemsSource="{Binding Elsewhere}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="services:FoundItem">
+                                    <Button Classes="row" Click="OnItemClicked" Margin="0,0,0,6">
+                                        <Grid ColumnDefinitions="4,34,*" MinHeight="44">
+                                            <Border Background="{Binding RarityColor, Converter={x:Static ui:Paint.Brush}}" />
+                                            <Image Grid.Column="1" ui:WebImage.Url="{Binding IconUrl}" Width="24"
+                                                   Height="24" VerticalAlignment="Center" Margin="10,0,0,0" />
+                                            <StackPanel Grid.Column="2" Spacing="1" VerticalAlignment="Center"
+                                                        Margin="12,0,0,0">
+                                                <TextBlock Text="{Binding Name}" FontSize="14"
+                                                           TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Text="{Binding LocationText}" Classes="caption small" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+
+                    <Border Classes="rule" Margin="0,6,0,0" />
+
+                    <!-- What you own, place by place. Reading every place is what makes the
+                         search above possible, so the breakdown comes free. -->
+                    <TextBlock Text="WHAT YOU OWN" Classes="heading small" Margin="0,4,0,0" />
+                    <TextBlock Text="{Binding EmptyMessage}" IsVisible="{Binding NotLoaded}" Classes="caption" />
+
+                    <!-- Shown whenever storage has been read. The total inside can be absent
+                         on its own: counts survive offline, prices do not. -->
+                    <Border Classes="card" IsVisible="{Binding IsLoaded}">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Everything tradable, sold now" Classes="caption"
+                                       IsVisible="{Binding HasTotal}" />
+                            <TextBlock Text="{Binding TotalText}" IsVisible="{Binding HasTotal}" Classes="figure"
+                                       FontSize="24" Foreground="{StaticResource MetalGoldBrush}" />
+                            <Border Classes="rule" />
+                            <ItemsControl ItemsSource="{Binding Places}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="services:PlaceTotal">
+                                        <Grid ColumnDefinitions="*,10,Auto,10,104" MinHeight="26" Margin="0,0,0,6">
+                                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis" FontSize="13" />
+                                            <TextBlock Grid.Column="2" Text="{Binding ItemsText}" Classes="caption small"
+                                                       VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="4" Text="{Binding ValueText}" Classes="figure"
+                                                       FontSize="13" VerticalAlignment="Center"
+                                                       HorizontalAlignment="Right" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock Text="{Binding StorageNote}" Classes="caption small" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </RefreshContainer>
+    </Grid>
+</shell:PageView>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+    <!-- The obsidian ground from the first frame, so the app does not flash white before
+         Avalonia draws. AppCompat because Avalonia's activity is an AppCompatActivity and
+         refuses to start under anything else. -->
+    <style name="CompanionTheme" parent="@style/Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@color/obsidian</item>
+        <item name="android:statusBarColor">@color/obsidian</item>
+        <item name="android:navigationBarColor">@color/obsidian</item>
+    </style>
+
+    <color name="obsidian">#0F141B</color>
+</resources>

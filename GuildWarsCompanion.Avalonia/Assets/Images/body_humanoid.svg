@@ -1,0 +1,38 @@
+<svg width="200" height="320" viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg">
+  <!-- the sheet beneath, showing past the cut -->
+  <g transform="translate(6,7)" fill="#080C11">
+    <circle cx="100" cy="36" r="24"/>
+    <path d="M88 52 h24 v26 h-24 z"/>
+    <path d="M62 92 L84 70 L116 70 L138 92 L132 132 L128 176 L72 176 L68 132 Z"/>
+    <path d="M62 92 L48 104 L44 174 L60 178 L68 122 Z"/>
+    <path d="M138 92 L152 104 L156 174 L140 178 L132 122 Z"/>
+    <path d="M74 170 L70 288 L94 288 L98 174 Z"/>
+    <path d="M126 170 L130 288 L106 288 L102 174 Z"/>
+    <path d="M66 288 h30 v14 h-36 z"/>
+    <path d="M134 288 h-30 v14 h36 z"/>
+  </g>
+  <!-- the lit edge of the cut -->
+  <g transform="translate(-2,-3)" fill="#41505F">
+    <circle cx="100" cy="36" r="24"/>
+    <path d="M88 52 h24 v26 h-24 z"/>
+    <path d="M62 92 L84 70 L116 70 L138 92 L132 132 L128 176 L72 176 L68 132 Z"/>
+    <path d="M62 92 L48 104 L44 174 L60 178 L68 122 Z"/>
+    <path d="M138 92 L152 104 L156 174 L140 178 L132 122 Z"/>
+    <path d="M74 170 L70 288 L94 288 L98 174 Z"/>
+    <path d="M126 170 L130 288 L106 288 L102 174 Z"/>
+    <path d="M66 288 h30 v14 h-36 z"/>
+    <path d="M134 288 h-30 v14 h36 z"/>
+  </g>
+  <!-- the paper itself -->
+  <g fill="#2E3B49">
+    <circle cx="100" cy="36" r="24"/>
+    <path d="M88 52 h24 v26 h-24 z"/>
+    <path d="M62 92 L84 70 L116 70 L138 92 L132 132 L128 176 L72 176 L68 132 Z"/>
+    <path d="M62 92 L48 104 L44 174 L60 178 L68 122 Z"/>
+    <path d="M138 92 L152 104 L156 174 L140 178 L132 122 Z"/>
+    <path d="M74 170 L70 288 L94 288 L98 174 Z"/>
+    <path d="M126 170 L130 288 L106 288 L102 174 Z"/>
+    <path d="M66 288 h30 v14 h-36 z"/>
+    <path d="M134 288 h-30 v14 h36 z"/>
+  </g>
+</svg>

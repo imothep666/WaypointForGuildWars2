@@ -1,0 +1,315 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                xmlns:services="using:GuildWarsCompanion.Services"
+                xmlns:controls="using:GuildWarsCompanion.Ava.Controls"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
+                x:Class="GuildWarsCompanion.Ava.Views.SettingsView"
+                x:DataType="vm:SettingsViewModel">
+
+    <ScrollViewer>
+        <StackPanel Margin="20,18,20,32" Spacing="14">
+
+            <!-- The page was one long scroll of four unrelated things: a key, a background poll,
+                 an 11 MB download and an account summary. The same tab strip the character page
+                 carries, for the same reason. -->
+            <controls:PageTabStrip Tabs="{Binding Tabs}" Selected="OnTabSelected" />
+
+            <!-- ── Key ─────────────────────────────────────────────────────────────── -->
+            <StackPanel IsVisible="{Binding IsKey}" Spacing="14">
+                <TextBlock Text="API KEY" Classes="heading" Margin="0,6,0,0" />
+                <TextBlock Classes="caption"
+                           Text="Create a key at account.arena.net under Applications. Tick every permission listed under PERMISSIONS below to use every screen - a key's permissions cannot be changed once it is made, so a missing one means a new key. Paste it below, or scan a QR code holding it. The key is kept on this device only." />
+
+                <TextBox Text="{Binding ApiKey}" PlaceholderText="Paste your API key" PasswordChar="•" />
+
+                <WrapPanel>
+                    <Button Content="CONNECT" Command="{Binding SignInCommand}" Margin="0,0,10,10" />
+                    <!-- Says what this device can do: the camera on a phone, a picture on a desktop. -->
+                    <Button x:Name="ScanButton" Classes="quiet" Command="{Binding ScanCommand}"
+                            Margin="0,0,10,10" />
+                    <Button Content="REMOVE KEY" Classes="quiet" Command="{Binding SignOutCommand}"
+                            IsVisible="{Binding IsSignedIn}" Margin="0,0,10,10" />
+                </WrapPanel>
+
+                <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}" />
+
+                <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
+                <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+
+                <StackPanel Spacing="10" IsVisible="{Binding HasSessionDetails}" Margin="0,10,0,0">
+                    <Border Classes="rule" />
+                    <TextBlock Text="CONNECTED" Classes="heading" Margin="0,6,0,0" />
+                    <TextBlock Text="{Binding AccountLine}" Classes="figure" />
+                    <TextBlock Text="{Binding KeyLine}" Classes="caption" />
+                    <TextBlock Text="{Binding PermissionsLine}" Classes="caption" />
+
+                    <!-- The two lists side by side. A missing permission does not always announce
+                         itself - characters/heropoints answers 200 with an empty array, which reads
+                         as an account that has finished nothing - so the comparison is the only way
+                         to catch one. The names are the API's own spelling on purpose: they have to
+                         match the tick boxes on account.arena.net by eye. -->
+                    <TextBlock Text="PERMISSIONS" Classes="heading" Margin="0,10,0,0" />
+                    <TextBlock Text="{Binding ScopeSummary}" Classes="caption" />
+
+                    <ItemsControl ItemsSource="{Binding Scopes}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ScopeRow">
+                                <Grid Margin="0,8" ColumnDefinitions="*,Auto" Opacity="{Binding Fade}">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Text="{Binding Permission}" Classes="inscription"
+                                                   FontSize="14" />
+                                        <TextBlock Text="{Binding Powers}" Classes="caption" />
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="1" Text="GRANTED" FontSize="10"
+                                               Foreground="{StaticResource BrassDimBrush}"
+                                               VerticalAlignment="Center" IsVisible="{Binding IsGranted}" />
+                                    <TextBlock Grid.Column="1" Text="MISSING" FontSize="10"
+                                               Foreground="{StaticResource EmberBrush}"
+                                               VerticalAlignment="Center" IsVisible="{Binding IsMissing}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Text="{Binding SpareScopesLine}" Classes="caption"
+                               IsVisible="{Binding HasSpareScopes}" />
+                </StackPanel>
+            </StackPanel>
+
+            <!-- ── Reminders ───────────────────────────────────────────────────────── -->
+            <StackPanel IsVisible="{Binding IsReminders}" Spacing="14">
+                <TextBlock Text="REMINDERS" Classes="heading" Margin="0,6,0,0" />
+                <TextBlock Classes="caption"
+                           Text="Guild Wars 2 has no push service, so the app checks your account every 30 minutes in the background and tells you when a Wizard's Vault reward is waiting, a trade has closed, a watched price has arrived, a world boss you still need today is about to appear, the daily reset is an hour away with Wizard's Vault dailies or time-gated crafts still open, or a map meta you chose on the timetable is about to start." />
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="Notify me about waiting rewards" VerticalAlignment="Center" />
+                    <ToggleSwitch Grid.Column="1" IsChecked="{Binding RemindersEnabled}"
+                                  OnContent="" OffContent="" />
+                </Grid>
+
+                <!-- Stated as when you can play, not as two blocks of quiet: someone at work all
+                     day and asleep at night has one window in between, and that takes one setting
+                     rather than two that have to meet exactly in the middle. -->
+                <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
+                    <TextBlock Text="Only at certain hours" VerticalAlignment="Center" />
+                    <ToggleSwitch Grid.Column="1" IsChecked="{Binding WindowEnabled}"
+                                  OnContent="" OffContent="" />
+                </Grid>
+
+                <!-- Fluent's own minimum (242) puts two pickers past a phone's width, but its hour
+                     and minute columns have no padding of their own: at no minimum at all the box
+                     closes onto the digits. 112 holds "22 30" with room either side. -->
+                <Grid ColumnDefinitions="Auto,*,Auto,*" IsVisible="{Binding WindowEnabled}">
+                    <TextBlock Text="From" Classes="caption" VerticalAlignment="Center" Margin="0,0,10,0" />
+                    <TimePicker Grid.Column="1" SelectedTime="{Binding WindowFrom}"
+                                ClockIdentifier="24HourClock" MinWidth="112" />
+                    <TextBlock Grid.Column="2" Text="to" Classes="caption" VerticalAlignment="Center"
+                               Margin="10,0" />
+                    <TimePicker Grid.Column="3" SelectedTime="{Binding WindowTo}"
+                                ClockIdentifier="24HourClock" MinWidth="112" />
+                </Grid>
+
+                <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding WindowEnabled}">
+                    <TextBlock Text="All day at weekends" VerticalAlignment="Center" />
+                    <ToggleSwitch Grid.Column="1" IsChecked="{Binding WindowWeekends}"
+                                  OnContent="" OffContent="" />
+                </Grid>
+
+                <!-- Read back in a sentence: four controls do not say what they add up to. -->
+                <TextBlock Text="{Binding WindowLine}" Classes="caption" />
+                <TextBlock Classes="caption small"
+                           Text="Outside those hours the app still checks, so nothing piles up — it just stays off the notification shade. Nothing is held back for later: a world boss reminder that arrives after the boss has gone is worse than silence. While a paired PC says you are in the game, trading post and Wizard's Vault news stays off the phone too: the game already tells you." />
+
+                <Button Content="CHECK NOW" Command="{Binding CheckNowCommand}" Classes="quiet"
+                        HorizontalAlignment="Left" />
+
+                <!-- What CHECK NOW found. It used to answer only on the Key tab, out of sight. -->
+                <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsBusy}" />
+                <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
+                <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+            </StackPanel>
+
+            <!-- ── Data ────────────────────────────────────────────────────────────── -->
+            <StackPanel IsVisible="{Binding IsData}" Spacing="14">
+                <TextBlock Text="DIAGNOSTIC LOG" Classes="heading" Margin="0,6,0,0" />
+                <TextBlock Classes="caption"
+                           Text="What the app did with the bridge and the game: which PC it found, where, how long it took, and what came back. Useful after a session rather than during one, because the interesting failures happen while nobody is looking at either screen. It records lengths and outcomes, never what was pasted or your API key." />
+                <TextBlock Text="{Binding LogLine}" Classes="caption" IsVisible="{Binding HasLogLine}" />
+                <Button Content="SHARE LOG" Command="{Binding ShareLogCommand}" Classes="quiet"
+                        HorizontalAlignment="Left" />
+
+                <Border Classes="rule" Margin="0,6" />
+
+                <TextBlock Text="ITEM CATALOGUE" Classes="heading" Margin="0,6,0,0" />
+                <TextBlock Classes="caption"
+                           Text="The API has no item search, and it will not say which recipes you know — it reports only the ones learned from an item. So the app keeps its own copy of both. Without it a price watch cannot be set on something you do not own, and the crafting guide has nothing to work from. About 74,000 items and 13,000 recipes, roughly 11 MB." />
+
+                <TextBlock Text="{Binding CatalogueLine}" Classes="figure" FontSize="14" />
+
+                <ProgressBar Minimum="0" Maximum="1" Value="{Binding CatalogueProgress}"
+                             IsVisible="{Binding IsFilling}" />
+
+                <TextBlock Text="{Binding CatalogueOutcome}" IsVisible="{Binding HasCatalogueOutcome}"
+                           Classes="caption" />
+
+                <WrapPanel>
+                    <Button Content="DOWNLOAD ALL ITEMS" Command="{Binding FillCatalogueCommand}"
+                            Classes="quiet" IsVisible="{Binding IsNotFilling}" Margin="0,0,10,0" />
+                    <Button Content="STOP" Command="{Binding StopFillingCommand}" Classes="quiet"
+                            IsVisible="{Binding IsFilling}" />
+                </WrapPanel>
+
+                <TextBlock Text="MARKER PACK" Classes="heading" Margin="0,6,0,0" />
+                <TextBlock Classes="caption"
+                           Text="Chests and jumping puzzles are not events and no endpoint publishes them, so the only source is a community marker pack. Choose one under BROWSE PACKS, or paste the address of a .taco, and the app fetches it, keeps the chests and jumping puzzles, and throws the rest away — the pack itself is not kept and nothing is shipped inside the app. Boss arenas need none of this; they come from ArenaNet's own data." />
+
+                <!-- The packs already here. UPDATE asks the server whether anything changed and
+                     costs one request when nothing has; see MarkerStore.UpdateAsync. Clicked
+                     handlers rather than commands reached out of the template. -->
+                <ItemsControl ItemsSource="{Binding MarkerPacks}" IsVisible="{Binding HasMarkerPacks}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:MarkerPackRow">
+                            <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,4,0,10">
+                                <StackPanel Spacing="3" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Name}" Classes="inscription" FontSize="15" />
+                                    <TextBlock Text="{Binding Detail}" Classes="caption" />
+                                </StackPanel>
+                                <Button Grid.Column="1" Content="UPDATE" FontSize="10" Classes="quiet"
+                                        Padding="12,8" Margin="8,0,0,0" Click="OnUpdatePack"
+                                        VerticalAlignment="Center" />
+                                <Button Grid.Column="2" Content="REMOVE" FontSize="10" Classes="quiet"
+                                        Padding="12,8" Margin="8,0,0,0" Click="OnRemovePack"
+                                        VerticalAlignment="Center" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- The list first: an address typed on a phone is the hard way. The box stays for
+                     a pack no repository lists. -->
+                <Button Content="BROWSE PACKS" Command="{Binding BrowsePacksCommand}"
+                        HorizontalAlignment="Left" />
+
+                <TextBox Text="{Binding MarkerUrl}" PlaceholderText="or paste https://…/pack.taco" />
+
+                <TextBlock Text="{Binding MarkerNote}" IsVisible="{Binding HasMarkerNote}" Classes="caption" />
+
+                <WrapPanel>
+                    <Button Content="UPDATE ALL" Command="{Binding UpdateAllMarkersCommand}" Classes="quiet"
+                            IsVisible="{Binding HasMarkerPacks}" Margin="0,0,10,0" />
+                    <Button Content="ADD PACK" Command="{Binding DownloadMarkersCommand}" Classes="quiet"
+                            IsVisible="{Binding IsNotDownloadingMarkers}" Margin="0,0,10,0" />
+                    <Button Content="STOP" Command="{Binding StopMarkersCommand}" Classes="quiet"
+                            IsVisible="{Binding IsDownloadingMarkers}" />
+                </WrapPanel>
+            </StackPanel>
+
+            <!-- ── Bridge ──────────────────────────────────────────────────────────── -->
+            <StackPanel IsVisible="{Binding IsBridge}" Spacing="14">
+                <TextBlock Text="PC BRIDGE" Classes="heading" Margin="0,6,0,0" />
+                <TextBlock Text="{Binding BridgeNote}" Classes="caption" />
+
+                <!-- A known PC seen somewhere new. Only ever shown for a pairing that was typed,
+                     because a scanned one proves itself and needs no permission to move. -->
+                <Border IsVisible="{Binding HasMove}" Background="{StaticResource SlateBrush}"
+                        BorderBrush="{StaticResource BrassBrush}" BorderThickness="1" CornerRadius="2"
+                        Padding="12,10">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="{Binding MoveNote}" Classes="caption" />
+                        <Button Content="USE THE NEW ADDRESS" Command="{Binding AllowMoveCommand}"
+                                Classes="quiet" HorizontalAlignment="Left" />
+                    </StackPanel>
+                </Border>
+
+                <TextBlock Text="PAIRED PCS" Classes="heading small" Margin="0,4,0,0" />
+
+                <TextBlock Text="No PC paired yet. Scan the QR code in the bridge window." Classes="caption"
+                           IsVisible="{Binding Bridges.Count, Converter={x:Static ui:Counts.IsZero}}" />
+
+                <ItemsControl ItemsSource="{Binding Bridges}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="services:KnownBridge">
+                            <Grid ColumnDefinitions="4,*,Auto" MinHeight="52" Margin="0,0,0,8">
+                                <Border Background="{StaticResource BrassBrush}" />
+                                <StackPanel Grid.Column="1" Margin="12,6,8,6" Spacing="2"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Label}"
+                                               FontFamily="{StaticResource BarlowMedium}" />
+                                    <!-- The address is shown as history, not as a setting: it is
+                                         where this PC was last found, and nobody has to keep it right. -->
+                                    <TextBlock Text="{Binding Where}" Classes="caption small" />
+                                </StackPanel>
+                                <Button Grid.Column="2" Content="FORGET" Classes="quiet" FontSize="11"
+                                        Padding="10,3" VerticalAlignment="Center" Click="OnForgetBridge" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Text="{Binding BridgeOutcome}" IsVisible="{Binding HasBridgeOutcome}"
+                           Classes="caption" />
+
+                <WrapPanel>
+                    <Button x:Name="ScanBridgeButton" Command="{Binding ScanBridgeCommand}" Classes="quiet"
+                            Margin="0,0,10,10" />
+                    <Button Content="FIND MY PCS" Command="{Binding PairBridgeCommand}" Classes="quiet"
+                            Margin="0,0,10,10" />
+                </WrapPanel>
+
+                <!-- The fallback, kept small on purpose. It is the only place an address is still
+                     typed, and only until the bridge answers once and says who it is. -->
+                <TextBlock Text="BY HAND" Classes="heading small" Margin="0,8,0,0" />
+                <TextBlock Classes="caption small"
+                           Text="If the camera or the QR code will not cooperate. A PC paired this way is asked about once if its address changes, because a short code cannot prove which machine it is." />
+
+                <TextBox Text="{Binding BridgeHost}" PlaceholderText="192.168.1.20:47623" />
+                <!-- Not a password field: it is read off a screen in the same room, and hiding it
+                     would only make it harder to check a typo. -->
+                <TextBox Text="{Binding BridgeCode}" PlaceholderText="XXXX-XXXX" />
+
+                <Button Content="PAIR BY HAND" Command="{Binding PairTypedCommand}" Classes="quiet"
+                        HorizontalAlignment="Left" />
+            </StackPanel>
+
+            <!-- ── Desktop ─────────────────────────────────────────────────────────── -->
+            <!-- Only a desktop head adds this tab; a phone has no window of its own. -->
+            <StackPanel IsVisible="{Binding IsDesktop}" Spacing="14">
+                <TextBlock Text="WINDOW" Classes="heading" Margin="0,6,0,0" />
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="Fullscreen" VerticalAlignment="Center" />
+                    <ToggleSwitch Grid.Column="1" IsChecked="{Binding WindowMode.FullScreen}"
+                                  OnContent="" OffContent="" />
+                </Grid>
+                <TextBlock Classes="caption"
+                           Text="Fills the screen and remembers this choice for the next launch. F11 switches it from any page." />
+
+                <!-- Only for an installed build; one run from a folder has nothing to update. -->
+                <StackPanel IsVisible="{Binding Updates.IsSupported}" Spacing="14">
+                    <Border Classes="rule" Margin="0,6" />
+                    <TextBlock Text="UPDATES" Classes="heading" Margin="0,6,0,0" />
+                    <TextBlock Text="{Binding Updates.Status}" Classes="caption" />
+                    <ProgressBar IsIndeterminate="True" IsVisible="{Binding Updates.IsBusy}" />
+                    <WrapPanel>
+                        <Button Content="CHECK NOW" Command="{Binding CheckForUpdateCommand}" Classes="quiet"
+                                IsVisible="{Binding !Updates.IsReady}" Margin="0,0,10,10" />
+                        <Button Content="RESTART TO UPDATE" Command="{Binding RestartToUpdateCommand}"
+                                IsVisible="{Binding Updates.IsReady}" Margin="0,0,10,10" />
+                    </WrapPanel>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Under every tab, because "which build is this" is asked from wherever you are. -->
+            <TextBlock Text="{Binding VersionLine}" Classes="caption small" Margin="0,18,0,0" />
+
+            <!-- ArenaNet's Content Terms of Use require this notice, word for word, on any fan
+                 project using the game's content, and that the project say it is unofficial. -->
+            <TextBlock Classes="caption small" Margin="0,10,0,0"
+                       Text="An unofficial fan app, not made, endorsed, sponsored or approved by ArenaNet or NCSOFT." />
+            <TextBlock Classes="caption small" Margin="0,6,0,24"
+                       Text="Guild Wars Games © ArenaNet LLC. All rights reserved. NCSOFT, ArenaNet, Guild Wars, Guild Wars 2, GW2, Heart of Thorns, Path of Fire, End of Dragons, Secrets of the Obscure, Janthir Wilds, Visions of Eternity, and all associated logos, designs, and composite marks are trademarks or registered trademarks of NCSOFT Corporation. All other trademarks are the property of their respective owners." />
+        </StackPanel>
+    </ScrollViewer>
+</shell:PageView>

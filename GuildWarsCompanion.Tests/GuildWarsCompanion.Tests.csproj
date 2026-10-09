@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!-- Plain net10.0, like Core: an android head is nothing a test host can load. -->
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsPackable>false</IsPackable>
+        <RootNamespace>GuildWarsCompanion.Tests</RootNamespace>
+    </PropertyGroup>
+
+    <!--
+        The app's logic comes from Core, the same assembly every head runs. Before Core existed
+        the files under test were compiled straight in here one by one, because the app was an
+        android project no test host could load; Core is plain net10.0, so it is referenced.
+    -->
+    <ItemGroup>
+        <ProjectReference Include="..\GuildWarsCompanion.Core\GuildWarsCompanion.Core.csproj" />
+    </ItemGroup>
+
+    <!--
+        The bridge is a separate desktop app, but its wire contract is the same kind of pure
+        decision as everything else here and the same rule applies: no sockets. Core already
+        compiles in the part the phone speaks; the rest of the bridge's side is linked here.
+    -->
+    <ItemGroup>
+        <Compile Include="..\GuildWarsCompanion.Bridge\Protocol\MumbleLink.cs" Link="Logic\MumbleLink.cs" />
+        <!-- The deciding half of the map lookup: what to ask the API for, and what not to ask
+             twice. The request itself lives in Gw2Maps.cs, which stays out of here. -->
+        <Compile Include="..\GuildWarsCompanion.Bridge\Protocol\MapNames.cs" Link="Logic\MapNames.cs" />
+        <Compile Include="..\GuildWarsCompanion.Bridge\Protocol\BossReminder.cs" Link="Logic\BossReminder.cs" />
+        <Compile Include="..\GuildWarsCompanion.Bridge\Protocol\BlishHud.cs" Link="Logic\BlishHud.cs" />
+        <Compile Include="..\GuildWarsCompanion.Bridge\Protocol\BlishHudInstall.cs" Link="Logic\BlishHudInstall.cs" />
+        <Compile Include="..\GuildWarsCompanion.Bridge\Protocol\ModuleWire.cs" Link="Logic\ModuleWire.cs" />
+        <Compile Include="..\GuildWarsCompanion.Bridge\Protocol\TrailAhead.cs" Link="Logic\TrailAhead.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+        <PackageReference Include="xunit" Version="2.9.3" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    </ItemGroup>
+
+</Project>

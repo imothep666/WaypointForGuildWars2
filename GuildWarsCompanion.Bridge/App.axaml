@@ -1,0 +1,243 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="GuildWarsCompanion.Bridge.App"
+             RequestedThemeVariant="Dark">
+
+    <Application.Resources>
+        <!-- The phone app's two faces, as App.axaml there has them: Marcellus SC names things,
+             Barlow reads and counts. One resource per Barlow weight, each naming its own file,
+             for the reason the phone app gives. -->
+        <FontFamily x:Key="Barlow">avares://GuildWarsCompanion.Bridge/Assets/Fonts/Barlow-Regular.ttf#Barlow</FontFamily>
+        <FontFamily x:Key="BarlowMedium">avares://GuildWarsCompanion.Bridge/Assets/Fonts/Barlow-Medium.ttf#Barlow Medium</FontFamily>
+        <FontFamily x:Key="Marcellus">avares://GuildWarsCompanion.Bridge/Assets/Fonts/MarcellusSC-Regular.ttf#Marcellus SC</FontFamily>
+
+        <!-- Fluent's expander, in this look rather than its own grey: the header and its body
+             on the window's ground, edged like the cards. -->
+        <SolidColorBrush x:Key="ExpanderHeaderBackground" Color="Transparent" />
+        <SolidColorBrush x:Key="ExpanderHeaderBackgroundPointerOver" Color="#18212C" />
+        <SolidColorBrush x:Key="ExpanderHeaderBackgroundPressed" Color="#18212C" />
+        <SolidColorBrush x:Key="ExpanderHeaderBorderBrush" Color="#243040" />
+        <SolidColorBrush x:Key="ExpanderHeaderBorderBrushPointerOver" Color="#6E5A2E" />
+        <SolidColorBrush x:Key="ExpanderHeaderBorderBrushPressed" Color="#6E5A2E" />
+        <SolidColorBrush x:Key="ExpanderHeaderForeground" Color="#E6DECB" />
+        <SolidColorBrush x:Key="ExpanderHeaderForegroundPointerOver" Color="#E6DECB" />
+        <SolidColorBrush x:Key="ExpanderContentBackground" Color="Transparent" />
+        <SolidColorBrush x:Key="ExpanderContentBorderBrush" Color="#243040" />
+        <SolidColorBrush x:Key="ExpanderChevronForeground" Color="#C8A34E" />
+        <SolidColorBrush x:Key="ExpanderChevronForegroundPointerOver" Color="#C8A34E" />
+
+        <!-- Fluent's check box, brass when ticked as the phone app's switches are, edged in
+             tarnished brass when not. -->
+        <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeUnchecked" Color="#6E5A2E" />
+        <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeUncheckedPointerOver" Color="#C8A34E" />
+        <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillChecked" Color="#C8A34E" />
+        <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillCheckedPointerOver" Color="#D8B666" />
+        <SolidColorBrush x:Key="CheckBoxCheckBackgroundFillCheckedPressed" Color="#B08E40" />
+        <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeChecked" Color="#C8A34E" />
+        <SolidColorBrush x:Key="CheckBoxCheckBackgroundStrokeCheckedPointerOver" Color="#D8B666" />
+        <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundChecked" Color="#0F141B" />
+        <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundCheckedPointerOver" Color="#0F141B" />
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+
+        <!--
+            The phone app's palette, restated. There is no shared resource dictionary to draw
+            on — that one is MAUI's and this is Avalonia — so these are copied from
+            GuildWarsCompanion/Resources/Styles/Colors.xaml and have to be kept in step by hand.
+        -->
+        <!-- No FontFamily setter: WithInterFont() in Program.cs already makes Inter the app
+             default, and naming it here as a StaticResource looks right and is not — the font
+             is registered as an embedded asset, not as a resource key. -->
+        <Style Selector="Window">
+            <Setter Property="Background" Value="#0F141B" />
+            <Setter Property="FontFamily" Value="{StaticResource Barlow}" />
+        </Style>
+
+        <!-- The window's name, in the carved capitals the phone app titles its pages with. -->
+        <Style Selector="TextBlock.inscription">
+            <Setter Property="FontFamily" Value="{StaticResource Marcellus}" />
+            <Setter Property="Foreground" Value="#E6DECB" />
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="LetterSpacing" Value="3" />
+        </Style>
+
+        <!--
+            The window's own caption buttons, since the frame no longer brings any.
+
+            Deliberately not the platform's glyph set. Three strokes in the hairline grey,
+            invisible until the pointer is on them: the chrome is the one part of this window
+            that should never be the thing you notice, and the brass is spent on the rule and
+            the beads. Close is the only one that colours, and only on hover — a red X sitting
+            there permanently reads as an alarm on a window that is working fine.
+
+            42 by 28 is bigger than the marks inside it. The stroke is 10 pixels and the target
+            is four times that, which is the difference between a quiet button and a fiddly one.
+        -->
+        <Style Selector="Button.caption">
+            <Setter Property="Width" Value="42" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="Button.caption /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="0" />
+        </Style>
+
+        <Style Selector="Button.caption Path">
+            <Setter Property="Stroke" Value="#7E8B9B" />
+            <Setter Property="StrokeThickness" Value="1" />
+        </Style>
+
+        <Style Selector="Button.caption:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#18212C" />
+        </Style>
+
+        <Style Selector="Button.caption:pointerover Path">
+            <Setter Property="Stroke" Value="#E6DECB" />
+        </Style>
+
+        <Style Selector="Button.caption.close:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#C0453B" />
+        </Style>
+
+        <Style Selector="TextBlock.heading">
+            <Setter Property="FontFamily" Value="{StaticResource Marcellus}" />
+            <Setter Property="Foreground" Value="#C8A34E" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="LetterSpacing" Value="2" />
+        </Style>
+
+        <Style Selector="TextBlock.caption">
+            <Setter Property="Foreground" Value="#7E8B9B" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+
+        <Style Selector="TextBlock.figure">
+            <Setter Property="Foreground" Value="#E6DECB" />
+            <Setter Property="FontFamily" Value="Consolas,Menlo,DejaVu Sans Mono,monospace" />
+        </Style>
+
+        <Style Selector="Border.rule">
+            <Setter Property="Height" Value="1" />
+            <Setter Property="Background" Value="#6E5A2E" />
+        </Style>
+
+        <!-- The phone app's quiet button: a brass outline that lights on the pointer. -->
+        <Style Selector="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#E6DECB" />
+            <Setter Property="BorderBrush" Value="#6E5A2E" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="2" />
+            <Setter Property="Padding" Value="14,6" />
+        </Style>
+
+        <Style Selector="Button:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#18212C" />
+            <Setter Property="BorderBrush" Value="#C8A34E" />
+        </Style>
+
+        <!-- A page tab: no button chrome at all, only its carved name. -->
+        <Style Selector="Button.tab">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0,2" />
+        </Style>
+
+        <!-- After the quiet button's styles, which would otherwise light a tab like a button. -->
+        <Style Selector="Button.tab:pointerover /template/ ContentPresenter, Button.tab:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+
+        <Style Selector="TextBlock.tab">
+            <Setter Property="FontFamily" Value="{StaticResource Marcellus}" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="LetterSpacing" Value="2" />
+            <Setter Property="Foreground" Value="#7E8B9B" />
+        </Style>
+
+        <Style Selector="TextBlock.tab.live">
+            <Setter Property="Foreground" Value="#E6DECB" />
+        </Style>
+
+        <Style Selector="Button.tab:pointerover TextBlock.tab">
+            <Setter Property="Foreground" Value="#E6DECB" />
+        </Style>
+
+        <!-- The phone app's dry-brush stroke, in brass: hairs that run out at either end. -->
+        <Style Selector="Border.stroke">
+            <Setter Property="Height" Value="7" />
+            <Setter Property="Margin" Value="-5,0" />
+            <Setter Property="Background" Value="#C8A34E" />
+            <!-- Under every tab, shown only under the live one, so all three sit on one line. -->
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="OpacityMask">
+                <ImageBrush Source="/Assets/brushstroke.png" Stretch="Fill" />
+            </Setter>
+        </Style>
+
+        <Style Selector="Border.stroke.live">
+            <Setter Property="Opacity" Value="1" />
+        </Style>
+
+        <!-- Accepted pastes get the brass spine the phone app uses for "this is the live one";
+             everything else is refused and reads as such. -->
+        <Style Selector="Border.spine">
+            <Setter Property="Background" Value="#C0453B" />
+        </Style>
+
+        <Style Selector="Border.spine.accepted">
+            <Setter Property="Background" Value="#C8A34E" />
+        </Style>
+
+        <!--
+            Brass, banked down. For a state that is neither working nor broken: a phone that is
+            paired and simply has nothing to say.
+
+            This exists because the base spine above is red, so anything not marked accepted
+            read as refused — fine for a paste, which either reached the clipboard or did not,
+            and quite wrong for a phone. An idle phone was being reported as a problem, which
+            is the one thing an indicator must never do. Same hue as accepted, a third of the
+            way to the background: recognisably the same signal, asleep.
+        -->
+        <Style Selector="Border.spine.quiet">
+            <Setter Property="Background" Value="#6E5B2C" />
+        </Style>
+
+    </Application.Styles>
+
+    <!--
+        The notification area. Windows always has one; on Linux this needs StatusNotifierItem,
+        which KDE implements and GNOME does not support at all — hence the per-platform default
+        on the "keep running" setting, and hence /show as the way back if the icon never appears.
+
+        A .ico rather than the .png next to it: Windows picks the right size out of a multi-size
+        icon and renders the notification area far more crisply for it.
+    -->
+    <TrayIcon.Icons>
+        <TrayIcons>
+            <TrayIcon Icon="/Assets/tray.ico"
+                      ToolTipText="Waypoint PC Bridge"
+                      Clicked="OnTrayClicked">
+                <TrayIcon.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="Show bridge" Click="OnTrayShow" />
+                        <NativeMenuItemSeparator />
+                        <NativeMenuItem Header="Quit" Click="OnTrayQuit" />
+                    </NativeMenu>
+                </TrayIcon.Menu>
+            </TrayIcon>
+        </TrayIcons>
+    </TrayIcon.Icons>
+
+</Application>

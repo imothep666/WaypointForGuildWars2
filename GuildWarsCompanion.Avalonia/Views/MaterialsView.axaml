@@ -1,0 +1,104 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:controls="using:GuildWarsCompanion.Ava.Controls"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                xmlns:services="using:GuildWarsCompanion.Services"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
+                x:Class="GuildWarsCompanion.Ava.Views.MaterialsView"
+                x:DataType="vm:MaterialsViewModel"
+                ShowsWash="True">
+
+
+    <Grid RowDefinitions="Auto,Auto,*">
+        <controls:AreaTabStrip Area="account" Current="materials" />
+
+        <StackPanel Grid.Row="1" Margin="20,0" Spacing="10">
+            <!-- What the pile is worth. Two numbers, because "dump it now" and "list it and
+                 wait" are different decisions and the gap between them is the point. -->
+            <Border Classes="card" IsVisible="{Binding HasValue}" Margin="0,14,0,0">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="ESTIMATED VALUE" Classes="heading small" />
+                    <Grid ColumnDefinitions="*,14,*">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Sell instantly" Classes="caption" />
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="{Binding InstantValue.Gold}" FontFamily="{StaticResource BarlowSemiBold}"
+                                           FontSize="24" Foreground="{StaticResource MetalGoldBrush}" />
+                                <TextBlock Text="g" FontSize="13" Foreground="{StaticResource MetalGoldBrush}"
+                                           VerticalAlignment="Bottom" Margin="-6,0,0,4" />
+                                <TextBlock Text="{Binding InstantValue.Silver}" FontFamily="{StaticResource BarlowSemiBold}"
+                                           FontSize="24" Foreground="{StaticResource MetalSilverBrush}" />
+                                <TextBlock Text="s" FontSize="13" Foreground="{StaticResource MetalSilverBrush}"
+                                           VerticalAlignment="Bottom" Margin="-6,0,0,4" />
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Spacing="4">
+                            <TextBlock Text="If listed" Classes="caption" />
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="{Binding ListedValue.Gold}" FontFamily="{StaticResource BarlowSemiBold}"
+                                           FontSize="24" Foreground="{StaticResource MetalGoldBrush}" />
+                                <TextBlock Text="g" FontSize="13" Foreground="{StaticResource MetalGoldBrush}"
+                                           VerticalAlignment="Bottom" Margin="-6,0,0,4" />
+                                <TextBlock Text="{Binding ListedValue.Silver}" FontFamily="{StaticResource BarlowSemiBold}"
+                                           FontSize="24" Foreground="{StaticResource MetalSilverBrush}" />
+                                <TextBlock Text="s" FontSize="13" Foreground="{StaticResource MetalSilverBrush}"
+                                           VerticalAlignment="Bottom" Margin="-6,0,0,4" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                    <TextBlock Text="{Binding ValueNote}" Classes="caption small" />
+                </StackPanel>
+            </Border>
+
+            <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption"
+                       Margin="0,12,0,0" />
+            <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+            <TextBlock Text="{Binding EmptyMessage}" Classes="caption"
+                       IsVisible="{Binding Sections.Count, Converter={x:Static ui:Counts.IsZero}}"
+                       HorizontalAlignment="Center" Margin="0,32" />
+        </StackPanel>
+
+        <RefreshContainer Grid.Row="2" Margin="0,8,0,0" RefreshRequested="OnPullRefresh">
+            <!-- Several hundred rows: a flat, virtualised list of headers and rows. -->
+            <ItemsControl x:Name="List">
+                <ItemsControl.Template>
+                    <ControlTemplate>
+                        <ScrollViewer>
+                            <ItemsPresenter />
+                        </ScrollViewer>
+                    </ControlTemplate>
+                </ItemsControl.Template>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.DataTemplates>
+                    <DataTemplate DataType="services:MaterialSection">
+                        <controls:SectionBand Title="{Binding Name}" Summary="{Binding Summary}" />
+                    </DataTemplate>
+                    <DataTemplate DataType="services:MaterialRow">
+                        <!-- Padding sits on the contents, not the row, so the rarity spine
+                             runs the full height and the list reads as a continuous edge. -->
+                        <Button Classes="row" Click="OnRowClicked">
+                            <Grid ColumnDefinitions="4,38,*,Auto" Margin="20,0" Height="58">
+                                <Border Background="{Binding RarityColor, Converter={x:Static ui:Paint.Brush}}" />
+                                <Image Grid.Column="1" ui:WebImage.Url="{Binding IconUrl}" Width="26"
+                                       Height="26" VerticalAlignment="Center" Margin="12,0,0,0" />
+                                <TextBlock Grid.Column="2" Text="{Binding Name}" VerticalAlignment="Center"
+                                           Margin="14,0,8,0" TextTrimming="CharacterEllipsis" />
+                                <StackPanel Grid.Column="3" Spacing="1" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding CountText}" Classes="figure"
+                                               HorizontalAlignment="Right" />
+                                    <TextBlock Text="{Binding ValueText}" Classes="caption small"
+                                               HorizontalAlignment="Right" />
+                                </StackPanel>
+                            </Grid>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.DataTemplates>
+            </ItemsControl>
+        </RefreshContainer>
+    </Grid>
+</shell:PageView>

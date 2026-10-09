@@ -1,0 +1,108 @@
+# Builds the desktop app for Linux, keeps it as a pipeline artifact, and on master publishes it as
+# a GitHub release that installed copies update from (see VelopackUpdates in the desktop project).
+#
+# Linux first, arm64 and x64: an AppImage each, made by Velopack's vpk, plus the update packages
+# beside it. Windows is meant to join as a second job of the same shape.
+#
+# Set up once, in the pipeline's variables (Edit > Variables), not here:
+#   ReleasesRepo   https://github.com/<owner>/<repo>, a public repository that holds only releases.
+#                  It needs one commit (a README will do) before a release can be tagged in it.
+#   GitHubToken    secret. A fine-grained token for that repository alone, with Contents: read and
+#                  write, which is what creating a release and uploading to it takes.
+#
+# The version is the repository's own, from Directory.Build.targets: 1.0.<commits on master>.
+# Every push to master is a new number, so every push to master is a release.
+
+trigger:
+  branches:
+    include: [master]
+
+pr: none
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  # Keep in step with the Velopack package in GuildWarsCompanion.Avalonia.Desktop.csproj.
+  VpkVersion: 1.2.161
+  Project: GuildWarsCompanion.Avalonia.Desktop/GuildWarsCompanion.Avalonia.Desktop.csproj
+  Icon: GuildWarsCompanion.Avalonia.Android/Resources/mipmap-xxxhdpi/appicon.png
+  Out: $(Build.ArtifactStagingDirectory)/releases
+
+steps:
+  # The whole history: the version counts commits, and a shallow clone would count one.
+  - checkout: self
+    fetchDepth: 0
+    fetchTags: false
+
+  - task: UseDotNet@2
+    displayName: .NET 10 SDK
+    inputs:
+      packageType: sdk
+      version: 10.x
+
+  - bash: |
+      set -euo pipefail
+      # An undefined variable arrives as its own name, $(ReleasesRepo), not as nothing.
+      if [[ -z "${RELEASES_REPO:-}" || "$RELEASES_REPO" == '$('* ]]; then
+        echo "##vso[task.logissue type=error]ReleasesRepo is not set; see the top of azure-pipelines.yml."
+        exit 1
+      fi
+      majorMinor=$(sed -n 's:.*<CompanionVersionMajorMinor>\(.*\)</CompanionVersionMajorMinor>.*:\1:p' Directory.Build.targets)
+      version="$majorMinor.$(git rev-list --count HEAD)"
+      echo "Waypoint $version from $(git rev-parse --short HEAD)"
+      echo "##vso[task.setvariable variable=Version]$version"
+      echo "##vso[build.updatebuildnumber]$version"
+      dotnet tool install --global vpk --version "$(VpkVersion)"
+      echo "##vso[task.prependpath]$HOME/.dotnet/tools"
+    displayName: Version and vpk
+    env:
+      RELEASES_REPO: $(ReleasesRepo)
+
+  - bash: dotnet test GuildWarsCompanion.Tests -c Release -nologo
+    displayName: Tests
+
+  # One AppImage per processor, each on its own Velopack channel, so an arm64 install is only
+  # ever offered arm64 updates. The previous release is fetched first: vpk makes a delta package
+  # against it, which is what most updates then download.
+  - ${{ each rid in split('linux-arm64,linux-x64', ',') }}:
+    - bash: |
+        set -euo pipefail
+        publish="$(Agent.TempDirectory)/publish-${{ rid }}"
+        out="$(Out)/${{ rid }}"
+        mkdir -p "$out"
+
+        dotnet publish "$(Project)" -r ${{ rid }} --self-contained true -c Release -o "$publish" -nologo \
+          -p:WaypointReleases="$RELEASES_REPO"
+
+        vpk download github --repoUrl "$RELEASES_REPO" --token "$GITHUB_TOKEN" --channel ${{ rid }} -o "$out" \
+          || echo "No earlier release to make a delta against."
+
+        vpk pack --packId Waypoint --packTitle Waypoint --packAuthors mpsoft \
+          --packVersion "$(Version)" --packDir "$publish" --mainExe GuildWarsCompanion.Desktop \
+          --runtime ${{ rid }} --channel ${{ rid }} --icon "$(Icon)" --categories "Game;Utility" \
+          --outputDir "$out"
+      displayName: Pack ${{ rid }}
+      env:
+        RELEASES_REPO: $(ReleasesRepo)
+        GITHUB_TOKEN: $(GitHubToken)
+
+  - task: PublishPipelineArtifact@1
+    displayName: Artifact
+    inputs:
+      targetPath: $(Out)
+      artifact: waypoint-linux
+
+  # Both channels into one release: the first upload makes it, the second adds to it.
+  - ${{ each rid in split('linux-arm64,linux-x64', ',') }}:
+    - bash: |
+        set -euo pipefail
+        vpk upload github --repoUrl "$RELEASES_REPO" --token "$GITHUB_TOKEN" --channel ${{ rid }} \
+          --outputDir "$(Out)/${{ rid }}" --publish --merge \
+          --releaseName "Waypoint $(Version)" --tag "v$(Version)"
+      displayName: Release ${{ rid }}
+      # Master only: a run started by hand on another branch builds the artifact and stops.
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      env:
+        RELEASES_REPO: $(ReleasesRepo)
+        GITHUB_TOKEN: $(GitHubToken)

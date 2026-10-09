@@ -1,0 +1,55 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                x:Class="GuildWarsCompanion.Ava.Views.TestPlanView"
+                x:DataType="vm:TestPlanViewModel">
+
+    <ScrollViewer>
+        <StackPanel Margin="20,18,20,32" Spacing="14">
+
+            <TextBlock Text="{Binding Summary}" Classes="figure" FontSize="14" />
+            <TextBlock Classes="caption"
+                       Text="What was built but not yet tried in the game. Tap a check once it works. Leave one open that does not, and say what you saw instead." />
+
+            <ItemsControl ItemsSource="{Binding Groups}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:TestGroup">
+                        <StackPanel Spacing="2" Margin="0,8,0,6">
+                            <TextBlock Text="{Binding Title}" Classes="heading" Margin="0,0,0,6" />
+
+                            <ItemsControl ItemsSource="{Binding Rows}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:TestRow">
+                                        <Button Classes="row" Click="OnCheckClicked" Margin="0,0,0,2">
+                                            <Grid ColumnDefinitions="Auto,*" Opacity="{Binding Fade}">
+                                                <Border Width="22" Height="22" Margin="12,10,0,0"
+                                                        VerticalAlignment="Top"
+                                                        BorderBrush="{StaticResource BrassDimBrush}"
+                                                        BorderThickness="1.5" CornerRadius="3">
+                                                    <TextBlock Text="{Binding Mark}"
+                                                               Foreground="{StaticResource BrassBrush}"
+                                                               FontSize="15"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center" />
+                                                </Border>
+
+                                                <StackPanel Grid.Column="1" Spacing="3" Margin="14,9,12,9">
+                                                    <TextBlock Text="{Binding Do}" TextWrapping="Wrap" />
+                                                    <TextBlock Text="{Binding Expect}" Classes="caption" />
+                                                    <TextBlock Text="{Binding Evidence}"
+                                                               Classes="caption small"
+                                                               Foreground="{StaticResource BrassDimBrush}" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</shell:PageView>

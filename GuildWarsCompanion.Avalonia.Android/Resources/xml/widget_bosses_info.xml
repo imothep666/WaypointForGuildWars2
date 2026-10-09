@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    updatePeriodMillis is 0 on purpose. Its floor is 30 minutes, which is both too slow for a
+    boss rotation and too eager for a widget whose countdown ticks itself; the redraw is driven
+    by WidgetWorker instead, on the quarter hour the bosses actually keep.
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:minWidth="250dp"
+                    android:minHeight="110dp"
+                    android:targetCellWidth="4"
+                    android:targetCellHeight="2"
+                    android:updatePeriodMillis="0"
+                    android:initialLayout="@layout/widget_bosses"
+                    android:previewLayout="@layout/widget_bosses"
+                    android:resizeMode="horizontal|vertical"
+                    android:widgetCategory="home_screen" />

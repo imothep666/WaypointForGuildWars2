@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!--
+            The Avalonia front end: the views, the shell around them and the answers to Core's
+            Host\ interfaces that every Avalonia platform shares. Plain net10.0; the two heads,
+            .Desktop (Windows and Linux) and .Android, start it and add what only they can do.
+
+            The namespace is GuildWarsCompanion.Ava rather than the project's name on purpose:
+            a namespace ending in .Avalonia would shadow the Avalonia namespace itself inside
+            this code, and every Avalonia.Media.Color would quietly resolve to here.
+        -->
+        <TargetFramework>net10.0</TargetFramework>
+        <RootNamespace>GuildWarsCompanion.Ava</RootNamespace>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GuildWarsCompanion.Core\GuildWarsCompanion.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- The four faces: Barlow in three weights and Marcellus SC. -->
+        <AvaloniaResource Include="Assets\Fonts\*.ttf" />
+        <!-- And the bundled pictures: the cut specialization banners, the papercut body
+             silhouettes, the expansion emblems. Core names them by file; see Ui/BundledArt. -->
+        <AvaloniaResource Include="Assets\Images\*" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="12.1.2" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.2" />
+        <!-- The Skia canvas behind Avalonia's drawing, for the map and the compass: see
+             Controls/DrawableView. -->
+        <PackageReference Include="Avalonia.Skia" Version="12.1.2" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+        <!-- Decodes tiles and icons into the IImage the map and compass draw. Skia, because
+             Avalonia already renders with it. -->
+        <PackageReference Include="Microsoft.Maui.Graphics.Skia" Version="10.0.20" />
+        <!-- QR codes: the same managed decoder MAUI's ZXing.Net.Maui wraps, so a code the
+             Android app reads, this one reads too. -->
+        <PackageReference Include="ZXing.Net" Version="0.16.11" />
+    </ItemGroup>
+
+</Project>

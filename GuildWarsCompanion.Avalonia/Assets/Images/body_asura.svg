@@ -1,0 +1,44 @@
+<svg width="200" height="320" viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg">
+  <!-- the sheet beneath, showing past the cut -->
+  <g transform="translate(6,7)" fill="#080C11">
+    <path d="M74 54 Q42 42 24 24 Q34 54 56 66 Q68 68 74 62 Z"/>
+    <path d="M126 54 Q158 42 176 24 Q166 54 144 66 Q132 68 126 62 Z"/>
+    <ellipse cx="100" cy="62" rx="32" ry="31"/>
+    <path d="M88 86 h24 v26 h-24 z"/>
+    <path d="M70 124 L86 106 L114 106 L130 124 L126 152 L122 198 L78 198 L74 152 Z"/>
+    <path d="M70 124 L57 138 L55 194 L70 198 L78 148 Z"/>
+    <path d="M130 124 L143 138 L145 194 L130 198 L122 148 Z"/>
+    <path d="M82 192 L77 274 L97 274 L99 196 Z"/>
+    <path d="M118 192 L123 274 L103 274 L101 196 Z"/>
+    <path d="M74 274 h24 v13 h-30 z"/>
+    <path d="M126 274 h-24 v13 h30 z"/>
+  </g>
+  <!-- the lit edge of the cut -->
+  <g transform="translate(-2,-3)" fill="#41505F">
+    <path d="M74 54 Q42 42 24 24 Q34 54 56 66 Q68 68 74 62 Z"/>
+    <path d="M126 54 Q158 42 176 24 Q166 54 144 66 Q132 68 126 62 Z"/>
+    <ellipse cx="100" cy="62" rx="32" ry="31"/>
+    <path d="M88 86 h24 v26 h-24 z"/>
+    <path d="M70 124 L86 106 L114 106 L130 124 L126 152 L122 198 L78 198 L74 152 Z"/>
+    <path d="M70 124 L57 138 L55 194 L70 198 L78 148 Z"/>
+    <path d="M130 124 L143 138 L145 194 L130 198 L122 148 Z"/>
+    <path d="M82 192 L77 274 L97 274 L99 196 Z"/>
+    <path d="M118 192 L123 274 L103 274 L101 196 Z"/>
+    <path d="M74 274 h24 v13 h-30 z"/>
+    <path d="M126 274 h-24 v13 h30 z"/>
+  </g>
+  <!-- the paper itself -->
+  <g fill="#2E3B49">
+    <path d="M74 54 Q42 42 24 24 Q34 54 56 66 Q68 68 74 62 Z"/>
+    <path d="M126 54 Q158 42 176 24 Q166 54 144 66 Q132 68 126 62 Z"/>
+    <ellipse cx="100" cy="62" rx="32" ry="31"/>
+    <path d="M88 86 h24 v26 h-24 z"/>
+    <path d="M70 124 L86 106 L114 106 L130 124 L126 152 L122 198 L78 198 L74 152 Z"/>
+    <path d="M70 124 L57 138 L55 194 L70 198 L78 148 Z"/>
+    <path d="M130 124 L143 138 L145 194 L130 198 L122 148 Z"/>
+    <path d="M82 192 L77 274 L97 274 L99 196 Z"/>
+    <path d="M118 192 L123 274 L103 274 L101 196 Z"/>
+    <path d="M74 274 h24 v13 h-30 z"/>
+    <path d="M126 274 h-24 v13 h30 z"/>
+  </g>
+</svg>

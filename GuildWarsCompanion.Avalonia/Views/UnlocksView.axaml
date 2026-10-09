@@ -1,0 +1,58 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                x:Class="GuildWarsCompanion.Ava.Views.UnlocksView"
+                x:DataType="vm:UnlocksViewModel">
+
+    <Grid RowDefinitions="Auto,*">
+        <StackPanel Margin="20,12,20,0" Spacing="8">
+            <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
+            <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+        </StackPanel>
+
+        <RefreshContainer Grid.Row="1" RefreshRequested="OnPullRefresh">
+            <ScrollViewer>
+                <StackPanel>
+                    <!-- Counting a category is two requests of ids and nothing else, so all twelve
+                         are counted at once - even skins, where the total is ten and a half
+                         thousand integers and still one request.
+
+                         Tapping one pushes a page of its own rather than swapping this screen's
+                         contents, so the back arrow and Android's back gesture work. -->
+                    <ItemsControl ItemsSource="{Binding Categories}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:UnlockCategoryRow">
+                                <Button Classes="row" Click="OnCategoryClicked">
+                                    <Grid Margin="20,10" ColumnDefinitions="4,*,Auto"
+                                          RowDefinitions="Auto,Auto,Auto" MinHeight="54">
+                                        <Border Grid.RowSpan="3" Background="{StaticResource BrassDimBrush}" />
+
+                                        <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="16,0,10,0"
+                                                   Classes="inscription" FontSize="15" />
+                                        <TextBlock Grid.Column="2" Text="{Binding Line}" Classes="caption"
+                                                   VerticalAlignment="Center" />
+
+                                        <!-- A bar rather than only a number: twelve rows of "2 of
+                                             971" is arithmetic, and the question is which pile is
+                                             worth opening. -->
+                                        <ProgressBar Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                                                     Margin="16,6,0,0" Minimum="0" Maximum="1"
+                                                     Value="{Binding Fraction}" />
+
+                                        <TextBlock Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
+                                                   Margin="16,4,0,0" Text="{Binding Aside}"
+                                                   IsVisible="{Binding HasAside}" Classes="caption" />
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Margin="20,16,20,32" Classes="caption"
+                               Text="Unlocks are account-wide, so these are the same on every character. Tap a category to see which ones you have." />
+                </StackPanel>
+            </ScrollViewer>
+        </RefreshContainer>
+    </Grid>
+</shell:PageView>

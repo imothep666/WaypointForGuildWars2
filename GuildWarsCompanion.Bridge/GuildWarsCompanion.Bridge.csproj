@@ -1,0 +1,95 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!--
+            Plain net10.0, no platform TFM: Avalonia.Desktop carries the Win32 and X11 backends
+            in one assembly and picks at runtime, so Windows and Linux come out of the same
+            build. That is the whole reason this is not a second MAUI app — MAUI has no Linux
+            target at all.
+        -->
+        <TargetFramework>net10.0</TargetFramework>
+        <OutputType>WinExe</OutputType>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>GuildWarsCompanion.Bridge</RootNamespace>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+
+        <!--
+            The same icon the notification area gets, burned into the .exe: this is what
+            Explorer, a pinned taskbar button and Alt+Tab show, and none of them read the
+            Avalonia resource. Windows-only metadata, harmlessly ignored by a Linux build.
+        -->
+        <ApplicationIcon>Assets\tray.ico</ApplicationIcon>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\**" />
+    </ItemGroup>
+
+    <!--
+        The world boss timetable, compiled from the app's copy rather than duplicated. It is
+        hardcoded prose with no dependencies — see EventSchedule — and two copies of a timetable
+        is two things to edit and one of them to forget.
+    -->
+    <ItemGroup>
+        <Compile Include="..\GuildWarsCompanion.Core\Services\EventSchedule.cs"
+                 Link="Protocol\EventSchedule.cs" />
+
+        <!-- The emote list, for the same reason: it is what decides which texts the Blish HUD
+             module may type, and it has to be the list the phone shows, not a second one. -->
+        <Compile Include="..\GuildWarsCompanion.Core\Services\Emotes.cs"
+                 Link="Protocol\Emotes.cs" />
+    </ItemGroup>
+
+    <!--
+        The Blish HUD module, built first and carried beside the bridge's own files. It is not
+        referenced as an assembly — it is net48, runs inside Blish HUD, and nothing here calls
+        it — so the reference only orders the build, and the .bhm is copied as a plain file.
+    -->
+    <ItemGroup>
+        <!--
+            No SetTargetFramework: the module has one framework, and naming it here would make
+            this a second build of the same project — which a solution build then runs in
+            parallel with the first, both zipping the same .bhm.
+
+            And no runtime identifier. `publish -r win-x64` would otherwise hand its RID down,
+            the module would build into bin\Release\net48\win-x64\, and the copy below would find
+            nothing. Blish HUD loads the module as AnyCPU whatever the bridge is published for.
+        -->
+        <ProjectReference Include="..\GuildWarsCompanion.Blish\GuildWarsCompanion.Blish.csproj"
+                          ReferenceOutputAssembly="false"
+                          SkipGetTargetFrameworkProperties="true"
+                          GlobalPropertiesToRemove="RuntimeIdentifier;SelfContained" />
+
+        <None Include="..\GuildWarsCompanion.Blish\bin\$(Configuration)\net48\GuildWarsCompanion.Blish.bhm"
+              Link="GuildWarsCompanion.Blish.bhm"
+              CopyToOutputDirectory="PreserveNewest"
+              CopyToPublishDirectory="PreserveNewest"
+              Visible="false" />
+    </ItemGroup>
+
+    <!--
+        Kestrel and SignalR, for the one thing a socket-per-request design cannot do: hold a
+        connection open for the compass screen. Everything else still goes through the
+        hand-rolled TcpListener in Protocol/BridgeServer.cs.
+
+        The cost is deployment, not privilege. A framework-dependent publish now needs the
+        ASP.NET Core runtime rather than just the desktop one, which matters most on Linux.
+        That target is already published self-contained from Windows, so it absorbs this, but a
+        framework-dependent Windows install gains a prerequisite it did not have.
+    -->
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="12.1.2" />
+        <PackageReference Include="Avalonia.Desktop" Version="12.1.2" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.2" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.2" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+        <PackageReference Include="QRCoder" Version="1.6.0" />
+    </ItemGroup>
+
+</Project>

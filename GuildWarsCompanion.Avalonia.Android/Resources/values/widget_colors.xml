@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="widgetBrass">#C8A34E</color>
+    <color name="widgetBrassDim">#6E5A2E</color>
+    <color name="widgetVellum">#E6DECB</color>
+    <color name="widgetMist">#7E8B9B</color>
+
+    <!-- Each widget's area tint, as the app's bar lights it: the timetable's ember, the vault's
+         astral teal, the compass's blue. Keep in step with Shell/Routes.cs. -->
+    <color name="widgetEmber">#C0453B</color>
+    <color name="widgetAstral">#46B7AE</color>
+    <color name="widgetCompass">#5E9FD0</color>
+</resources>

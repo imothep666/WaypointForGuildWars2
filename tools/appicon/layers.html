@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<!--
+    The launcher icon's two layers, cut from design.png: the emblem of the app's design - a ring of
+    red and gold brush strokes, a dragon rising out of it, a gold diamond before a Tyrian landscape -
+    without the lettering under it, which no launcher icon can carry at 48 px.
+
+    ?layer=background&size=N    the obsidian ground, N square
+    ?layer=foreground&size=N    the emblem, on clear
+    ?layer=preview              both, in a round and a squircle mask and at 48 px
+
+    tools/render-appicon.py renders the layers at every density.
+-->
+<html>
+<head><style>html, body { margin: 0; background: transparent; } canvas { display: block; }</style></head>
+<body>
+<script>
+const q = new URLSearchParams(location.search);
+const layer = q.get("layer") || "preview";
+const N = Number(q.get("size") || 432);
+
+// Where the emblem sits in design.png, and how far it reaches.
+const CX = 628, CY = 410, R = 420;
+// The ring fills a little under the 66% a launcher promises to show.
+const K = 0.305;
+
+function background(n) {
+  const c = document.createElement("canvas"); c.width = c.height = n;
+  const g = c.getContext("2d");
+  const bg = g.createRadialGradient(n * .5, n * .46, 0, n * .5, n * .5, n * .7);
+  bg.addColorStop(0, "#221A16"); bg.addColorStop(1, "#060505");
+  g.fillStyle = bg; g.fillRect(0, 0, n, n);
+  return c;
+}
+
+function foreground(n, img) {
+  const c = document.createElement("canvas"); c.width = c.height = n;
+  const g = c.getContext("2d");
+  const k = n * K / R;
+  g.drawImage(img, CX - n / 2 / k, CY - n / 2 / k, n / k, n / k, 0, 0, n, n);
+  // Feathered into the ground on every side, before the design's own frame shows.
+  g.globalCompositeOperation = "destination-in";
+  const m = g.createRadialGradient(n / 2, n / 2, R * k * 0.84, n / 2, n / 2, R * k * 1.0);
+  m.addColorStop(0, "rgba(0,0,0,1)"); m.addColorStop(1, "rgba(0,0,0,0)");
+  g.fillStyle = m; g.fillRect(0, 0, n, n);
+  // And stopped above the word TYRIA.
+  const cut = n / 2 + (748 - CY) * k;
+  const lin = g.createLinearGradient(0, cut - n * 0.017, 0, cut + n * 0.006);
+  lin.addColorStop(0, "rgba(0,0,0,1)"); lin.addColorStop(1, "rgba(0,0,0,0)");
+  g.fillStyle = lin; g.fillRect(0, 0, n, n);
+  return c;
+}
+
+const img = new Image();
+img.onload = () => {
+  if (layer === "background") { document.body.appendChild(background(N)); return; }
+  if (layer === "foreground") { document.body.appendChild(foreground(N, img)); return; }
+
+  document.body.style.cssText = "background:#2A2F36;display:flex;gap:22px;padding:18px;align-items:flex-start";
+  const full = document.createElement("canvas"); full.width = full.height = 1080;
+  const g = full.getContext("2d"); g.drawImage(background(1080), 0, 0); g.drawImage(foreground(1080, img), 0, 0);
+  for (const [size, radius] of [[260, "50%"], [200, "28%"], [48, "50%"]]) {
+    const box = document.createElement("div"); box.style.cssText = `width:${size}px;height:${size}px;border-radius:${radius};overflow:hidden`;
+    const s = document.createElement("canvas"); s.width = s.height = size;
+    const inset = 1080 * 18 / 108;
+    s.getContext("2d").drawImage(full, inset, inset, 1080 - 2 * inset, 1080 - 2 * inset, 0, 0, size, size);
+    box.appendChild(s); document.body.appendChild(box);
+  }
+};
+img.src = "design.png";
+</script>
+</body>
+</html>

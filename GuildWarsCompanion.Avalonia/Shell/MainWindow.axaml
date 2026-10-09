@@ -1,0 +1,116 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="GuildWarsCompanion.Ava.Shell.MainWindow"
+        Title="Waypoint"
+        Icon="/Assets/Images/app_icon.png"
+        Width="420" Height="860"
+        MinWidth="340" MinHeight="480"
+        Background="{StaticResource ObsidianBrush}"
+        WindowStartupLocation="CenterScreen"
+        WindowDecorations="None">
+
+    <!--
+        The desktop's window around the shell. Phone-shaped by default, because every screen was
+        laid out for one; it resizes freely.
+
+        It draws its own title bar, as the PC Bridge does: the system's white-and-grey strip sat
+        over a painted page like a sticker. Without the frame, moving, resizing and the window's
+        edge against a dark desktop are this window's job; see the code-behind.
+    -->
+    <Window.Styles>
+        <!--
+            The caption buttons: the bridge's, restated. Strokes in mist, brightening under the
+            pointer; close is the only one that colours, and only on hover. 46 by 32, bigger
+            than the marks inside them, so they are quiet rather than fiddly.
+        -->
+        <Style Selector="Button.caption">
+            <Setter Property="Width" Value="46" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Button.caption /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="0" />
+        </Style>
+        <Style Selector="Button.caption Path">
+            <Setter Property="Stroke" Value="{StaticResource MistBrush}" />
+            <Setter Property="StrokeThickness" Value="1" />
+        </Style>
+        <Style Selector="Button.caption:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource SlateBrush}" />
+        </Style>
+        <Style Selector="Button.caption:pointerover Path">
+            <Setter Property="Stroke" Value="{StaticResource VellumBrush}" />
+        </Style>
+        <Style Selector="Button.caption.close:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource EmberBrush}" />
+        </Style>
+
+        <Style Selector="Button.update">
+            <Setter Property="Height" Value="22" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="10.5" />
+            <Setter Property="Foreground" Value="{StaticResource BrassBrush}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrassDimBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="2" />
+        </Style>
+        <Style Selector="Button.update:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource SlateBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BrassBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource VellumBrush}" />
+        </Style>
+    </Window.Styles>
+
+    <!-- The hairline is the window's edge: a dark window on a dark desktop has no silhouette
+         without it. Gone when maximised or fullscreen, where there is no edge to show. -->
+    <Border x:Name="Frame" BorderBrush="{StaticResource BankedBrush}" BorderThickness="1">
+        <Grid RowDefinitions="Auto,*">
+
+            <!-- The bar: the app's emblem and name, the rest of it a handle. Kept in fullscreen,
+                 so the mouse can still leave it or close the app. -->
+            <Border x:Name="TitleBar" Background="{StaticResource SlateDeepBrush}"
+                    BorderBrush="{StaticResource HairlineBrush}" BorderThickness="0,0,0,1"
+                    PointerPressed="OnTitleBarPressed">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Image Source="/Assets/Images/app_icon.png" Width="18" Height="18" Margin="10,0,9,0"
+                           VerticalAlignment="Center" IsHitTestVisible="False" />
+                    <!-- Hidden beside the rail, whose masthead already says it. -->
+                    <TextBlock x:Name="AppName" Grid.Column="1" Text="WAYPOINT" Classes="heading small"
+                               VerticalAlignment="Center" IsHitTestVisible="False" />
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <!-- Only once an update is downloaded: the one time the bar asks for
+                             anything. Brass, because it is the bar's only call to action. -->
+                        <Button x:Name="UpdateButton" Classes="update" Content="RESTART TO UPDATE"
+                                IsVisible="False" Click="OnRestartToUpdate" Margin="0,0,8,0"
+                                AutomationProperties.Name="Restart to update" />
+                        <Button Classes="caption" Click="OnMinimise" ToolTip.Tip="Minimise"
+                                AutomationProperties.Name="Minimise">
+                            <Path Data="M 0,5.5 H 10" />
+                        </Button>
+                        <Button x:Name="MaximiseButton" Classes="caption" Click="OnMaximise"
+                                ToolTip.Tip="Maximise" AutomationProperties.Name="Maximise">
+                            <Path x:Name="MaximiseMark" Data="M 0.5,0.5 H 9.5 V 9.5 H 0.5 Z" />
+                        </Button>
+                        <Button Classes="caption close" Click="OnClose" ToolTip.Tip="Close"
+                                AutomationProperties.Name="Close">
+                            <Path Data="M 0,0 L 10,10 M 10,0 L 0,10" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <ContentControl x:Name="Body" Grid.Row="1" />
+        </Grid>
+    </Border>
+</Window>

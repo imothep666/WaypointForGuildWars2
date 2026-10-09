@@ -1,0 +1,116 @@
+<views:AppWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="using:GuildWarsCompanion.Bridge.Views"
+        x:Class="GuildWarsCompanion.Bridge.Views.MumbleSetupWindow"
+        Title="Set up MumbleLink on Linux"
+        Icon="/Assets/tray.ico"
+        Width="640" Height="720"
+        MinWidth="520" MinHeight="420"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner">
+
+    <!--
+        Why this is a window full of prose rather than a button that does it.
+
+        The bridge cannot set this up itself, and the reason is worth stating once, here, where
+        somebody is looking for it: Guild Wars 2 under Proton writes MumbleLink into a named
+        section inside the Wine prefix, and a native Linux process has no way to open one. The
+        copy has to be made by something already inside the prefix. So the honest interface is
+        instructions plus a check — the bead on the main window turns brass within two seconds
+        of the file appearing, which is the only confirmation that actually proves anything.
+
+        Everything a person has to type is a SelectableTextBlock. A how-to you cannot copy out
+        of is a how-to you retype with a typo in it.
+    -->
+
+    <Border BorderBrush="#243040" BorderThickness="1">
+    <Grid RowDefinitions="Auto,*">
+
+        <Grid ColumnDefinitions="*,Auto" Margin="22,14,0,0" Background="Transparent"
+              PointerPressed="OnCaptionPressed">
+            <StackPanel Spacing="4">
+                <TextBlock Text="WAYPOINT · FOR GUILD WARS 2" Classes="heading" />
+                <TextBlock Text="MUMBLELINK ON LINUX" Foreground="#E6DECB" FontSize="21"
+                           LetterSpacing="3" />
+            </StackPanel>
+
+            <Button Grid.Column="1" Classes="caption close" Click="OnClose" ToolTip.Tip="Close" AutomationProperties.Name="Close"
+                    VerticalAlignment="Top" Margin="0,-8,0,0">
+                <Path Data="M 0,0 L 10,10 M 10,0 L 0,10" />
+            </Button>
+        </Grid>
+
+    <ScrollViewer Grid.Row="1">
+        <StackPanel Margin="22,0,22,18" Spacing="12">
+
+            <Border Classes="rule" />
+
+            <TextBlock Foreground="#E6DECB" FontSize="12" LineHeight="19" TextWrapping="Wrap"
+                       Text="Guild Wars 2 has no Linux build, so it runs under Proton or Wine. It publishes MumbleLink — character, map, position — into shared memory inside the Wine prefix, and nothing outside that prefix can open it. A small Windows helper running in the same prefix has to copy the block out to a file this bridge can read. That helper is jokolink; TacO and Jokolay read the very same file." />
+
+            <TextBlock Text="ONE — GET JOKOLINK" Classes="heading" Margin="0,6,0,0" />
+
+            <TextBlock Foreground="#E6DECB" FontSize="12" LineHeight="19" TextWrapping="Wrap"
+                       Text="Download jokolink.exe from the Jokolay releases and put it in the game's own folder, next to Gw2-64.exe. That folder is inside the prefix, which is the whole point — the helper has to run where the game runs." />
+
+            <TextBlock Text="TWO — START IT INSIDE THE PREFIX" Classes="heading" Margin="0,6,0,0" />
+
+            <TextBlock Foreground="#E6DECB" FontSize="12" LineHeight="19" TextWrapping="Wrap"
+                       Text="It has to be launched by whatever launches the game, so that it lands in the same prefix. Two recipes, depending on how the game is installed." />
+
+            <TextBlock Text="Steam and Proton" Foreground="#E6DECB" FontSize="14"
+                       Margin="0,4,0,0" />
+
+            <TextBlock Foreground="#E6DECB" FontSize="12" LineHeight="19" TextWrapping="Wrap"
+                       Text="Save a batch file next to the game — gw2.bat — that starts both, then point Steam's launch options at it instead of at the game. Proton runs the pair in one prefix and no prefix path is ever named:" />
+
+            <Border Background="#18212C" BorderBrush="#243040" BorderThickness="1"
+                    CornerRadius="2" Padding="12,10">
+                <SelectableTextBlock Classes="figure" FontSize="12"
+                                     Text="start jokolink.exe&#x0a;start Gw2-64.exe -provider Steam" />
+            </Border>
+
+            <TextBlock Classes="caption" FontSize="11" TextWrapping="Wrap"
+                       Text="Use -provider Portal instead if you sign in with an ArenaNet account rather than through Steam." />
+
+            <TextBlock Text="Lutris, Bottles or plain Wine" Foreground="#E6DECB" FontSize="14"
+                       Margin="0,4,0,0" />
+
+            <TextBlock Foreground="#E6DECB" FontSize="12" LineHeight="19" TextWrapping="Wrap"
+                       Text="Set jokolink.exe as the pre-launch script for Guild Wars 2. Lutris runs a pre-launch script inside the game's own prefix, which is exactly what is needed and needs no batch file. On plain Wine, run it yourself with the same WINEPREFIX you start the game with." />
+
+            <TextBlock Text="THREE — CHECK IT" Classes="heading" Margin="0,6,0,0" />
+
+            <TextBlock Foreground="#E6DECB" FontSize="12" LineHeight="19" TextWrapping="Wrap"
+                       Text="Start the game, get as far as a character standing in the world, then look at the file:" />
+
+            <Border Background="#18212C" BorderBrush="#243040" BorderThickness="1"
+                    CornerRadius="2" Padding="12,10">
+                <SelectableTextBlock Classes="figure" FontSize="12"
+                                     Text="ls -l /dev/shm/MumbleLink" />
+            </Border>
+
+            <TextBlock Foreground="#E6DECB" FontSize="12" LineHeight="19" TextWrapping="Wrap"
+                       Text="About 1200 bytes, with a modification time that keeps moving while you play. The bridge polls every two seconds, so the Game bead on the main window turns brass on its own — there is nothing to restart here. A file that exists but never changes means the helper started and the game did not." />
+
+            <Border Classes="rule" Margin="0,8,0,0" />
+
+            <TextBlock Classes="caption" FontSize="11" TextWrapping="Wrap"
+                       Text="The bridge reads the first 1193 bytes: tick, identity, map and position. jokolink appends the game's X11 window id after them, which this ignores. Nothing is ever written back to the game, and no key or password is involved — MumbleLink is published by the game for exactly this." />
+
+            <TextBlock Text="WHERE TO GET IT" Classes="heading" Margin="0,6,0,0" />
+
+            <SelectableTextBlock Classes="figure" FontSize="11"
+                                 Text="https://github.com/coderedart/jokolay" />
+            <SelectableTextBlock Classes="figure" FontSize="11"
+                                 Text="https://wiki.guildwars2.com/wiki/API:MumbleLink" />
+
+            <Button Content="Open jokolay page" Click="OnOpenJokolay"
+                    HorizontalAlignment="Left" Margin="0,8,0,0" />
+
+        </StackPanel>
+    </ScrollViewer>
+    </Grid>
+    </Border>
+
+</views:AppWindow>

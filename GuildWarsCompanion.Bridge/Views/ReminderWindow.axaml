@@ -1,0 +1,35 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:protocol="clr-namespace:GuildWarsCompanion.Bridge.Protocol"
+        x:Class="GuildWarsCompanion.Bridge.Views.ReminderWindow"
+        x:DataType="protocol:BossDue"
+        Title="Waypoint"
+        Width="340" SizeToContent="Height"
+        WindowDecorations="None" CanResize="False"
+        Topmost="True" ShowInTaskbar="False"
+        ShowActivated="False"
+        Background="#0F141B"
+        BorderBrush="#C8A34E" BorderThickness="1">
+
+    <!--
+        A panel of our own rather than a system notification, and that is a portability decision
+        rather than a stylistic one. Avalonia's TrayIcon has a menu and a tooltip and no balloon;
+        a real Windows toast wants a packaged identity this app does not have, and neither exists
+        on Linux, which the bridge also targets. One borderless topmost window works on both and
+        adds no dependency.
+
+        ShowActivated is false and ShowInTaskbar is false: this must never steal focus from the
+        game. A window that took a keystroke mid-fight would be worse than saying nothing.
+    -->
+    <Border Padding="16,14">
+        <StackPanel Spacing="6">
+            <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold"
+                       Foreground="#E6DECB" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding Where}" FontSize="12" Foreground="#7E8B9B"
+                       TextWrapping="Wrap" />
+            <TextBlock Text="Click to dismiss" FontSize="10" Foreground="#4A5866"
+                       Margin="0,4,0,0" />
+        </StackPanel>
+    </Border>
+
+</Window>

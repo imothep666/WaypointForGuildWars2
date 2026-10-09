@@ -1,0 +1,21 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<!--
+		MAUI's XAML source generator emits two files per .xaml page, App.xaml.sg.cs and
+		App.xaml.xsg.cs, and ReSharper resolves the pair inconsistently: the half that implements
+		InitializeComponent cannot see the half that declares it. That produces "No defining
+		declaration found", "Cannot resolve symbol 'InitializeComponentRuntime'" and complaints
+		about __XamlGeneratedCode__ types across every page. The compiler has no such trouble -
+		dotnet build is clean - so these are ReSharper's own resolve errors on generated code.
+
+		Skipped here rather than marked as generated code on purpose: for generated code ReSharper
+		still runs the inspections that report compiler errors, which is exactly what these are, so
+		a GeneratedFileMasks entry would leave all 84 of them on screen. Ignored Code is the only
+		switch that covers them, and two masks cover every page at once.
+
+		These are masks in ReSharper | Options | Code Inspection | Ignored Code. Both halves are
+		listed because *.sg.cs does not match *.xsg.cs - the character before "sg.cs" is an "x",
+		not a dot.
+	-->
+	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=_002A_002Exsg_002Ecs/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeInspection/ExcludedFiles/FileMasksToSkip/=_002A_002Esg_002Ecs/@EntryIndexedValue">True</s:Boolean>
+</wpf:ResourceDictionary>

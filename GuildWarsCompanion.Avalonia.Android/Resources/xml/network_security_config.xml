@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Android blocks cleartext HTTP by default, and the PC bridge is cleartext by nature: it lives
+    on a home LAN at an address the user types in, so there is no certificate to trust and no
+    hostname to put one on. Without this, pairing fails with "Cleartext HTTP traffic to
+    192.168.x.x not permitted" — which reads, wrongly, like a firewall or a network problem.
+
+    Scoped rather than blanket. The base allows cleartext so a bridge at any private address
+    works, and the account traffic is then pinned back to HTTPS explicitly, so the one connection
+    that carries an API key can never silently downgrade to plain HTTP. A build-time domain list
+    cannot cover the bridge itself, because its address is only known once somebody types it.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true" />
+
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">guildwars2.com</domain>
+    </domain-config>
+</network-security-config>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The app's own ground and hairline, restated in Android XML because a RemoteViews tree cannot
+    reach the app's resource dictionary. Obsidian and BrassDim; keep in step with App.axaml.
+    The root clips to it, so the painted wash inside keeps to the rounded corners.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#F20F141B" />
+    <stroke android:width="1dp" android:color="#6E5A2E" />
+    <corners android:radius="16dp" />
+</shape>

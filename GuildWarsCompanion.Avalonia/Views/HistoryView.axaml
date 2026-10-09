@@ -1,0 +1,67 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:controls="using:GuildWarsCompanion.Ava.Controls"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                xmlns:services="using:GuildWarsCompanion.Services"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
+                x:Class="GuildWarsCompanion.Ava.Views.HistoryView"
+                x:DataType="vm:HistoryViewModel"
+                ShowsWash="True">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+        <controls:AreaTabStrip Area="tradingpost" Current="history" />
+
+        <StackPanel Grid.Row="1" Margin="20,0" Spacing="8">
+            <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error"
+                       Margin="0,12,0,0" />
+        </StackPanel>
+
+        <RefreshContainer Grid.Row="2" RefreshRequested="OnPullRefresh">
+            <ScrollViewer>
+                <StackPanel>
+                    <TextBlock Text="{Binding EmptyMessage}" Classes="caption"
+                               IsVisible="{Binding Sections.Count, Converter={x:Static ui:Counts.IsZero}}"
+                               HorizontalAlignment="Center" Margin="0,32" />
+
+                    <ItemsControl ItemsSource="{Binding Sections}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:OrderSection">
+                                <StackPanel>
+                                    <controls:SectionBand Title="{Binding Name}" Summary="{Binding Summary}" />
+
+                                    <ItemsControl ItemsSource="{Binding}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="services:OrderRow">
+                                                <Grid ColumnDefinitions="4,40,*,Auto" RowDefinitions="Auto,*"
+                                                      Margin="20,0" MinHeight="62">
+                                                    <Border Grid.RowSpan="2"
+                                                            Background="{Binding RarityColor, Converter={x:Static ui:Paint.Brush}}" />
+                                                    <Image Grid.RowSpan="2" Grid.Column="1"
+                                                           ui:WebImage.Url="{Binding IconUrl}" Width="28" Height="28"
+                                                           VerticalAlignment="Center" Margin="12,0,0,0" />
+                                                    <TextBlock Grid.Column="2" Text="{Binding ItemName}"
+                                                               Margin="14,12,8,0" TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock Grid.Column="3" Text="{Binding Total}" Classes="figure"
+                                                               Margin="0,12,0,0" HorizontalAlignment="Right" />
+                                                    <!-- The market line: brass when the market has moved past you. -->
+                                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding MarketNote}"
+                                                               Classes="caption" TextWrapping="NoWrap"
+                                                               Foreground="{Binding NoteColor, Converter={x:Static ui:Paint.Brush}}"
+                                                               Margin="14,2,8,12" TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding UnitPrice}"
+                                                               Classes="caption" Margin="0,2,0,12"
+                                                               HorizontalAlignment="Right" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </RefreshContainer>
+    </Grid>
+</shell:PageView>

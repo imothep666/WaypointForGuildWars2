@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!--
+            Everything the app knows that is not a screen: the GW2 client, the caches, the
+            services and the view models. Plain net10.0 so that it builds without a platform
+            workload, and so that every head of the Avalonia app — Android, desktop Windows and
+            Linux, Ubuntu Touch — runs exactly the same code.
+
+            What only a platform can do (navigation, settings, the keystore, the share sheet,
+            the accelerometer, decoding a PNG) is asked for through the interfaces in Host\.
+            GuildWarsCompanion.Avalonia and its two heads answer them.
+        -->
+        <TargetFramework>net10.0</TargetFramework>
+        <RootNamespace>GuildWarsCompanion</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!--
+            The bridge's wire contract, compiled in from the desktop project rather than
+            duplicated. Both halves have to agree about a header name, a path and how a pairing
+            code is normalised, and two copies of that drift into a bug that looks exactly like
+            a mistyped code. The same <Compile Include> idiom the test project uses.
+        -->
+        <Compile Include="..\GuildWarsCompanion.Bridge\Protocol\BridgeProtocol.cs"
+                 Link="Services\BridgeProtocol.cs" />
+        <Compile Include="..\GuildWarsCompanion.Bridge\Protocol\Journal.cs"
+                 Link="Bridge\Journal.cs" />
+        <Compile Include="..\GuildWarsCompanion.Bridge\Protocol\GameState.cs"
+                 Link="Services\GameState.cs" />
+        <Compile Include="..\GuildWarsCompanion.Bridge\Protocol\GuideWire.cs"
+                 Link="Services\GuideWire.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- The tests reach the same internals they did when they compiled these files in, and
+             the Android head's Wi-Fi discovery the ones it did when this was all one assembly:
+             the wire contract's JSON contexts are internal on purpose, on the bridge side too. -->
+        <InternalsVisibleTo Include="GuildWarsCompanion.Tests" />
+        <InternalsVisibleTo Include="GuildWarsCompanion.Avalonia.Android" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- Colours, rectangles and the drawable IImage. The graphics primitives only, with no
+             UI framework behind them: they build and run on any .NET, and the map and compass
+             drawing is written against them. Same version as Microsoft.Maui.Graphics.Skia in
+             the Avalonia app, so the app does not see two. -->
+        <PackageReference Include="Microsoft.Maui.Graphics" Version="10.0.20" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+        <!-- The registrations every front end shares; see CompanionServices. -->
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+        <!-- Hand-written SQL over Microsoft.Data.Sqlite: no ORM reflection, so it survives
+             TrimMode=full. sqlite-net-pcl would not without extra trimmer descriptors. -->
+        <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.0" />
+        <!-- Microsoft.Data.Sqlite 10.0.0 pulls SQLitePCLRaw 2.1.11, which carries
+             GHSA-2m69-gcr7-jv3q. Pin the patched build explicitly. -->
+        <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.13" />
+        <!-- The compass stream. Server-sent events rather than WebSockets, because
+             ClientWebSocket does not go through the SocketsHttpHandler that binds the
+             connection to Wi-Fi; see Services/GameStream.cs and ROADMAP.md. -->
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.0" />
+    </ItemGroup>
+
+</Project>

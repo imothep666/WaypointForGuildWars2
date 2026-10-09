@@ -1,0 +1,294 @@
+﻿<views:AppWindow xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:GuildWarsCompanion.Bridge.ViewModels"
+        xmlns:p="using:GuildWarsCompanion.Bridge.Protocol"
+        xmlns:views="using:GuildWarsCompanion.Bridge.Views"
+        x:Class="GuildWarsCompanion.Bridge.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="Waypoint PC Bridge"
+        Icon="/Assets/tray.ico"
+        Width="600" Height="900"
+        MinWidth="460" MinHeight="520">
+
+    <!--
+        The hairline is the window's edge now. Without the system frame a dark window has no
+        silhouette against a dark desktop, and the shadow Windows still draws is not enough on
+        its own — on X11 there is no shadow at all.
+    -->
+    <Border BorderBrush="#243040" BorderThickness="1">
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- The phone app's painted wash, as a band behind the masthead alone: the gold of the
+             account, faded so the caption marks and the name read over it. -->
+        <Image Source="/Assets/wash.png" Height="86" VerticalAlignment="Top" Stretch="UniformToFill"
+               Opacity="0.6" IsHitTestVisible="False" />
+
+        <!--
+            The title bar. Not a strip above the masthead — the masthead itself, with the caption
+            marks on its first line. Dragging anywhere in here moves the window.
+
+            Two marks, not three: there is nothing to see at full screen. The window is a fixed
+            column of cards over a list, so maximising it stretches whitespace and pushes the
+            beads away from the QR code. Resizing by the edges is still there for the one thing
+            that does grow, which is the received list. No maximise means no double-click to
+            maximise either — a gesture that silently does nothing is worse than none.
+        -->
+        <Grid ColumnDefinitions="*,Auto" Margin="22,14,0,0"
+              PointerPressed="OnCaptionPressed"
+              Background="Transparent">
+
+            <StackPanel Spacing="4">
+                <TextBlock Text="WAYPOINT · FOR GUILD WARS 2" Classes="heading" />
+                <TextBlock Text="PC Bridge" Classes="inscription" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top"
+                        Margin="0,-8,0,0">
+                <Button Classes="caption" Click="OnMinimise" ToolTip.Tip="Minimise"
+                        AutomationProperties.Name="Minimise">
+                    <Path Data="M 0,5 H 10" />
+                </Button>
+                <Button Classes="caption close" Click="OnClose" ToolTip.Tip="Close"
+                        AutomationProperties.Name="Close">
+                    <Path Data="M 0,0 L 10,10 M 10,0 L 0,10" />
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!--
+            Three pages, in the order somebody needs them: is it working, how do I pair, how does
+            it behave. Status is the one watched - the live card and the log of what arrived,
+            which fills the window - and the bridge opens on it once a phone has ever been in
+            touch, and on Pair before that. Pairing is done once and settings rarely; on one page
+            they left the log a few lines.
+        -->
+        <Grid Grid.Row="1" RowDefinitions="Auto,Auto,*,Auto" Margin="22,12,22,16" RowSpacing="12">
+
+        <!-- The rule under the masthead: the seam between the title bar and the window. -->
+        <Border Classes="rule" />
+
+        <!-- The phone app's page tabs: carved capitals, and a dry-brush stroke under the live one. -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="26">
+            <Button Classes="tab" Command="{Binding ShowPageCommand}" CommandParameter="status">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Status" Classes="tab" Classes.live="{Binding IsStatusPage}" />
+                    <Border Classes="stroke" Classes.live="{Binding IsStatusPage}" />
+                </StackPanel>
+            </Button>
+            <Button Classes="tab" Command="{Binding ShowPageCommand}" CommandParameter="pair">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Pair" Classes="tab" Classes.live="{Binding IsPairPage}" />
+                    <Border Classes="stroke" Classes.live="{Binding IsPairPage}" />
+                </StackPanel>
+            </Button>
+            <Button Classes="tab" Command="{Binding ShowPageCommand}" CommandParameter="settings">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Settings" Classes="tab" Classes.live="{Binding IsSettingsPage}" />
+                    <Border Classes="stroke" Classes.live="{Binding IsSettingsPage}" />
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <!-- Status: everything live in one card, then the log filling the rest. -->
+        <Grid Grid.Row="2" RowDefinitions="Auto,*" RowSpacing="12" IsVisible="{Binding IsStatusPage}">
+            <!-- Everything live, in one card. Three beads down the left edge answer "is it
+                 working" without reading a word: listening, phone, game. -->
+            <Border BorderBrush="#243040" BorderThickness="1" CornerRadius="2"
+                    Padding="12,10">
+                <StackPanel Spacing="8">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Border Width="8" Height="8" CornerRadius="4" VerticalAlignment="Center"
+                                Classes="spine" Classes.accepted="{Binding IsListening}" />
+                        <TextBlock Text="{Binding Status}" Foreground="#E6DECB" FontSize="14"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <TextBlock Text="{Binding Problem}" IsVisible="{Binding HasProblem}"
+                               Foreground="#C0453B" FontSize="12" TextWrapping="Wrap"
+                               Margin="16,0,0,0" />
+
+                    <!-- The phone. Every request counts, not only pastes: pairing is /hello and
+                         /game, so a list of pastes alone left a phone that could not get through
+                         looking exactly like a phone nobody had picked up. -->
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Border Width="8" Height="8" CornerRadius="4" VerticalAlignment="Center"
+                                Classes="spine" Classes.accepted="{Binding IsPhoneFine}"
+                                Classes.quiet="{Binding IsPhoneQuiet}" />
+                        <TextBlock Text="Phone" Classes="caption" VerticalAlignment="Center"
+                                   Width="42" />
+                        <TextBlock Text="{Binding PhoneLine}" Foreground="#E6DECB" FontSize="13"
+                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+
+                    <!-- The game, read from MumbleLink, which it publishes for exactly this.
+                         Nothing is sent to it. -->
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Border Width="8" Height="8" CornerRadius="4" VerticalAlignment="Center"
+                                Classes="spine" Classes.accepted="{Binding IsGameLive}"
+                                Classes.quiet="{Binding IsGameQuiet}" />
+                        <TextBlock Text="Game" Classes="caption" VerticalAlignment="Center"
+                                   Width="42" />
+                        <TextBlock Text="{Binding GameLine}" Foreground="#E6DECB" FontSize="13"
+                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+
+                    <TextBlock Text="{Binding GameDetail}" Classes="caption" FontSize="11"
+                               TextWrapping="Wrap" Margin="58,-4,0,0" />
+
+                    <!-- Linux has a setup step here that Windows does not: the game's MumbleLink
+                         lives inside the Wine prefix and something in there has to copy it out.
+                         Offered next to the bead that stays red until it is done, and gone once
+                         the game is being read. -->
+                    <Button Content="Set up MumbleLink" Click="OnMumbleSetup"
+                            IsVisible="{Binding NeedsMumbleHelp}" HorizontalAlignment="Left"
+                            Margin="58,2,0,0" Padding="10,3" FontSize="12" />
+                </StackPanel>
+            </Border>
+
+            <!-- The audit trail. Anything on the network can knock; this is where you see it. -->
+            <DockPanel Grid.Row="1" Margin="0,4,0,0">
+                <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,8"
+                      ColumnSpacing="8">
+                    <TextBlock Text="RECEIVED" Classes="heading" VerticalAlignment="Center" />
+                    <Button Grid.Column="1" Content="Open log" Command="{Binding OpenLogCommand}"
+                            Padding="10,3" FontSize="12" />
+                    <Button Grid.Column="2" Content="Clear" Command="{Binding ClearLogCommand}"
+                            Padding="10,3" FontSize="12" />
+                </Grid>
+
+                <Border BorderBrush="#243040" BorderThickness="1" CornerRadius="2">
+                    <ScrollViewer>
+                        <ItemsControl ItemsSource="{Binding Arrivals}" Margin="0,2">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="p:Arrival">
+                                    <Grid ColumnDefinitions="3,66,110,*" Margin="0,1" MinHeight="26">
+                                        <Border Classes="spine" VerticalAlignment="Stretch"
+                                                Classes.accepted="{Binding IsAccepted}" />
+
+                                        <TextBlock Grid.Column="1" Text="{Binding TimeText}"
+                                                   Classes="caption" FontSize="11" Margin="10,0,0,0"
+                                                   VerticalAlignment="Center" />
+
+                                        <TextBlock Grid.Column="2" Text="{Binding From}"
+                                                   Classes="caption" FontSize="11"
+                                                   VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis" />
+
+                                        <TextBlock Grid.Column="3" Text="{Binding Preview}"
+                                                   Foreground="#E6DECB" FontSize="12"
+                                                   VerticalAlignment="Center" Margin="0,0,8,0"
+                                                   TextTrimming="CharacterEllipsis" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Border>
+            </DockPanel>
+        </Grid>
+
+        <!-- Pair: one picture and one sentence; typing an address is behind the expander. -->
+        <ScrollViewer Grid.Row="2" IsVisible="{Binding IsPairPage}">
+            <StackPanel Spacing="10">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="14" IsVisible="{Binding HasPairingImage}">
+                    <Border BorderBrush="#243040" BorderThickness="1" Padding="6" Background="White"
+                            VerticalAlignment="Top">
+                        <Image Source="{Binding PairingImage}" Width="132" Height="132" />
+                    </Border>
+
+                    <StackPanel Grid.Column="1" Spacing="6" VerticalAlignment="Center">
+                        <TextBlock Text="Scan this in the phone app" Foreground="#E6DECB"
+                                   FontSize="15" />
+                        <TextBlock Classes="caption" FontSize="11" TextWrapping="Wrap"
+                                   Text="Settings → Bridge → Scan a PC. Pair as many PCs as you like; the phone finds whichever is awake and prefers the one running the game." />
+                        <TextBlock Classes="caption" FontSize="11" TextWrapping="Wrap"
+                                   Text="{Binding PcName, StringFormat='This PC answers as {0}. Its address is found, not typed.'}" />
+                        <Button Content="New code" Command="{Binding NewCodeCommand}"
+                                HorizontalAlignment="Left" Margin="0,4,0,0" />
+                    </StackPanel>
+                </Grid>
+
+                <!-- Collapsed by default. This held the only way to pair once, which is why it
+                     used to be the loudest thing on the window; now it is the way out when a
+                     camera will not cooperate. -->
+                <Expander Header="If the QR code will not scan" HorizontalAlignment="Stretch">
+                    <StackPanel Spacing="10" Margin="0,6,0,0">
+                        <Grid ColumnDefinitions="90,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="10">
+                            <TextBlock Text="Address" Classes="caption" VerticalAlignment="Top"
+                                       Margin="0,3,0,0" />
+
+                            <!-- Selectable: this gets typed into a phone, and more than one is
+                                 possible when the PC is on both wired and wireless. -->
+                            <ItemsControl Grid.Column="1" ItemsSource="{Binding Addresses}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="x:String">
+                                        <SelectableTextBlock Text="{Binding}" Classes="figure"
+                                                             FontSize="15" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <TextBlock Grid.Row="1" Text="Code" Classes="caption"
+                                       VerticalAlignment="Center" />
+
+                            <SelectableTextBlock Grid.Row="1" Grid.Column="1"
+                                                 Text="{Binding PairingCode}"
+                                                 Classes="figure" FontSize="24" LetterSpacing="2"
+                                                 Foreground="#C8A34E" VerticalAlignment="Center" />
+
+                            <Button Grid.Row="2" Grid.Column="1" Content="Recheck network"
+                                    Command="{Binding RefreshCommand}" HorizontalAlignment="Left" />
+                        </Grid>
+
+                        <TextBlock Classes="caption" FontSize="11" TextWrapping="Wrap"
+                                   Text="Enter both under Settings → Bridge in the phone app. A PC paired this way is asked about once if its address changes, because a short code cannot prove which machine it is. A new code un-pairs every phone that had the old one, scanned or typed." />
+                    </StackPanel>
+                </Expander>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Settings: how it behaves, and what each choice means. -->
+        <ScrollViewer Grid.Row="2" IsVisible="{Binding IsSettingsPage}">
+            <!-- How it behaves, and the one thing about it that is not obvious: the clipboard
+                 belongs to a running program, so closing this window has to be a real choice. -->
+            <StackPanel Spacing="2">
+                <CheckBox IsChecked="{Binding MinimiseToTray}"
+                          Content="Keep running in the tray when this window is closed" />
+
+                <CheckBox IsChecked="{Binding BossReminders}" Margin="0,6,0,0"
+                          Content="Tell me when a world boss is ten minutes away" />
+
+                <TextBlock Classes="caption" FontSize="11" TextWrapping="Wrap" Margin="26,-2,0,0"
+                           Text="A small panel in the corner of this screen, while the game is running. It never takes focus, so it cannot swallow a keypress. The phone's own reminder is separate and stays on either way." />
+
+                <TextBlock Classes="caption" FontSize="11" TextWrapping="Wrap" Margin="26,-2,0,0"
+                           Text="Not every Linux desktop has a notification area — GNOME has none — so this starts off there. If the icon never appears, launching the app again brings this window back." />
+
+                <!-- Windows only: under Proton, Blish HUD lives in the game's Wine prefix, out of
+                     reach of a native process. -->
+                <CheckBox IsChecked="{Binding StartBlishHud}" Margin="0,6,0,0"
+                          IsVisible="{Binding OffersBlishHud}"
+                          Content="Start and close Blish HUD with the game" />
+
+                <TextBlock Classes="caption" FontSize="11" TextWrapping="Wrap" Margin="26,-2,0,0"
+                           IsVisible="{Binding OffersBlishHud}"
+                           Text="{Binding BlishHudLine}" />
+
+                <!-- Whether a tapped emote is done in the game or copied. Said even while the box is
+                     off, because "why was that only copied?" is answered here either way. -->
+                <TextBlock Classes="caption" FontSize="11" TextWrapping="Wrap" Margin="26,0,0,0"
+                           IsVisible="{Binding OffersBlishHud}"
+                           Text="{Binding EmoteLine}" />
+
+                <TextBlock Classes="caption" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,0"
+                           Text="Text sent from the phone lands on this PC's clipboard — press Ctrl+V in the game's chat box. The one exception is an emote, which the Blish HUD module does in the game when Blish HUD was started from here. No account key is stored here." />
+            </StackPanel>
+        </ScrollViewer>
+
+        <SelectableTextBlock Grid.Row="3" Classes="caption" FontSize="11"
+                             Text="{Binding Version, StringFormat='PC Bridge {0}'}" />
+
+        </Grid>
+    </Grid>
+    </Border>
+</views:AppWindow>

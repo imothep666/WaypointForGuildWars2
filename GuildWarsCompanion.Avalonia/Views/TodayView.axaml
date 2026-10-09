@@ -1,0 +1,116 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:controls="using:GuildWarsCompanion.Ava.Controls"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                xmlns:services="using:GuildWarsCompanion.Services"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
+                x:Class="GuildWarsCompanion.Ava.Views.TodayView"
+                x:DataType="vm:TodayViewModel"
+                ShowsWash="True">
+
+    <Grid RowDefinitions="Auto,*">
+        <StackPanel Margin="20,6,20,0" Spacing="8">
+            <!-- The deadline is the point: "3 unfinished" only matters against the clock. So it is
+                 the headline, on the dawn wash. -->
+            <StackPanel Spacing="2">
+                <TextBlock Text="{Binding ResetIn}" FontFamily="{StaticResource BarlowSemiBold}" FontSize="60" />
+                <TextBlock Text="until the daily reset" Classes="caption" />
+            </StackPanel>
+            <!-- Only while the PC says a character is in the game; see PlayingLine. A tap opens them. -->
+            <Button Classes="row" Command="{Binding OpenPlayingCommand}" IsVisible="{Binding HasPlaying}"
+                    HorizontalAlignment="Stretch" Margin="0,6,0,0">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <!-- A live bead: someone is in the game right now. -->
+                    <Ellipse Width="8" Height="8" Fill="{StaticResource BrassBrush}" Margin="0,0,10,0"
+                             VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding Playing}" FontSize="13.5"
+                               TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Classes="chevron" Margin="10,0,0,0" VerticalAlignment="Center" />
+                </Grid>
+            </Button>
+            <!-- What is left on that map; see HereLine. Wraps: a boss and a chest can both be due. -->
+            <TextBlock Text="{Binding Here}" IsVisible="{Binding HasHere}" Classes="caption"
+                       TextWrapping="Wrap" />
+            <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+        </StackPanel>
+
+        <RefreshContainer Grid.Row="1" Margin="0,10,0,0" RefreshRequested="OnPullRefresh">
+            <ScrollViewer>
+                <StackPanel>
+                    <TextBlock Text="{Binding EmptyMessage}" Classes="caption"
+                               IsVisible="{Binding Sections.Count, Converter={x:Static ui:Counts.IsZero}}"
+                               HorizontalAlignment="Center" Margin="0,32" />
+
+                    <ItemsControl ItemsSource="{Binding Sections}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:TodaySection">
+                                <StackPanel>
+                                    <controls:SectionBand Title="{Binding Name}" Summary="{Binding Summary}" />
+
+                                    <ItemsControl ItemsSource="{Binding}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="services:TodayRow">
+                                                <Button Classes="row" Click="OnRowClicked"
+                                                        IsHitTestVisible="{Binding CanOpen}">
+                                                    <Grid ColumnDefinitions="4,*,Auto,Auto"
+                                                          RowDefinitions="Auto,Auto,Auto"
+                                                          Margin="20,0" MinHeight="72">
+                                                        <!-- Brass while there is something to chase;
+                                                             quiet once done, or unknown. -->
+                                                        <Border Grid.RowSpan="3"
+                                                                Background="{StaticResource BrassBrush}"
+                                                                IsVisible="{Binding !IsQuiet}" />
+                                                        <Border Grid.RowSpan="3"
+                                                                Background="{StaticResource BankedBrush}"
+                                                                IsVisible="{Binding IsQuiet}" />
+
+                                                        <TextBlock Grid.Column="1" Text="{Binding Name}"
+                                                                   Margin="16,13,10,0" />
+                                                        <TextBlock Grid.Column="2" Text="{Binding Progress}"
+                                                                   Classes="figure" Margin="0,13,0,0" />
+                                                        <!-- Only on rows that actually lead somewhere. -->
+                                                        <TextBlock Grid.Column="3" Classes="chevron"
+                                                                   IsVisible="{Binding CanOpen}"
+                                                                   Margin="10,8,0,0" />
+
+                                                        <ProgressBar Grid.Row="1" Grid.Column="1"
+                                                                     Grid.ColumnSpan="3" Minimum="0"
+                                                                     Maximum="1" Value="{Binding Fraction}"
+                                                                     Margin="16,7,0,0" />
+
+                                                        <!-- What is actually left, named. -->
+                                                        <TextBlock Grid.Row="2" Grid.Column="1"
+                                                                   Grid.ColumnSpan="3"
+                                                                   Text="{Binding Caption}" Classes="caption small"
+                                                                   TextWrapping="NoWrap"
+                                                                   TextTrimming="CharacterEllipsis"
+                                                                   Margin="16,5,0,13" />
+                                                    </Grid>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- The last session, from the ledger; see SessionRecap. -->
+                    <StackPanel IsVisible="{Binding HasSession}" Margin="0,0,0,24">
+                        <controls:SectionBand Title="{Binding Session.Heading}" Summary="{Binding Session.When}" />
+                        <ItemsControl ItemsSource="{Binding Session.Characters}" Margin="20,10,20,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+                                    <TextBlock Text="{Binding}" Margin="0,2" TextWrapping="Wrap" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Text="{Binding Session.Wallet}" Classes="caption" Margin="20,6,20,0"
+                                   Foreground="{StaticResource BrassBrush}" TextWrapping="Wrap" />
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </RefreshContainer>
+    </Grid>
+</shell:PageView>

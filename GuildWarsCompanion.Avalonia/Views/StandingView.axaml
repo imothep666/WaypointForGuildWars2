@@ -1,0 +1,115 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:controls="using:GuildWarsCompanion.Ava.Controls"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                xmlns:services="using:GuildWarsCompanion.Services"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
+                x:Class="GuildWarsCompanion.Ava.Views.StandingView"
+                x:DataType="vm:StandingViewModel"
+                ShowsWash="True">
+
+    <Grid RowDefinitions="Auto,*">
+        <controls:AreaTabStrip Area="account" Current="standing" />
+
+        <RefreshContainer Grid.Row="1" RefreshRequested="OnPullRefresh">
+            <ScrollViewer>
+                <StackPanel Margin="20,16,20,32" Spacing="14">
+                    <!-- What the account is, rather than what it owns. -->
+                    <TextBlock Text="STANDING" Classes="heading" />
+                    <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
+                    <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+
+                    <ItemsControl ItemsSource="{Binding Rows}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:StandingRow">
+                                <Grid ColumnDefinitions="4,*,Auto" RowDefinitions="Auto,*" MinHeight="56"
+                                      Margin="0,0,0,10">
+                                    <Border Grid.RowSpan="2" Background="{StaticResource BrassDimBrush}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="16,10,10,0"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="2" Text="{Binding Value}" Classes="figure" FontSize="20"
+                                               Foreground="{StaticResource BrassBrush}" Margin="0,10,0,0" />
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                                               Text="{Binding Note}" IsVisible="{Binding HasNote}"
+                                               Classes="caption small" Margin="16,3,0,10" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- What the account owns. The access list has arrived with every
+                         account read since the app was written and was thrown away. -->
+                    <Border Classes="rule" Margin="0,8,0,0" />
+                    <TextBlock Text="OWNED" Classes="heading" />
+                    <TextBlock Text="{Binding Owned}" Classes="caption" />
+
+                    <ItemsControl ItemsSource="{Binding Expansions}" IsVisible="{Binding HasExpansions}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:Owned">
+                                <Grid ColumnDefinitions="4,38,*" RowDefinitions="Auto,*" MinHeight="48"
+                                      Margin="0,0,0,2">
+                                    <Border Grid.RowSpan="2" Background="{StaticResource BrassBrush}" />
+                                    <!-- Cut for this app: the API has artwork for
+                                         professions but none for expansions. -->
+                                    <Image Grid.RowSpan="2" Grid.Column="1"
+                                           ui:AppImage.Source="{Binding Icon}"
+                                           Width="26" Height="26" VerticalAlignment="Center" Margin="12,0,0,0" />
+                                    <TextBlock Grid.Column="2" Text="{Binding Name}" Margin="14,8,0,0"
+                                               VerticalAlignment="Center" />
+                                    <!-- Said out loud where ownership is implied rather than
+                                         reported, so the list can be checked against reality. -->
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Note}"
+                                               IsVisible="{Binding HasNote}" Classes="caption small"
+                                               Margin="14,1,0,8" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Whose artwork this is. The app draws its own silhouettes; these are
+                         the game's, and the credit belongs on the screen showing them. -->
+                    <TextBlock Text="Expansion emblems are ArenaNet's, from the Guild Wars 2 Wiki."
+                               Classes="caption small" Margin="0,4,0,0" />
+
+                    <!-- The home instance. Small catalogues, self-describing ids and no
+                         name lookup anywhere: the cheapest checklist in the app. -->
+                    <StackPanel IsVisible="{Binding HasHome}" Spacing="10" Margin="0,8,0,0">
+                        <Border Classes="rule" />
+                        <TextBlock Text="HOME INSTANCE" Classes="heading" />
+                        <TextBlock Text="{Binding NodeSummary}" Classes="caption" />
+                        <ItemsControl ItemsSource="{Binding Nodes}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="services:HomeRow">
+                                    <Grid ColumnDefinitions="4,*" MinHeight="36" Margin="0,0,0,2">
+                                        <Border Background="{Binding EdgeColor, Converter={x:Static ui:Paint.Brush}}" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="16,0,0,0"
+                                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- The cats have no names in the API, only the food that lures them. -->
+                        <TextBlock Text="{Binding CatSummary}" Classes="caption" Margin="0,8,0,0" />
+                        <ItemsControl ItemsSource="{Binding Cats}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="services:HomeRow">
+                                    <Grid ColumnDefinitions="4,*" MinHeight="36" Margin="0,0,0,2">
+                                        <Border Background="{Binding EdgeColor, Converter={x:Static ui:Paint.Brush}}" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="16,0,0,0"
+                                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Text="{Binding HomeNote}" Classes="caption small" Margin="0,6,0,0" />
+                    </StackPanel>
+
+                    <!-- Why luck is a count and not a percentage. -->
+                    <TextBlock Text="{Binding Footnote}" Classes="caption small" Margin="0,6,0,0" />
+                </StackPanel>
+            </ScrollViewer>
+        </RefreshContainer>
+    </Grid>
+</shell:PageView>

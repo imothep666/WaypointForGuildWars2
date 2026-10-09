@@ -1,0 +1,98 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
+                x:Class="GuildWarsCompanion.Ava.Views.UnlockCategoryView"
+                x:DataType="vm:UnlockCategoryViewModel"
+                PageTitle="{Binding Heading}">
+
+    <Grid RowDefinitions="Auto,*">
+        <StackPanel Margin="20,12,20,0" Spacing="8">
+            <!-- The shell's bar carries the title alone, so the count leads the page. -->
+            <TextBlock Text="{Binding Count}" Classes="caption" />
+            <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
+            <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+        </StackPanel>
+
+        <!--
+            One virtualised list for both kinds of category, pointed at a flat run of items by the
+            code-behind: group headings and rows of four swatches for dyes, plain names for
+            everything else. Each item finds its template by type.
+
+            A row of four swatches is ONE item, not four. On MAUI a grid of single tiles put forty
+            item views on screen and scrolled at 85ms a frame against a plain list's 10; ten rows
+            beat forty tiles, and the same holds for any list that recycles its items.
+        -->
+        <ScrollViewer Grid.Row="1" Margin="0,8,0,0">
+            <ItemsControl x:Name="Items">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.DataTemplates>
+                    <!-- A rarity heading, in that rarity's own colour, so it reads as the same fact
+                         the frames beneath it carry. -->
+                    <DataTemplate DataType="vm:TileGroup">
+                        <Grid Margin="16,16,16,4" ColumnDefinitions="*,Auto">
+                            <TextBlock Text="{Binding Heading}" Classes="heading small"
+                                       Foreground="{Binding Tint, Converter={x:Static ui:Paint.Brush}}"
+                                       VerticalAlignment="Bottom" />
+                            <TextBlock Grid.Column="1" Text="{Binding Line}" Classes="caption"
+                                       VerticalAlignment="Bottom" />
+                        </Grid>
+                    </DataTemplate>
+
+                    <DataTemplate DataType="vm:TileRow">
+                        <Grid ColumnDefinitions="*,8,*,8,*,8,*" Margin="16,5" Height="84">
+                            <Grid RowDefinitions="56,2,16" IsVisible="{Binding HasA}">
+                                <Border Background="{Binding A.Frame, Converter={x:Static ui:Paint.Brush}}" />
+                                <Border Background="{Binding A.Swatch, Converter={x:Static ui:Paint.Brush}}" Margin="2" />
+                                <TextBlock Grid.Row="2" Text="{Binding A.Name}" FontSize="9"
+                                           HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                           Foreground="{Binding A.Ink, Converter={x:Static ui:Paint.Brush}}" />
+                            </Grid>
+                            <Grid Grid.Column="2" RowDefinitions="56,2,16" IsVisible="{Binding HasB}">
+                                <Border Background="{Binding B.Frame, Converter={x:Static ui:Paint.Brush}}" />
+                                <Border Background="{Binding B.Swatch, Converter={x:Static ui:Paint.Brush}}" Margin="2" />
+                                <TextBlock Grid.Row="2" Text="{Binding B.Name}" FontSize="9"
+                                           HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                           Foreground="{Binding B.Ink, Converter={x:Static ui:Paint.Brush}}" />
+                            </Grid>
+                            <Grid Grid.Column="4" RowDefinitions="56,2,16" IsVisible="{Binding HasC}">
+                                <Border Background="{Binding C.Frame, Converter={x:Static ui:Paint.Brush}}" />
+                                <Border Background="{Binding C.Swatch, Converter={x:Static ui:Paint.Brush}}" Margin="2" />
+                                <TextBlock Grid.Row="2" Text="{Binding C.Name}" FontSize="9"
+                                           HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                           Foreground="{Binding C.Ink, Converter={x:Static ui:Paint.Brush}}" />
+                            </Grid>
+                            <Grid Grid.Column="6" RowDefinitions="56,2,16" IsVisible="{Binding HasD}">
+                                <Border Background="{Binding D.Frame, Converter={x:Static ui:Paint.Brush}}" />
+                                <Border Background="{Binding D.Swatch, Converter={x:Static ui:Paint.Brush}}" Margin="2" />
+                                <TextBlock Grid.Row="2" Text="{Binding D.Name}" FontSize="9"
+                                           HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                           Foreground="{Binding D.Ink, Converter={x:Static ui:Paint.Brush}}" />
+                            </Grid>
+                        </Grid>
+                    </DataTemplate>
+
+                    <!-- Everything else: a name is all there is, so a name is all it draws. Faded
+                         through the text colour rather than Opacity, so no row needs a layer of its
+                         own. -->
+                    <DataTemplate DataType="vm:UnlockRow">
+                        <Grid Margin="20,8" ColumnDefinitions="*,Auto" Height="40">
+                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"
+                                       Foreground="{Binding Ink, Converter={x:Static ui:Paint.Brush}}" />
+                            <TextBlock Grid.Column="1" Text="locked" FontSize="10"
+                                       Foreground="{StaticResource BrassDimBrush}"
+                                       IsVisible="{Binding IsLocked}" VerticalAlignment="Center" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.DataTemplates>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</shell:PageView>

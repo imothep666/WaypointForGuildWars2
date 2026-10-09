@@ -1,0 +1,69 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:controls="using:GuildWarsCompanion.Ava.Controls"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                xmlns:services="using:GuildWarsCompanion.Services"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
+                x:Class="GuildWarsCompanion.Ava.Views.MasteriesView"
+                x:DataType="vm:MasteriesViewModel"
+                ShowsWash="True">
+
+    <Grid RowDefinitions="Auto,*">
+        <controls:AreaTabStrip Area="account" Current="masteries" />
+
+        <RefreshContainer Grid.Row="1" RefreshRequested="OnPullRefresh">
+            <ScrollViewer>
+                <StackPanel Margin="20,16,20,32" Spacing="14">
+                    <!-- Points sitting unspent is what this screen exists to catch. -->
+                    <TextBlock Text="{Binding Summary}" Classes="figure"
+                               Foreground="{StaticResource BrassBrush}" TextWrapping="Wrap" />
+                    <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
+                    <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+
+                    <!-- Per region, because that is how they are spent. -->
+                    <ItemsControl ItemsSource="{Binding Regions}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:RegionPoints">
+                                <Grid ColumnDefinitions="4,*,Auto" MinHeight="44" Margin="0,0,0,2">
+                                    <Border Background="{StaticResource BrassDimBrush}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Region}" Margin="16,0,10,0"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Grid.Column="2" Text="{Binding Line}" Classes="caption"
+                                               VerticalAlignment="Center" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Border Classes="rule" Margin="0,8,0,0" />
+                    <TextBlock Text="TRACKS" Classes="heading" />
+
+                    <ItemsControl ItemsSource="{Binding Tracks}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:MasteryRow">
+                                <Grid ColumnDefinitions="4,*,Auto" RowDefinitions="Auto,*" MinHeight="56"
+                                      Margin="0,0,0,2">
+                                    <!-- Brass only where the next level can be taken today. -->
+                                    <Border Grid.RowSpan="2"
+                                            Background="{Binding EdgeColor, Converter={x:Static ui:Paint.Brush}}" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="16,9,10,0"
+                                               TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Grid.Column="2" Text="{Binding ProgressText}" Classes="caption"
+                                               Margin="0,9,0,0" />
+                                    <!-- What the next level is, what it costs, and whether the
+                                         region's points cover it. -->
+                                    <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                                               Text="{Binding Detail}" Classes="caption small"
+                                               Margin="16,2,0,9" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Text="{Binding Footnote}" Classes="caption small" Margin="0,6,0,0" />
+                </StackPanel>
+            </ScrollViewer>
+        </RefreshContainer>
+    </Grid>
+</shell:PageView>
