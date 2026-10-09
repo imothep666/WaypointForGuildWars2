@@ -146,6 +146,15 @@
             <Setter Property="BorderBrush" Value="#C8A34E" />
         </Style>
 
+        <!-- The title bar's update button: small brass capitals, the bar's one call to action. -->
+        <Style Selector="Button.update">
+            <Setter Property="Height" Value="22" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="10.5" />
+            <Setter Property="Foreground" Value="#C8A34E" />
+        </Style>
+
         <!-- A page tab: no button chrome at all, only its carved name. -->
         <Style Selector="Button.tab">
             <Setter Property="Background" Value="Transparent" />

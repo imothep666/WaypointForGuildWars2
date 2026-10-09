@@ -72,21 +72,10 @@
             <Grid RowDefinitions="56,Auto,*,Auto">
                 <!-- The area's painted wash, for a page that leads with a masthead: behind the bar
                      and the top of the page, fading out into the obsidian below. -->
-                <!-- A page's landscape, under the wash: muted, so the headline still reads over
-                     a bright sky, and fading out with the wash. -->
-                <Image x:Name="SceneImage" Grid.RowSpan="3" Height="260" VerticalAlignment="Top"
-                       Stretch="UniformToFill" Opacity="0.4" IsHitTestVisible="False">
-                    <Image.OpacityMask>
-                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-                            <GradientStop Offset="0" Color="White" />
-                            <GradientStop Offset="0.55" Color="White" />
-                            <GradientStop Offset="1" Color="Transparent" />
-                        </LinearGradientBrush>
-                    </Image.OpacityMask>
+<Image x:Name="WashImage" Grid.RowSpan="3" Height="260" VerticalAlignment="Top"
+                       Stretch="Fill" IsVisible="False" IsHitTestVisible="False">
+                    <Image.Transitions><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.6" Easing="SineEaseInOut" /></Transitions></Image.Transitions>
                 </Image>
-
-                <Image x:Name="WashImage" Grid.RowSpan="3" Height="260" VerticalAlignment="Top"
-                       Stretch="Fill" IsVisible="False" IsHitTestVisible="False" />
 
                 <!-- The same wash as a band behind the bar alone: cropped, not squeezed, and over
                      a rule of the area's tint where the page begins. -->
@@ -97,6 +86,7 @@
                      white wash_mask. -->
                 <Border x:Name="TintedWash" Grid.RowSpan="3" Height="260" VerticalAlignment="Top"
                         IsVisible="False" IsHitTestVisible="False">
+                    <Border.Transitions><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.6" Easing="SineEaseInOut" /></Transitions></Border.Transitions>
                     <Border.OpacityMask>
                         <ImageBrush Source="/Assets/Images/wash_mask.png" Stretch="Fill" />
                     </Border.OpacityMask>
@@ -108,6 +98,7 @@
                 <Image x:Name="ArtImage" Grid.RowSpan="3" Height="236" Margin="0,4,-24,0"
                        VerticalAlignment="Top" HorizontalAlignment="Right" Stretch="Uniform"
                        Opacity="0.8" IsHitTestVisible="False">
+                    <Image.Transitions><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.6" Easing="SineEaseInOut" /></Transitions></Image.Transitions>
                     <Image.OpacityMask>
                         <RadialGradientBrush Center="58%,40%" GradientOrigin="58%,40%" RadiusX="62%" RadiusY="66%">
                             <GradientStop Offset="0" Color="White" />
@@ -116,6 +107,49 @@
                         </RadialGradientBrush>
                     </Image.OpacityMask>
                 </Image>
+
+                <!--
+                    A page's landscape: the loading screen of the map someone is playing on. It
+                    takes the wash's place rather than sitting faintly under it, and the two fade
+                    into each other, as do one map's and the next's: two layers, the new one
+                    fading in over the old. See ShowScene.
+                -->
+                <Image x:Name="SceneA" Grid.RowSpan="3" Height="260" VerticalAlignment="Top"
+                       Stretch="UniformToFill" Opacity="0" IsHitTestVisible="False">
+                    <Image.Transitions><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.6" Easing="SineEaseInOut" /></Transitions></Image.Transitions>
+                    <Image.OpacityMask>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                            <GradientStop Offset="0" Color="White" />
+                            <GradientStop Offset="0.55" Color="White" />
+                            <GradientStop Offset="1" Color="Transparent" />
+                        </LinearGradientBrush>
+                    </Image.OpacityMask>
+                </Image>
+                <Image x:Name="SceneB" Grid.RowSpan="3" Height="260" VerticalAlignment="Top"
+                       Stretch="UniformToFill" Opacity="0" IsHitTestVisible="False">
+                    <Image.Transitions><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.6" Easing="SineEaseInOut" /></Transitions></Image.Transitions>
+                    <Image.OpacityMask>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                            <GradientStop Offset="0" Color="White" />
+                            <GradientStop Offset="0.55" Color="White" />
+                            <GradientStop Offset="1" Color="Transparent" />
+                        </LinearGradientBrush>
+                    </Image.OpacityMask>
+                </Image>
+
+                <!-- The shade the headline stands in over a landscape: darkest at the top left,
+                     where the title and the countdown are, clear towards the bottom right. -->
+                <Border x:Name="SceneShade" Grid.RowSpan="3" Height="260" VerticalAlignment="Top"
+                        Opacity="0" IsHitTestVisible="False">
+                    <Border.Transitions><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.6" Easing="SineEaseInOut" /></Transitions></Border.Transitions>
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                            <GradientStop Offset="0" Color="#B30F141B" />
+                            <GradientStop Offset="0.45" Color="#660F141B" />
+                            <GradientStop Offset="1" Color="#000F141B" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+                </Border>
 
                 <Grid ColumnDefinitions="Auto,*,Auto">
                     <!-- Only on a page opened from another; an area's own page has nowhere to go back to. -->

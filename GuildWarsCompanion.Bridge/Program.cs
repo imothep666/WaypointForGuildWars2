@@ -5,15 +5,29 @@ using Avalonia;
 
 using GuildWarsCompanion.Bridge.Protocol;
 
+using Velopack;
+
 namespace GuildWarsCompanion.Bridge;
 
 internal static class Program
 {
+    /// <summary>This run's arguments, which an update hands on to the version it starts.</summary>
+    public static string[] Args { get; private set; } = [];
+
     // Avalonia needs this before any SynchronizationContext exists, so it must stay the entry
     // point and stay free of anything that touches the toolkit.
     [STAThread]
     public static void Main(string[] args)
     {
+        // First, before anything else runs: an installer or updater may start the bridge only to
+        // run a hook and exit, and an update downloaded but never restarted for is applied here.
+        VelopackApp.Build().Run();
+
+        Args = args;
+        GuildWarsCompanion.Ava.Desktop.LinuxMenuEntry.Refresh(BridgeSettings.DataFolder, args,
+            "waypoint-bridge.desktop", "Waypoint PC Bridge", "Passes Guild Wars 2's live state to the Waypoint app",
+            "waypoint-bridge.png", "Game;Utility;");
+
         // Launching it again is how you get the window back. That matters most where the tray
         // is least reliable: a GNOME session shows no icon to click, so without this the only
         // way out of "keep running in the tray" would be to kill the process.

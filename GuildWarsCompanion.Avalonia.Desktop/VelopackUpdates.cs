@@ -21,6 +21,9 @@ namespace GuildWarsCompanion.Ava.Desktop;
 /// The releases address is baked in at build time (WaypointReleases in the project file), so a
 /// local build has none and does not update. Neither does a build that was not installed by
 /// Velopack: a folder from dotnet publish or packaging/linux/build.ps1 has nothing to swap.
+///
+/// The PC Bridge compiles this same file (see its project file), so the two update alike; the
+/// address is read from whichever assembly it was compiled into.
 /// </summary>
 public sealed partial class VelopackUpdates : ObservableObject, IAppUpdates
 {
@@ -34,6 +37,7 @@ public sealed partial class VelopackUpdates : ObservableObject, IAppUpdates
     private readonly IMainThread _mainThread;
     private readonly Journal _journal;
     private readonly string[] _args;
+    private readonly Action _exit;
 
     private VelopackAsset? _ready;
     private Timer? _timer;
@@ -43,11 +47,14 @@ public sealed partial class VelopackUpdates : ObservableObject, IAppUpdates
     [ObservableProperty] private bool _isBusy;
     [ObservableProperty] private bool _isReady;
 
-    public VelopackUpdates(IMainThread mainThread, Journal journal, string[] args)
+    /// <param name="exit">Closes the app the way its own Quit does, so it can save and let go of
+    /// what it holds before the update replaces it.</param>
+    public VelopackUpdates(IMainThread mainThread, Journal journal, string[] args, Action exit)
     {
         _mainThread = mainThread;
         _journal = journal;
         _args = args;
+        _exit = exit;
 
         var releases = typeof(VelopackUpdates).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
             .FirstOrDefault(attribute => attribute.Key == "WaypointReleases")?.Value;
@@ -131,8 +138,12 @@ public sealed partial class VelopackUpdates : ObservableObject, IAppUpdates
 
         _journal.Write("update", $"restarting into {_ready.Version}");
 
-        // The arguments this run had, so a --software start comes back as one.
-        _manager.ApplyUpdatesAndRestart(_ready, _args);
+        // The updater waits for this process to end, applies the update and starts the new
+        // version with the arguments this run had, so a --software start comes back as one.
+        // The app closes itself meanwhile, the normal way: ApplyUpdatesAndRestart would end the
+        // process on the spot, and the bridge has a server and a tray icon to let go of first.
+        _manager.WaitExitThenApplyUpdates(_ready, silent: true, restart: true, _args);
+        _exit();
     }
 
     private void Ready(VelopackAsset asset)

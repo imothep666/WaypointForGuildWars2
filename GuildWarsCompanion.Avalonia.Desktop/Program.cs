@@ -1,6 +1,7 @@
 using System.Reflection;
 
 using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
 
 using GuildWarsCompanion.Host;
 
@@ -34,7 +35,9 @@ internal static class Program
             services.AddSingleton<IAppUpdates>(provider => new VelopackUpdates(
                 provider.GetRequiredService<IMainThread>(),
                 provider.GetRequiredService<Bridge.Protocol.Journal>(),
-                args));
+                args,
+                exit: () => provider.GetRequiredService<IMainThread>().BeginInvokeOnMainThread(() =>
+                    (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.Shutdown())));
         };
 
         BuildAvaloniaApp(args.Contains("--wayland"), args.Contains("--software")).StartWithClassicDesktopLifetime(args);

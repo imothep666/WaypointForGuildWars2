@@ -10,12 +10,19 @@ namespace GuildWarsCompanion.Ava.Desktop;
 ///
 /// The icon is copied out next to the app's data, because an AppImage's own files are mounted
 /// somewhere new on every run and nothing outside it can point at them.
+///
+/// The PC Bridge compiles this same file and writes its own entry with it.
 /// </summary>
 internal static class LinuxMenuEntry
 {
-    private const string FileName = "gw2companion.desktop";
+    /// <summary>The app's entry: the file name install.sh used, so the AppImage takes it over.</summary>
+    public static void Refresh(string dataDirectory, string[] args) =>
+        Refresh(dataDirectory, args, "gw2companion.desktop", "Waypoint", "Guild Wars 2 companion",
+            "waypoint.png", "Game;Utility;");
 
-    public static void Refresh(string dataDirectory, string[] args)
+    /// <param name="icon">An embedded resource of the calling assembly, copied out under the same name.</param>
+    public static void Refresh(string dataDirectory, string[] args, string fileName, string name, string comment,
+        string icon, string categories)
     {
         if (!OperatingSystem.IsLinux()) return;
 
@@ -24,9 +31,9 @@ internal static class LinuxMenuEntry
 
         try
         {
-            var icon = Path.Combine(dataDirectory, "waypoint.png");
-            using (var source = typeof(LinuxMenuEntry).Assembly.GetManifestResourceStream("waypoint.png"))
-            using (var target = File.Create(icon))
+            var iconPath = Path.Combine(dataDirectory, icon);
+            using (var source = typeof(LinuxMenuEntry).Assembly.GetManifestResourceStream(icon))
+            using (var target = File.Create(iconPath))
                 source?.CopyTo(target);
 
             var options = string.Concat(args.Where(arg => arg is "--software" or "--wayland").Select(arg => " " + arg));
@@ -41,16 +48,16 @@ internal static class LinuxMenuEntry
             var entry = $"""
                 [Desktop Entry]
                 Type=Application
-                Name=Waypoint
-                Comment=Guild Wars 2 companion
+                Name={name}
+                Comment={comment}
                 Exec="{appImage}"{options}
-                Icon={icon}
+                Icon={iconPath}
                 Terminal=false
-                Categories=Game;Utility;
+                Categories={categories}
 
                 """;
 
-            var path = Path.Combine(applications, FileName);
+            var path = Path.Combine(applications, fileName);
             if (!File.Exists(path) || File.ReadAllText(path) != entry) File.WriteAllText(path, entry);
         }
         catch (Exception)

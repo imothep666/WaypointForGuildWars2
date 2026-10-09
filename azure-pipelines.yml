@@ -1,11 +1,14 @@
-# Builds the desktop app for Linux, keeps it as a pipeline artifact, and on main publishes it as
-# a GitHub release that installed copies update from (see VelopackUpdates in the desktop project).
+# Builds the desktop app and the PC Bridge, keeps them as a pipeline artifact, and on main
+# publishes them as one GitHub release that installed copies update from (see VelopackUpdates in
+# the desktop project, which the bridge compiles too).
 #
-# Linux first, arm64 and x64: an AppImage each, made by Velopack's vpk, plus the update packages
-# beside it. Windows is meant to join as a second job of the same shape.
+# Each package below is published, packed by Velopack's vpk and uploaded on its own channel, so an
+# install is only ever offered updates for what it is: the app as an AppImage for Linux arm64 and
+# x64, the bridge as an AppImage for Linux x64 and a Setup.exe for Windows. Everything is built on
+# one Linux agent; vpk packs the Windows bridge from there with its [win] directive.
 #
 # Set up once, in the pipeline's variables (Edit > Variables), not here:
-#   ReleasesRepo   https://github.com/<owner>/<repo>, a public repository that holds only releases.
+#   ReleasesRepo   https://github.com/<owner>/<repo>, the public repository the releases go to.
 #                  It needs one commit (a README will do) before a release can be tagged in it.
 #   GitHubToken    secret. A fine-grained token for that repository alone, with Contents: read and
 #                  write, which is what creating a release and uploading to it takes.
@@ -22,11 +25,53 @@ pr: none
 pool:
   vmImage: ubuntu-latest
 
+parameters:
+  # channel: Velopack's, and the name in the feed file; unique across the whole release.
+  # exe: the file vpk treats as the program. directive: vpk's cross-packing switch, [win] for a
+  # Setup.exe made on this Linux agent. extra: options only one kind of package takes.
+  - name: packages
+    type: object
+    default:
+      - channel: linux-arm64
+        rid: linux-arm64
+        project: GuildWarsCompanion.Avalonia.Desktop/GuildWarsCompanion.Avalonia.Desktop.csproj
+        packId: Waypoint
+        title: Waypoint
+        exe: GuildWarsCompanion.Desktop
+        icon: GuildWarsCompanion.Avalonia.Android/Resources/mipmap-xxxhdpi/appicon.png
+        directive: ''
+        extra: --categories "Game;Utility"
+      - channel: linux-x64
+        rid: linux-x64
+        project: GuildWarsCompanion.Avalonia.Desktop/GuildWarsCompanion.Avalonia.Desktop.csproj
+        packId: Waypoint
+        title: Waypoint
+        exe: GuildWarsCompanion.Desktop
+        icon: GuildWarsCompanion.Avalonia.Android/Resources/mipmap-xxxhdpi/appicon.png
+        directive: ''
+        extra: --categories "Game;Utility"
+      - channel: bridge-linux-x64
+        rid: linux-x64
+        project: GuildWarsCompanion.Bridge/GuildWarsCompanion.Bridge.csproj
+        packId: WaypointBridge
+        title: Waypoint PC Bridge
+        exe: GuildWarsCompanion.Bridge
+        icon: GuildWarsCompanion.Bridge/Assets/tray.png
+        directive: ''
+        extra: --categories "Game;Utility"
+      - channel: bridge-win
+        rid: win-x64
+        project: GuildWarsCompanion.Bridge/GuildWarsCompanion.Bridge.csproj
+        packId: WaypointBridge
+        title: Waypoint PC Bridge
+        exe: GuildWarsCompanion.Bridge.exe
+        icon: GuildWarsCompanion.Bridge/Assets/tray.ico
+        directive: '"[win]"'
+        extra: ''
+
 variables:
-  # Keep in step with the Velopack package in GuildWarsCompanion.Avalonia.Desktop.csproj.
+  # Keep in step with the Velopack package in the desktop and bridge project files.
   VpkVersion: 1.2.161
-  Project: GuildWarsCompanion.Avalonia.Desktop/GuildWarsCompanion.Avalonia.Desktop.csproj
-  Icon: GuildWarsCompanion.Avalonia.Android/Resources/mipmap-xxxhdpi/appicon.png
   Out: $(Build.ArtifactStagingDirectory)/releases
 
 steps:
@@ -63,27 +108,26 @@ steps:
   - bash: dotnet test GuildWarsCompanion.Tests -nologo
     displayName: Tests
 
-  # One AppImage per processor, each on its own Velopack channel, so an arm64 install is only
-  # ever offered arm64 updates. The previous release is fetched first: vpk makes a delta package
-  # against it, which is what most updates then download.
-  - ${{ each rid in split('linux-arm64,linux-x64', ',') }}:
+  # The previous release is fetched first: vpk makes a delta package against it, which is what
+  # most updates then download.
+  - ${{ each p in parameters.packages }}:
     - bash: |
         set -euo pipefail
-        publish="$(Agent.TempDirectory)/publish-${{ rid }}"
-        out="$(Out)/${{ rid }}"
+        publish="$(Agent.TempDirectory)/publish-${{ p.channel }}"
+        out="$(Out)/${{ p.channel }}"
         mkdir -p "$out"
 
-        dotnet publish "$(Project)" -r ${{ rid }} --self-contained true -c Release -o "$publish" -nologo \
+        dotnet publish "${{ p.project }}" -r ${{ p.rid }} --self-contained true -c Release -o "$publish" -nologo \
           -p:WaypointReleases="$RELEASES_REPO"
 
-        vpk download github --repoUrl "$RELEASES_REPO" --token "$GITHUB_TOKEN" --channel ${{ rid }} -o "$out" \
+        vpk download github --repoUrl "$RELEASES_REPO" --token "$GITHUB_TOKEN" --channel ${{ p.channel }} -o "$out" \
           || echo "No earlier release to make a delta against."
 
-        vpk pack --packId Waypoint --packTitle Waypoint --packAuthors mpsoft \
-          --packVersion "$(Version)" --packDir "$publish" --mainExe GuildWarsCompanion.Desktop \
-          --runtime ${{ rid }} --channel ${{ rid }} --icon "$(Icon)" --categories "Game;Utility" \
+        vpk ${{ p.directive }} pack --packId ${{ p.packId }} --packTitle "${{ p.title }}" --packAuthors mpsoft \
+          --packVersion "$(Version)" --packDir "$publish" --mainExe ${{ p.exe }} \
+          --runtime ${{ p.rid }} --channel ${{ p.channel }} --icon "${{ p.icon }}" ${{ p.extra }} \
           --outputDir "$out"
-      displayName: Pack ${{ rid }}
+      displayName: Pack ${{ p.channel }}
       env:
         RELEASES_REPO: $(ReleasesRepo)
         GITHUB_TOKEN: $(GitHubToken)
@@ -92,16 +136,16 @@ steps:
     displayName: Artifact
     inputs:
       targetPath: $(Out)
-      artifact: waypoint-linux
+      artifact: waypoint-releases
 
-  # Both channels into one release: the first upload makes it, the second adds to it.
-  - ${{ each rid in split('linux-arm64,linux-x64', ',') }}:
+  # Every channel into one release: the first upload makes it, the others add to it.
+  - ${{ each p in parameters.packages }}:
     - bash: |
         set -euo pipefail
-        vpk upload github --repoUrl "$RELEASES_REPO" --token "$GITHUB_TOKEN" --channel ${{ rid }} \
-          --outputDir "$(Out)/${{ rid }}" --publish --merge \
+        vpk upload github --repoUrl "$RELEASES_REPO" --token "$GITHUB_TOKEN" --channel ${{ p.channel }} \
+          --outputDir "$(Out)/${{ p.channel }}" --publish --merge \
           --releaseName "Waypoint $(Version)" --tag "v$(Version)"
-      displayName: Release ${{ rid }}
+      displayName: Release ${{ p.channel }}
       # Main only: a run started by hand on another branch builds the artifact and stops.
       condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
       env:

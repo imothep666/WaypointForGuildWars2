@@ -1,7 +1,10 @@
-﻿using Avalonia;
+﻿using System.Runtime.InteropServices;
+
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 
 using GuildWarsCompanion.Bridge.ViewModels;
 using GuildWarsCompanion.Bridge.Views;
@@ -12,6 +15,9 @@ public partial class App : Application
 {
     private MainViewModel? _viewModel;
     private MainWindow? _window;
+
+    /// <summary>Held for as long as the app runs: a registration that is collected stops listening.</summary>
+    private readonly List<PosixSignalRegistration> _signals = [];
 
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
@@ -30,9 +36,18 @@ public partial class App : Application
 
             _viewModel.ShowRequested += Reveal;
             _viewModel.ReminderRequested += Remind;
-            _viewModel.QuitRequested += () => desktop.Shutdown();
+            _viewModel.QuitRequested += () => Quit(desktop);
 
+            // The window's X, with "keep running in the tray" off: the window is gone, and with
+            // an explicit shutdown mode nothing else would end the process.
+            _window.Closed += (_, _) => Quit(desktop);
+
+            // The session ending: the system asks, and the bridge tidies up before it goes.
             desktop.ShutdownRequested += (_, _) => _viewModel.Shutdown();
+
+            ListenForStopSignals(desktop);
+
+            _viewModel.Updates.Start();
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -63,15 +78,55 @@ public partial class App : Application
         _window.Activate();
     }
 
+    /// <summary>
+    /// `kill`, a logout or a shutdown asks with SIGTERM, a terminal with Ctrl+C. Both now quit
+    /// the way the tray's Quit does, so the hub and the server let go of their ports and the log
+    /// says "stop". Before, the hub's host took these signals for itself and the bridge stayed
+    /// running until a shutdown gave up waiting and killed it.
+    /// </summary>
+    private void ListenForStopSignals(IClassicDesktopStyleApplicationLifetime desktop)
+    {
+        foreach (var signal in new[] { PosixSignal.SIGTERM, PosixSignal.SIGINT })
+        {
+            try
+            {
+                _signals.Add(PosixSignalRegistration.Create(signal, context =>
+                {
+                    // Not the runtime's own handling, which would end the process at once.
+                    context.Cancel = true;
+                    Dispatcher.UIThread.Post(() => Quit(desktop));
+                }));
+            }
+            catch (PlatformNotSupportedException)
+            {
+                // A platform without that signal has nothing to listen for.
+            }
+        }
+    }
+
     private void OnTrayClicked(object? sender, EventArgs e) => Reveal();
 
     private void OnTrayShow(object? sender, EventArgs e) => Reveal();
 
     private void OnTrayQuit(object? sender, EventArgs e)
     {
-        _viewModel?.Shutdown();
-
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-            desktop.Shutdown();
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop) Quit(desktop);
     }
+
+    /// <summary>
+    /// The one way out: the view model lets go of the server, the hub and the game first, then
+    /// the app ends. Every route comes here — Quit in the window or the tray, the window's X,
+    /// an update's restart, SIGTERM — because Avalonia's Shutdown() does not raise
+    /// ShutdownRequested, and the routes that called only that ended without tidying up.
+    /// </summary>
+    private void Quit(IClassicDesktopStyleApplicationLifetime desktop)
+    {
+        if (_quitting) return;
+        _quitting = true;
+
+        _viewModel?.Shutdown();
+        desktop.Shutdown();
+    }
+
+    private bool _quitting;
 }

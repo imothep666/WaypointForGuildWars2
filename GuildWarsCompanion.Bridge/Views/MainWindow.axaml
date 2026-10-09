@@ -44,6 +44,10 @@
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top"
                         Margin="0,-8,0,0">
+                <!-- Only once an update is downloaded, as in the app's title bar. -->
+                <Button Classes="update" Content="RESTART TO UPDATE" Command="{Binding RestartToUpdateCommand}"
+                        IsVisible="{Binding Updates.IsReady}" Margin="0,3,8,0"
+                        AutomationProperties.Name="Restart to update" />
                 <Button Classes="caption" Click="OnMinimise" ToolTip.Tip="Minimise"
                         AutomationProperties.Name="Minimise">
                     <Path Data="M 0,5 H 10" />
@@ -282,6 +286,20 @@
 
                 <TextBlock Classes="caption" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,0"
                            Text="Text sent from the phone lands on this PC's clipboard — press Ctrl+V in the game's chat box. The one exception is an emote, which the Blish HUD module does in the game when Blish HUD was started from here. No account key is stored here." />
+
+                <!-- Only for an installed bridge; one run from a folder has nothing to update. -->
+                <StackPanel IsVisible="{Binding Updates.IsSupported}" Spacing="6" Margin="0,14,0,0">
+                    <Border Classes="rule" />
+                    <TextBlock Text="UPDATES" Classes="heading" Margin="0,8,0,0" />
+                    <TextBlock Classes="caption" FontSize="11" TextWrapping="Wrap" Text="{Binding Updates.Status}" />
+                    <ProgressBar IsIndeterminate="True" IsVisible="{Binding Updates.IsBusy}" />
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Button Content="CHECK NOW" Command="{Binding CheckForUpdateCommand}"
+                                IsVisible="{Binding !Updates.IsReady}" />
+                        <Button Content="RESTART TO UPDATE" Command="{Binding RestartToUpdateCommand}"
+                                IsVisible="{Binding Updates.IsReady}" />
+                    </StackPanel>
+                </StackPanel>
             </StackPanel>
         </ScrollViewer>
 

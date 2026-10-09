@@ -29,6 +29,23 @@ chmod +x Waypoint-linux-*.AppImage
 The first start adds Waypoint to the application menu. From then on the app updates itself: when a
 new version has been downloaded, the title bar offers **RESTART TO UPDATE**.
 
+Or let a script do it, which picks the right file for the processor and also replaces an older
+install made by `packaging/linux/install.sh`, keeping your data and its `--software` choice:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/imothep666/WaypointForGuildWars2/main/packaging/linux/install-appimage.sh | bash
+```
+
+Add `-s -- --software` after `bash` for drawing without the GPU, or `-s -- --uninstall` to remove it.
+
+The PC Bridge, for the PC the game runs on, is in the same release:
+
+- `WaypointBridge-bridge-win-Setup.exe`: Windows. Installs for your user only, no administrator
+  needed. It is not signed, so Windows SmartScreen asks once: "More info", then "Run anyway".
+- `WaypointBridge-bridge-linux-x64.AppImage`: Linux, for the game under Proton or Wine.
+
+It updates itself the same way as the app.
+
 ## Building
 
 Needs the .NET 10 SDK, and the Android workload for the Android app.

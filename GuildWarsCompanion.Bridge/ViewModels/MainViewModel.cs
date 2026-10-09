@@ -11,6 +11,7 @@ using CommunityToolkit.Mvvm.Input;
 
 using GuildWarsCompanion.Bridge.Protocol;
 using GuildWarsCompanion.Bridge.Stream;
+using GuildWarsCompanion.Host;
 
 namespace GuildWarsCompanion.Bridge.ViewModels;
 
@@ -43,6 +44,15 @@ public sealed partial class MainViewModel : ObservableObject
     /// <summary>Appearances already mentioned, so one boss is announced once.</summary>
     private readonly HashSet<string> _said = [];
 
+    /// <summary>The bridge's own updates; see VelopackUpdates. Started by App once the window is up.</summary>
+    public IAppUpdates Updates { get; }
+
+    [RelayCommand]
+    private Task CheckForUpdateAsync() => Updates.CheckAsync();
+
+    [RelayCommand]
+    private void RestartToUpdate() => Updates.RestartToUpdate();
+
     public MainViewModel()
     {
         _config = BridgeSettings.Load();
@@ -55,6 +65,10 @@ public sealed partial class MainViewModel : ObservableObject
         // here because it is what a phone matches on, and never the secret.
         _journal.Write("start", $"bridge {Version} up, port {_config.Port}, id {_config.Id}, " +
                                 $"name {_config.DisplayName}, os {Environment.OSVersion}");
+
+        // Quitting for an update is the tray's Quit: the server and the icon go first.
+        Updates = new GuildWarsCompanion.Ava.Desktop.VelopackUpdates(new BridgeMainThread(), _journal, Program.Args,
+            exit: () => Dispatcher.UIThread.Post(() => QuitRequested?.Invoke()));
         _server = new BridgeServer(
             () => _config, OnRequestAsync, RequestShow, () => _game.Json, OnContact, OnGuideAsync);
         _beacon = new BridgeBeacon(() => _config);
@@ -1063,8 +1077,14 @@ public sealed partial class MainViewModel : ObservableObject
                 : $"hub on {BridgeProtocol.HubPortFor(_config.Port)}{BridgeProtocol.HubPath}");
     }
 
+    /// <summary>Once only: Quit and the session ending can both ask.</summary>
+    private bool _shutDown;
+
     public void Shutdown()
     {
+        if (_shutDown) return;
+        _shutDown = true;
+
         _journal.Write("stop", "bridge shutting down");
 
         _gameTimer?.Stop();

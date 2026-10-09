@@ -2,6 +2,9 @@
 # Installs Waypoint from a folder made by packaging/linux/build.ps1, for the current user only:
 # no root, nothing outside the home folder.
 #
+# For a build of your own. The released app is the AppImage, which updates itself: install that
+# with install-appimage.sh, which also moves an install made by this script over to it.
+#
 #   bash install.sh               install or update
 #   bash install.sh --software    the same, drawing without the GPU (for a GL driver that fails,
 #                                 as the Tegra X1 under L4T may)

@@ -73,6 +73,23 @@ public sealed class HereService(
             !session.HasPermission(Gw2Permissions.Progression))
             return (0, null);
 
+        // Today redoes the line every minute while it is open, for the times in it; the hero
+        // points are the one part that costs a request, and they do not move that fast.
+        var key = (state.CharacterName, state.MapId);
+        if (_heroes is { } kept && kept.Key == key && DateTimeOffset.UtcNow - kept.At < HeroesKept)
+            return kept.Value;
+
+        var value = await AskHeroPointsAsync(state, ct);
+        _heroes = (key, DateTimeOffset.UtcNow, value);
+        return value;
+    }
+
+    private static readonly TimeSpan HeroesKept = TimeSpan.FromMinutes(5);
+
+    private ((string, int) Key, DateTimeOffset At, (int Total, int? Left) Value)? _heroes;
+
+    private async Task<(int Total, int? Left)> AskHeroPointsAsync(GameState state, CancellationToken ct)
+    {
         try
         {
             var ids = (await targets.OnMapAsync(state.MapId, ct))

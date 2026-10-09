@@ -93,7 +93,6 @@ public partial class MainView : UserControl
     private TaskCompletionSource? _alert;
     private IDisposable? _title;
     private IDisposable? _art;
-    private IDisposable? _scene;
     private PageView? _watched;
     private BaseViewModel? _watchedModel;
     private CancellationTokenSource? _sweeping;
@@ -181,9 +180,6 @@ public partial class MainView : UserControl
         _art?.Dispose();
         _art = page is null ? null : ArtImage.Bind(Image.SourceProperty, page.GetObservable(PageView.ArtProperty));
 
-        _scene?.Dispose();
-        _scene = page is null ? null : SceneImage.Bind(Image.SourceProperty, page.GetObservable(PageView.SceneProperty));
-
         Watch(page);
 
         BackButton.IsVisible = _router.CanGoBack;
@@ -207,6 +203,7 @@ public partial class MainView : UserControl
         _area = area;
 
         Paint(page);
+        ShowScene(page?.Scene);
 
         MoreLayer.IsVisible = false;
     }
@@ -265,7 +262,48 @@ public partial class MainView : UserControl
 
     private void OnPagePropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
-        if (e.Property == PageView.WashTintProperty && ReferenceEquals(sender, _router.Current)) Paint(_router.Current);
+        if (!ReferenceEquals(sender, _router.Current)) return;
+
+        if (e.Property == PageView.WashTintProperty) Paint(_router.Current);
+        if (e.Property == PageView.SceneProperty) ShowScene(_router.Current?.Scene);
+    }
+
+    /// <summary>How strongly a landscape shows: nearly whole, with SceneShade under the headline.</summary>
+    private const double SceneStrength = 0.9;
+
+    /// <summary>Which of the two landscape layers is the one showing.</summary>
+    private bool _sceneAInFront;
+
+    /// <summary>
+    /// A landscape in place of the wash, or the wash back. Only opacities change, and each layer
+    /// fades them (see the Transitions in MainView.axaml): a new landscape goes on the layer that
+    /// is not showing and fades in while the other fades out, so one map gives way to the next
+    /// the same way the wash gives way to the first.
+    /// </summary>
+    private void ShowScene(IImage? scene)
+    {
+        var front = _sceneAInFront ? SceneA : SceneB;
+        var back = _sceneAInFront ? SceneB : SceneA;
+
+        if (scene is null)
+        {
+            front.Opacity = 0;
+            back.Opacity = 0;
+        }
+        else if (!ReferenceEquals(front.Source, scene) || front.Opacity == 0)
+        {
+            back.Source = scene;
+            back.Opacity = SceneStrength;
+            front.Opacity = 0;
+            _sceneAInFront = !_sceneAInFront;
+        }
+
+        var shown = scene is not null;
+
+        WashImage.Opacity = shown ? 0 : 1;
+        TintedWash.Opacity = shown ? 0 : 1;
+        ArtImage.Opacity = shown ? 0 : 0.8;
+        SceneShade.Opacity = shown ? 1 : 0;
     }
 
     /// <summary>

@@ -70,6 +70,24 @@
     </ItemGroup>
 
     <!--
+        Installing and updating, the same way as the desktop app and with the same code: these
+        files are compiled from the app's copies. The releases address is baked in by the pipeline
+        only (-p:WaypointReleases=...), so a bridge built anywhere else never updates itself.
+    -->
+    <ItemGroup>
+        <Compile Include="..\GuildWarsCompanion.Core\Host\IAppUpdates.cs" Link="Updates\IAppUpdates.cs" />
+        <Compile Include="..\GuildWarsCompanion.Core\Host\IMainThread.cs" Link="Updates\IMainThread.cs" />
+        <Compile Include="..\GuildWarsCompanion.Avalonia.Desktop\VelopackUpdates.cs" Link="Updates\VelopackUpdates.cs" />
+        <Compile Include="..\GuildWarsCompanion.Avalonia.Desktop\LinuxMenuEntry.cs" Link="Updates\LinuxMenuEntry.cs" />
+        <!-- The Linux menu entry's icon; see LinuxMenuEntry. -->
+        <EmbeddedResource Include="Assets\tray.png" LogicalName="waypoint-bridge.png" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(WaypointReleases)' != ''">
+        <AssemblyMetadata Include="WaypointReleases" Value="$(WaypointReleases)" />
+    </ItemGroup>
+
+    <!--
         Kestrel and SignalR, for the one thing a socket-per-request design cannot do: hold a
         connection open for the compass screen. Everything else still goes through the
         hand-rolled TcpListener in Protocol/BridgeServer.cs.
@@ -90,6 +108,8 @@
         <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.2" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
         <PackageReference Include="QRCoder" Version="1.6.0" />
+        <!-- Keep in step with the desktop app's and with the vpk version in azure-pipelines.yml. -->
+        <PackageReference Include="Velopack" Version="1.2.161" />
     </ItemGroup>
 
 </Project>

@@ -70,19 +70,74 @@ public sealed partial class TodayViewModel(
         var loaded = await LoadSectionsAsync(ct);
 
         var report = await playing;
+        _loaded = loaded;
+
+        // After the trackers, whose fresh lists it reads; see HereService.
+        await ApplyGameAsync(report, ct);
+
+        if (loaded) Session = await ReadSessionAsync(ct);
+    });
+
+    /// <summary>Whether the last refresh read today's trackers, which the Here line builds on.</summary>
+    private bool _loaded;
+
+    /// <summary>
+    /// Where the last look found the game, or null for no live game. The map's name is part of
+    /// it: the bridge names a new map a moment after reporting its id, and "in Map 50" should not
+    /// stand until the minute's tick.
+    /// </summary>
+    private (string? Character, int? MapId, string? MapName)? _seen;
+
+    /// <summary>One look between refreshes at a time; the 15-second and the minute's can meet.</summary>
+    private int _looking;
+
+    /// <summary>
+    /// A look at the game between full refreshes, while the page is open: the PC again, and the
+    /// playing and Here lines when they would read differently. A new map or character always
+    /// redoes them; <paramref name="clockChanged"/> — the minute's tick — redoes the Here line
+    /// anyway, whose "in 8 min" goes stale on its own. Never an error on the page: a PC that does
+    /// not answer leaves the lines as they were until it does, or until a full refresh says otherwise.
+    /// </summary>
+    public async Task LookAtGameAsync(bool clockChanged, CancellationToken ct = default)
+    {
+        // A full refresh reads the game itself, and the trackers the Here line needs.
+        if (IsBusy || Interlocked.Exchange(ref _looking, 1) == 1) return;
+
+        try
+        {
+            var report = await ReadGameAsync(ct);
+            var seen = Where(report);
+
+            if (seen == _seen && !clockChanged) return;
+
+            await ApplyGameAsync(report, ct);
+        }
+        catch (Exception)
+        {
+            // Unreachable, mid-restart, rate limited: the next look is a few seconds away.
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _looking, 0);
+        }
+    }
+
+    private async Task ApplyGameAsync(GameReport? report, CancellationToken ct)
+    {
+        _seen = Where(report);
 
         Playing = PlayingLine.Describe(report);
         PlayingMap = Playing is null ? null : report?.MapName;
         _playingName = Playing is null ? null : report?.State?.CharacterName;
 
-        // After the trackers, whose fresh lists it reads; see HereService.
-        Here = loaded && report is not null ? await DescribeHereAsync(report, ct) : null;
+        Here = _loaded && report is not null ? await DescribeHereAsync(report, ct) : null;
 
         // The Here widget shows the same thing; it should not wait for its own poll to say so.
         await widgets.StoreHereAsync(report, Here, ct);
+    }
 
-        if (loaded) Session = await ReadSessionAsync(ct);
-    });
+    private static (string? Character, int? MapId, string? MapName)? Where(GameReport? report) =>
+        report is { IsLive: true, State: { } state } ? (state.CharacterName, state.MapId, report.MapName) : null;
 
     /// <summary>
     /// Takes a ledger point — opening Today is a moment worth recording, between the background
@@ -119,6 +174,10 @@ public sealed partial class TodayViewModel(
     /// <returns>Whether today's trackers were read, which is what <see cref="Here"/> builds on.</returns>
     private async Task<bool> LoadSectionsAsync(CancellationToken ct)
     {
+        // First, and whatever the key: the countdown needs none. Set only after the key checks,
+        // a page without a key showed no headline until the view's 30-second timer came round.
+        UpdateReset();
+
         await session.EnsureRestoredAsync(ct);
 
         if (!session.IsAuthenticated)
@@ -134,7 +193,6 @@ public sealed partial class TodayViewModel(
         }
 
         Notice = null;
-        UpdateReset();
 
         foreach (var section in await today.GetAsync(ct))
             Sections.Add(section);
@@ -220,12 +278,22 @@ public sealed partial class TodayViewModel(
     /// How long the list stays true. Without it "3 unfinished" is missing the only piece of
     /// context that decides whether you can still do anything about it.
     /// </summary>
-    public void UpdateReset()
+    /// <returns>Whether a reset has passed since the last call: the list is then yesterday's.</returns>
+    public bool UpdateReset()
     {
-        var remaining = TodayService.NextDailyReset(DateTimeOffset.UtcNow) - DateTimeOffset.UtcNow;
+        var now = DateTimeOffset.UtcNow;
+        var next = TodayService.NextDailyReset(now);
+        var remaining = next - now;
 
         ResetIn = remaining.TotalHours >= 1
             ? $"{(int)remaining.TotalHours}h {remaining.Minutes:00}m"
             : $"{remaining.Minutes} min";
+
+        var passed = _nextReset is { } before && next > before;
+        _nextReset = next;
+        return passed;
     }
+
+    /// <summary>The reset the countdown last counted down to.</summary>
+    private DateTimeOffset? _nextReset;
 }

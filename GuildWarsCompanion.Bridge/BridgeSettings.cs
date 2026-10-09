@@ -96,6 +96,16 @@ public static class BridgeSettings
     /// <summary>Beside the config, so "where is my setup" and "where is my log" have one answer.</summary>
     public static string LogPath => System.IO.Path.Combine(Folder, "bridge.log");
 
+    /// <summary>Where the config and the log live; the Linux menu entry's icon goes here too.</summary>
+    public static string DataFolder
+    {
+        get
+        {
+            Directory.CreateDirectory(Folder);
+            return Folder;
+        }
+    }
+
     private static string Folder => System.IO.Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "GuildWarsCompanion");

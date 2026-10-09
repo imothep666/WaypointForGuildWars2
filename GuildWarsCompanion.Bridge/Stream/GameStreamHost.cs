@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 // implicit usings do not apply and UseUrls has to be brought in by hand.
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace GuildWarsCompanion.Bridge.Stream;
@@ -101,6 +102,12 @@ public sealed class GameStreamHost(Func<BridgeConfig> config, Func<GameReport> r
 
             builder.Services.AddSignalR();
             builder.Services.AddSingleton(this);
+
+            // Not the console lifetime WebApplication brings by default: it takes SIGTERM and
+            // Ctrl+C for itself and answers them by stopping this hub alone, which left the
+            // bridge running without its hub and deaf to `kill`. The app handles those signals
+            // (see App) and stops the hub on its way out.
+            builder.Services.AddSingleton<IHostLifetime, NoSignalLifetime>();
 
             var app = builder.Build();
 

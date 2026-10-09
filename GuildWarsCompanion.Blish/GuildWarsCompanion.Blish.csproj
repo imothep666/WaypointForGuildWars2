@@ -50,7 +50,7 @@
             <_BhmStaging>$(IntermediateOutputPath)bhm\</_BhmStaging>
             <_BhmFile>$(OutDir)$(ProjectName).bhm</_BhmFile>
             <_BhmPlaceholder>"version": "0.0.0"</_BhmPlaceholder>
-            <_BhmManifest>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)\manifest.json'))</_BhmManifest>
+            <_BhmManifest>$([System.IO.File]::ReadAllText($([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', 'manifest.json'))))</_BhmManifest>
         </PropertyGroup>
 
         <Error Condition="!$(_BhmManifest.Contains('$(_BhmPlaceholder)'))"
