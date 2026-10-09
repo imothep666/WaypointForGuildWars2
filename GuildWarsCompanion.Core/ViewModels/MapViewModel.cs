@@ -374,6 +374,10 @@ public sealed partial class MapViewModel(
     /// <summary>True while a map is being shown because somebody picked it.</summary>
     [ObservableProperty] private bool _isPinned;
 
+    /// <summary>The name of the map on screen, picked or stood in, once it has loaded; its
+    /// loading screen goes in the band above it. Null before any map has.</summary>
+    [ObservableProperty] private string? _shownMap;
+
     /// <summary>
     /// Draws a map because somebody asked for it, rather than because a character is standing
     /// in it.
@@ -823,6 +827,7 @@ public sealed partial class MapViewModel(
         var map = await targets.InfoAsync(mapId, ct);
 
         _map = map;
+        ShownMap = map.Name;
 
         ContinentId = map.ContinentId;
         Floor = map.DefaultFloor;
@@ -922,11 +927,12 @@ public sealed partial class MapViewModel(
         // sideways phone back to upright.
         var at = ToView(player.X, player.Y, _viewWidth, _viewHeight);
 
-        if (!FollowBox.Escaped(at.X, at.Y, _viewWidth, _viewHeight)) return;
+        // Tighter and quicker close in; see FollowBox.ShareAt.
+        if (!FollowBox.Escaped(at.X, at.Y, _viewWidth, _viewHeight, FollowBox.ShareAt(Level, Levels))) return;
 
         // Glided rather than jumped. The jump was the whole of what made following distracting:
         // the map moving a quarter of the screen in one frame reads as having gone somewhere else.
-        _motion.GlideTo(ClampX(player.X), ClampY(player.Y));
+        _motion.GlideTo(ClampX(player.X), ClampY(player.Y), MapMotion.GlideSecondsAt(Level, Levels));
     }
 
     /// <summary>The continent from disk when it is there, otherwise from the API and then

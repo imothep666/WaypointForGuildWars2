@@ -80,7 +80,33 @@
                 <!-- The same wash as a band behind the bar alone: cropped, not squeezed, and over
                      a rule of the area's tint where the page begins. -->
                 <Image x:Name="BandImage" Grid.RowSpan="2" Height="57" VerticalAlignment="Top"
-                       Stretch="UniformToFill" IsVisible="False" IsHitTestVisible="False" />
+                       Stretch="UniformToFill" IsVisible="False" IsHitTestVisible="False">
+                    <Image.Transitions><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.6" Easing="SineEaseInOut" /></Transitions></Image.Transitions>
+                </Image>
+
+                <!-- A band page's landscape: the map and the compass put the loading screen of
+                     their map here, in the wash's place, as Today does in its masthead. -->
+                <Image x:Name="BandSceneA" Grid.RowSpan="2" Height="57" VerticalAlignment="Top"
+                       Stretch="UniformToFill" Opacity="0" IsHitTestVisible="False">
+                    <Image.Transitions><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.6" Easing="SineEaseInOut" /></Transitions></Image.Transitions>
+                </Image>
+                <Image x:Name="BandSceneB" Grid.RowSpan="2" Height="57" VerticalAlignment="Top"
+                       Stretch="UniformToFill" Opacity="0" IsHitTestVisible="False">
+                    <Image.Transitions><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.6" Easing="SineEaseInOut" /></Transitions></Image.Transitions>
+                </Image>
+
+                <!-- The shade the bar's title stands in over a landscape: from the left, where it is. -->
+                <Border x:Name="BandShade" Grid.RowSpan="2" Height="57" VerticalAlignment="Top"
+                        Opacity="0" IsHitTestVisible="False">
+                    <Border.Transitions><Transitions><DoubleTransition Property="Opacity" Duration="0:0:0.6" Easing="SineEaseInOut" /></Transitions></Border.Transitions>
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                            <GradientStop Offset="0" Color="#B30F141B" />
+                            <GradientStop Offset="0.5" Color="#4D0F141B" />
+                            <GradientStop Offset="1" Color="#1A0F141B" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+                </Border>
 
                 <!-- The same wash in a colour the page chooses: a block of it seen through the
                      white wash_mask. -->

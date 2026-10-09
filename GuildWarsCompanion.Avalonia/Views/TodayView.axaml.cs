@@ -28,24 +28,9 @@ public partial class TodayView : PageView
     }
 
     /// <summary>While someone is in the game, the masthead stands on the loading screen of their map.</summary>
-    private async void OnModelChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void OnModelChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        if (e.PropertyName != nameof(TodayViewModel.PlayingMap)) return;
-
-        var map = ViewModel.PlayingMap;
-
-        if (map is null)
-        {
-            Scene = null;
-            return;
-        }
-
-        var scene = await WikiArt.ForMapAsync(map);
-
-        // They may have moved on, or left the game, while the painting was on its way.
-        if (ViewModel.PlayingMap != map) return;
-
-        Scene = scene;
+        if (e.PropertyName == nameof(TodayViewModel.PlayingMap)) ShowMapScene(ViewModel.PlayingMap);
     }
 
     private TodayViewModel ViewModel => (TodayViewModel)DataContext!;

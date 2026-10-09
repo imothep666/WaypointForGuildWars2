@@ -34,12 +34,27 @@ public sealed class MapMotion
     /// </summary>
     public const double GlideSeconds = 0.15;
 
+    /// <summary>
+    /// The glide at a zoom level: quicker at the top two, where the follow box is tighter and a
+    /// glide comes more often (see <see cref="FollowBox.ShareAt"/>), so the ring is back in the
+    /// middle before the next step has taken it out again.
+    /// </summary>
+    public static double GlideSecondsAt(int level, int levels) => (levels - level) switch
+    {
+        <= 0 => 0.08,
+        1 => 0.11,
+        _ => GlideSeconds
+    };
+
     /// <summary>Close enough to call a glide finished, in pixels on the screen.</summary>
     private const double Arrived = 0.5;
 
     private Zooming? _zoom;
 
     private (double X, double Y)? _glide;
+
+    /// <summary>The time constant of the glide under way; see <see cref="GlideSeconds"/>.</summary>
+    private double _glideSeconds = GlideSeconds;
 
     /// <summary>
     /// How much bigger the map is drawn than its level's own pixels. One at rest; on the way in
@@ -69,7 +84,11 @@ public sealed class MapMotion
     }
 
     /// <summary>Starts gliding towards a point.</summary>
-    public void GlideTo(double x, double y) => _glide = (x, y);
+    public void GlideTo(double x, double y, double seconds = GlideSeconds)
+    {
+        _glide = (x, y);
+        _glideSeconds = seconds;
+    }
 
     /// <summary>Stops everything where it is, for a finger on the map or a new map.</summary>
     public void Stop()
@@ -108,7 +127,7 @@ public sealed class MapMotion
 
         if (_glide is { } target)
         {
-            var keep = Math.Exp(-seconds / GlideSeconds);
+            var keep = Math.Exp(-seconds / _glideSeconds);
             var x = target.X + (centreX - target.X) * keep;
             var y = target.Y + (centreY - target.Y) * keep;
 

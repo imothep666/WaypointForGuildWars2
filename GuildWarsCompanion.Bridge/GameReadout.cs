@@ -47,10 +47,14 @@ public sealed class GameReadout : IDisposable
     {
         var report = _watch.Poll(now) with { Arrived = arrived };
 
+        // Encoded before it becomes the current report: one that cannot be encoded must never be
+        // what the stream sends, or every connection breaks on it until something replaces it.
+        var json = JsonSerializer.Serialize(report, GameJson.Default.GameReport);
+
         Report = report;
+        Json = json;
         IsLive = report.IsLive;
         IsUnreadable = _watch.Problem is not null;
-        Json = JsonSerializer.Serialize(report, GameJson.Default.GameReport);
 
         if (report.State is not { } state)
         {

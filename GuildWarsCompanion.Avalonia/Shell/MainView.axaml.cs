@@ -203,7 +203,7 @@ public partial class MainView : UserControl
         _area = area;
 
         Paint(page);
-        ShowScene(page?.Scene);
+        ShowScene(page);
 
         MoreLayer.IsVisible = false;
     }
@@ -265,45 +265,70 @@ public partial class MainView : UserControl
         if (!ReferenceEquals(sender, _router.Current)) return;
 
         if (e.Property == PageView.WashTintProperty) Paint(_router.Current);
-        if (e.Property == PageView.SceneProperty) ShowScene(_router.Current?.Scene);
+        if (e.Property == PageView.SceneProperty) ShowScene(_router.Current);
     }
 
     /// <summary>How strongly a landscape shows: nearly whole, with SceneShade under the headline.</summary>
     private const double SceneStrength = 0.9;
 
-    /// <summary>Which of the two landscape layers is the one showing.</summary>
-    private bool _sceneAInFront;
+    /// <summary>Which of the two landscape layers is the one showing, in the masthead and in the band.</summary>
+    private bool _sceneAInFront, _bandSceneAInFront;
 
     /// <summary>
-    /// A landscape in place of the wash, or the wash back. Only opacities change, and each layer
-    /// fades them (see the Transitions in MainView.axaml): a new landscape goes on the layer that
-    /// is not showing and fades in while the other fades out, so one map gives way to the next
-    /// the same way the wash gives way to the first.
+    /// What each pair is showing, kept rather than read back off the layers: mid-fade, a layer's
+    /// opacity is wherever the fade has got to. Leaving the compass for the map — the same map,
+    /// the same painting — read a band still fading out as one still showing it, and left it blank.
     /// </summary>
-    private void ShowScene(IImage? scene)
+    private IImage? _sceneShown, _bandSceneShown;
+
+    /// <summary>
+    /// A page's landscape in place of the wash, or the wash back: in the masthead for a page that
+    /// has one, in the band for a band page (the map, the compass). Only opacities change, and
+    /// each layer fades them (see the Transitions in MainView.axaml).
+    /// </summary>
+    private void ShowScene(PageView? page)
     {
-        var front = _sceneAInFront ? SceneA : SceneB;
-        var back = _sceneAInFront ? SceneB : SceneA;
+        var scene = page?.Scene;
+        var inBand = page is { ShowsBand: true };
+
+        CrossFade(SceneA, SceneB, ref _sceneAInFront, ref _sceneShown, inBand ? null : scene, SceneStrength);
+        CrossFade(BandSceneA, BandSceneB, ref _bandSceneAInFront, ref _bandSceneShown, inBand ? scene : null, SceneStrength);
+
+        var masthead = scene is not null && !inBand;
+        var band = scene is not null && inBand;
+
+        WashImage.Opacity = masthead ? 0 : 1;
+        TintedWash.Opacity = masthead ? 0 : 1;
+        ArtImage.Opacity = masthead ? 0 : 0.8;
+        SceneShade.Opacity = masthead ? 1 : 0;
+
+        BandImage.Opacity = band ? 0 : 1;
+        BandShade.Opacity = band ? 1 : 0;
+    }
+
+    /// <summary>
+    /// A new landscape goes on the layer that is not showing and fades in while the other fades
+    /// out, so one map gives way to the next the same way the wash gives way to the first.
+    /// </summary>
+    private static void CrossFade(Image a, Image b, ref bool aInFront, ref IImage? shown, IImage? scene, double strength)
+    {
+        if (ReferenceEquals(shown, scene)) return;
+        shown = scene;
+
+        var front = aInFront ? a : b;
+        var back = aInFront ? b : a;
 
         if (scene is null)
         {
             front.Opacity = 0;
             back.Opacity = 0;
-        }
-        else if (!ReferenceEquals(front.Source, scene) || front.Opacity == 0)
-        {
-            back.Source = scene;
-            back.Opacity = SceneStrength;
-            front.Opacity = 0;
-            _sceneAInFront = !_sceneAInFront;
+            return;
         }
 
-        var shown = scene is not null;
-
-        WashImage.Opacity = shown ? 0 : 1;
-        TintedWash.Opacity = shown ? 0 : 1;
-        ArtImage.Opacity = shown ? 0 : 0.8;
-        SceneShade.Opacity = shown ? 1 : 0;
+        back.Source = scene;
+        back.Opacity = strength;
+        front.Opacity = 0;
+        aInFront = !aInFront;
     }
 
     /// <summary>

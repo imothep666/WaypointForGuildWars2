@@ -27,12 +27,27 @@ public static class FollowBox
     public const double Share = 0.5;
 
     /// <summary>
+    /// The box at a zoom level: tighter at the top two. Close in, a character crosses half the
+    /// screen in a few steps, and the ring stood well off the middle most of the time it was
+    /// being followed. One level from the top it is 0.4 of each side, at the top 0.3: more
+    /// glides, each of them short (see <see cref="MapMotion.GlideSecondsAt"/>), and only where a
+    /// step is many pixels. Further out, the half above.
+    /// </summary>
+    /// <param name="level">One for the widest view, <paramref name="levels"/> for the closest.</param>
+    public static double ShareAt(int level, int levels) => (levels - level) switch
+    {
+        <= 0 => 0.3,
+        1 => 0.4,
+        _ => Share
+    };
+
+    /// <summary>
     /// Whether the character, at this point in the viewport, has left the middle box.
     ///
     /// Both arguments are in the map's own space — the screen with its sides swapped on a quarter
     /// turn — so a sideways map asks this question about the box it actually has.
     /// </summary>
-    public static bool Escaped(double x, double y, double width, double height) =>
-        Math.Abs(x - width / 2) > width * Share / 2 ||
-        Math.Abs(y - height / 2) > height * Share / 2;
+    public static bool Escaped(double x, double y, double width, double height, double share = Share) =>
+        Math.Abs(x - width / 2) > width * share / 2 ||
+        Math.Abs(y - height / 2) > height * share / 2;
 }

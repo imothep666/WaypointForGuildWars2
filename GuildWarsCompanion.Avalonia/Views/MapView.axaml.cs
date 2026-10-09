@@ -105,6 +105,11 @@ public partial class MapView : PageView
 
     private MapViewModel ViewModel => (MapViewModel)DataContext!;
 
+    private void OnModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MapViewModel.ShownMap)) ShowMapScene(ViewModel.ShownMap);
+    }
+
     private float Density => (float)(TopLevel.GetTopLevel(this)?.RenderScaling ?? 1);
 
     protected override void OnDataContextChanged(EventArgs e)
@@ -122,6 +127,10 @@ public partial class MapView : PageView
         // Paired with OnDisappearing: the view model is a singleton and outlives this page.
         ViewModel.Changed += OnChanged;
 
+        // The band above the map shows the map's loading screen, picked or stood in.
+        ViewModel.PropertyChanged += OnModelPropertyChanged;
+        ShowMapScene(ViewModel.ShownMap);
+
         // Propped up while both hands are on the game, exactly like the compass.
         _awake.KeepScreenOn = true;
 
@@ -138,6 +147,8 @@ public partial class MapView : PageView
 
     public override void OnDisappearing()
     {
+        ViewModel.PropertyChanged -= OnModelPropertyChanged;
+
         ViewModel.Changed -= OnChanged;
 
         StopFrames();

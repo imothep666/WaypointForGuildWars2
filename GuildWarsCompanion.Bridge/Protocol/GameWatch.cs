@@ -33,6 +33,15 @@ public sealed class GameWatch(MapNames? maps = null) : IDisposable
                 "reached a character yet. The mapping is this bridge's own; the game fills it " +
                 "in within seconds of starting.");
 
+        // A position that is not a number: seen from MumbleSim given a lap of no seconds, not yet
+        // from the game, but one such poll made every report unsendable, and the stream refused
+        // every phone from then on. The last good position stands in, the rest of the reading is
+        // as it came.
+        if (!state.IsFinite)
+            state = _last is { IsFinite: true } good
+                ? state with { PlayerX = good.PlayerX, PlayerY = good.PlayerY, FrontX = good.FrontX, FrontZ = good.FrontZ }
+                : state with { PlayerX = 0, PlayerY = 0, FrontX = 0, FrontZ = 0 };
+
         _liveness = _liveness.Advance(state.Tick, now);
         _last = state;
 

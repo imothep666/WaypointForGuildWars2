@@ -398,7 +398,26 @@ public sealed partial class MainViewModel : ObservableObject
     /// <summary>Paired and nothing is wrong; there is simply no traffic. Banked-down brass.</summary>
     [ObservableProperty] private bool _isPhoneQuiet = true;
 
+    /// <summary>The last reason a poll failed, so the log says it once rather than every tick.</summary>
+    private string? _pollFailure;
+
     private void PollGame()
+    {
+        // A failed poll must not end the polling: an exception out of a timer's tick stops the
+        // timer, and the phone was then sent the same last reading for as long as the bridge ran.
+        try
+        {
+            PollGameOnce();
+            _pollFailure = null;
+        }
+        catch (Exception ex)
+        {
+            if (_pollFailure != ex.Message) _journal.Write("game", $"poll FAILED: {ex.Message}");
+            _pollFailure = ex.Message;
+        }
+    }
+
+    private void PollGameOnce()
     {
         ShowPhone();
 

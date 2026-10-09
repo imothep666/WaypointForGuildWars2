@@ -268,6 +268,10 @@ public sealed partial class CompassViewModel(
 
     [ObservableProperty] private string _mapLine = string.Empty;
 
+    /// <summary>The map the character is on, by name, while the game is live; its loading screen
+    /// goes in the band above the dial. Null with no game, or before the bridge has named it.</summary>
+    [ObservableProperty] private string? _sceneMap;
+
     [ObservableProperty] private string _instruction = string.Empty;
 
     [ObservableProperty] private string _distanceLine = string.Empty;
@@ -478,6 +482,7 @@ public sealed partial class CompassViewModel(
         if (report.State is not { } state)
         {
             Set(nameof(CharacterLine), CharacterLine, report.Note, v => CharacterLine = v);
+            SceneMap = null;
             Relative = null;
             Moved?.Invoke();
 
@@ -488,6 +493,9 @@ public sealed partial class CompassViewModel(
 
         Set(nameof(CharacterLine), CharacterLine, state.Line, v => CharacterLine = v);
         Set(nameof(MapLine), MapLine, report.MapLabel, v => MapLine = v);
+
+        // Every frame, but the property only notifies on a change of map.
+        SceneMap = report.MapName;
 
         // The reported position, not the eased one: the trail is a record of where the character
         // actually went, and smoothing it would be recording the drawing rather than the walk.

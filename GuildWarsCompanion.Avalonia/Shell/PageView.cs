@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Threading;
 
 namespace GuildWarsCompanion.Ava.Shell;
 
@@ -84,6 +85,39 @@ public class PageView : UserControl
     {
         get => GetValue(SceneProperty);
         set => SetValue(SceneProperty, value);
+    }
+
+    /// <summary>The map whose loading screen was last asked for, so a late answer can be dropped.</summary>
+    private string? _sceneMap;
+
+    /// <summary>
+    /// A map's loading screen as this page's <see cref="Scene"/>, or none. The painting comes from
+    /// the wiki, and a newer map asked for while it was on its way wins: the character may have
+    /// moved on, or left the game. A map without a loading screen leaves no scene, so the area's
+    /// own wash stays.
+    /// </summary>
+    protected async void ShowMapScene(string? map)
+    {
+        // The map's view model hears of a new map on the stream's thread, and a page's properties
+        // belong to the UI thread: set from anywhere else, the scene never arrived.
+        if (!Dispatcher.UIThread.CheckAccess())
+        {
+            Dispatcher.UIThread.Post(() => ShowMapScene(map));
+            return;
+        }
+
+        if (map == _sceneMap) return;
+        _sceneMap = map;
+
+        if (map is null)
+        {
+            Scene = null;
+            return;
+        }
+
+        var scene = await Ui.WikiArt.ForMapAsync(map);
+
+        if (_sceneMap == map) Scene = scene;
     }
 
     /// <summary>Whether the bar offers a refresh button, the desktop's answer to pulling down.</summary>

@@ -65,4 +65,39 @@ public class FollowBoxTests
         Assert.False(FollowBox.Escaped(599, 300, 800, 600));
         Assert.True(FollowBox.Escaped(601, 300, 800, 600));
     }
+
+    [Theory]
+    [InlineData(4, 4, 0.3)]
+    [InlineData(3, 4, 0.4)]
+    [InlineData(2, 4, FollowBox.Share)]
+    [InlineData(1, 4, FollowBox.Share)]
+    [InlineData(1, 1, 0.3)]
+    public void TheBoxTightensAtTheTopTwoLevels(int level, int levels, double share) =>
+        Assert.Equal(share, FollowBox.ShareAt(level, levels));
+
+    [Fact]
+    public void ATighterBoxLetsGoSooner()
+    {
+        // A quarter of the width off the middle: inside the half box, outside the 0.3 one.
+        var x = Width / 2 + Width * 0.2;
+
+        Assert.False(FollowBox.Escaped(x, Height / 2, Width, Height));
+        Assert.True(FollowBox.Escaped(x, Height / 2, Width, Height, FollowBox.ShareAt(4, 4)));
+    }
+
+    [Fact]
+    public void AQuickGlideClosesMoreOfTheDistanceInTheSameTime()
+    {
+        var slow = new MapMotion();
+        var quick = new MapMotion();
+
+        slow.GlideTo(100, 0);
+        quick.GlideTo(100, 0, MapMotion.GlideSecondsAt(4, 4));
+
+        var (slowX, _) = slow.Advance(0.1, 0, 0, 0.01);
+        var (quickX, _) = quick.Advance(0.1, 0, 0, 0.01);
+
+        Assert.True(quickX > slowX);
+        Assert.InRange(MapMotion.GlideSecondsAt(4, 4), 0.01, MapMotion.GlideSeconds);
+    }
 }

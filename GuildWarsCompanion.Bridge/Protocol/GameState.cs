@@ -96,6 +96,12 @@ public sealed record GameState(
 
     [JsonIgnore] public bool IsMounted => MountId > 0;
 
+    /// <summary>Whether the position and the facing are numbers. JSON has no NaN or infinity, so a
+    /// state with one cannot be sent at all; see GameWatch.Poll.</summary>
+    [JsonIgnore]
+    public bool IsFinite =>
+        float.IsFinite(PlayerX) && float.IsFinite(PlayerY) && float.IsFinite(FrontX) && float.IsFinite(FrontZ);
+
     [JsonIgnore] public string Profession => Named(Professions, ProfessionId - 1);
 
     [JsonIgnore] public string Race => Named(Races, RaceId);

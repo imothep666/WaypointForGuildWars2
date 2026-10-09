@@ -97,6 +97,13 @@ public partial class CompassView : PageView
 
     private CompassViewModel ViewModel => (CompassViewModel)DataContext!;
 
+    /// <summary>The band above the dial shows the loading screen of the map the character is on —
+    /// the band only: behind the dial a painting would cost the contrast its marks live on.</summary>
+    private void OnModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(CompassViewModel.SceneMap)) ShowMapScene(ViewModel.SceneMap);
+    }
+
     protected override void OnDataContextChanged(EventArgs e)
     {
         base.OnDataContextChanged(e);
@@ -112,6 +119,9 @@ public partial class CompassView : PageView
         // Paired with OnDisappearing rather than taken once: the view model is a singleton, and
         // Moved is only raised between Start and Stop, which is exactly this span.
         ViewModel.Moved += OnMoved;
+
+        ViewModel.PropertyChanged += OnModelPropertyChanged;
+        ShowMapScene(ViewModel.SceneMap);
 
         // Read rather than operated, and propped up while both hands are on the game: the screen
         // must not sleep under it. A window flag, released the moment the page goes.
@@ -134,6 +144,8 @@ public partial class CompassView : PageView
 
     public override void OnDisappearing()
     {
+        ViewModel.PropertyChanged -= OnModelPropertyChanged;
+
         if (_frames is { } timer)
         {
             timer.Stop();
