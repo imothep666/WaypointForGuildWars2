@@ -1,4 +1,4 @@
-# Builds the desktop app for Linux, keeps it as a pipeline artifact, and on master publishes it as
+# Builds the desktop app for Linux, keeps it as a pipeline artifact, and on main publishes it as
 # a GitHub release that installed copies update from (see VelopackUpdates in the desktop project).
 #
 # Linux first, arm64 and x64: an AppImage each, made by Velopack's vpk, plus the update packages
@@ -10,12 +10,12 @@
 #   GitHubToken    secret. A fine-grained token for that repository alone, with Contents: read and
 #                  write, which is what creating a release and uploading to it takes.
 #
-# The version is the repository's own, from Directory.Build.targets: 1.0.<commits on master>.
-# Every push to master is a new number, so every push to master is a release.
+# The version is the repository's own, from Directory.Build.targets: 1.0.<commits on main>.
+# Every push to main is a new number, so every push to main is a release.
 
 trigger:
   branches:
-    include: [master]
+    include: [main]
 
 pr: none
 
@@ -59,7 +59,8 @@ steps:
     env:
       RELEASES_REPO: $(ReleasesRepo)
 
-  - bash: dotnet test GuildWarsCompanion.Tests -c Release -nologo
+  # Debug, as locally: the test plan's own tests check behaviour that only the debug build has.
+  - bash: dotnet test GuildWarsCompanion.Tests -nologo
     displayName: Tests
 
   # One AppImage per processor, each on its own Velopack channel, so an arm64 install is only
@@ -101,8 +102,8 @@ steps:
           --outputDir "$(Out)/${{ rid }}" --publish --merge \
           --releaseName "Waypoint $(Version)" --tag "v$(Version)"
       displayName: Release ${{ rid }}
-      # Master only: a run started by hand on another branch builds the artifact and stops.
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      # Main only: a run started by hand on another branch builds the artifact and stops.
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
       env:
         RELEASES_REPO: $(ReleasesRepo)
         GITHUB_TOKEN: $(GitHubToken)

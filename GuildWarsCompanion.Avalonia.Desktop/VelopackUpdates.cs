@@ -26,7 +26,7 @@ public sealed partial class VelopackUpdates : ObservableObject, IAppUpdates
 {
     private static readonly TimeSpan FirstCheck = TimeSpan.FromMinutes(1);
 
-    /// <summary>A release is a commit on master, so several a day are possible; four checks a day
+    /// <summary>A release is a commit on main, so several a day are possible; four checks a day
     /// stay far inside GitHub's sixty unauthenticated requests an hour.</summary>
     private static readonly TimeSpan Every = TimeSpan.FromHours(6);
 
