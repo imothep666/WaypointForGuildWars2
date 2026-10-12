@@ -53,9 +53,9 @@ public sealed class StandingService(Gw2Client client, ApiKeySession session, Off
 
         return new StandingView(
             rows,
-            "Account-wide, so these apply to every character. Magic find is the base figure " +
-            "luck alone buys — achievement points, food, boosters and guild bonuses stack on " +
-            "top. The API carries no conversion for it, so the app ships the wiki's table.",
+            L.T("Account-wide, so these apply to every character. Magic find is the base figure " +
+                "luck alone buys — achievement points, food, boosters and guild bonuses stack on " +
+                "top. The API carries no conversion for it, so the app ships the wiki's table."),
             rows.Count > 0,
             // Free with every account read, and discarded until now.
             Access.Expansions(account.Access),

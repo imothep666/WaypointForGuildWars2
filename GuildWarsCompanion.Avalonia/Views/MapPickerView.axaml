@@ -19,7 +19,7 @@
                 for "gorgesnowden" and answered, correctly and uselessly, that no map is called
                 that.
             -->
-            <TextBox x:Name="Search" Text="{Binding Search}" PlaceholderText="Map name"
+            <TextBox x:Name="Search" Text="{Binding Search}" PlaceholderText="{ui:T 'Map name'}"
                      GotFocus="OnSearchFocused" />
 
             <TextBlock Text="{Binding ResultNote}" Classes="caption small" />

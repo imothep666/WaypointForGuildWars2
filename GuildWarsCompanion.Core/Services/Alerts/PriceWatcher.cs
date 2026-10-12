@@ -51,8 +51,8 @@ public sealed class PriceWatcher(Gw2Client client, WatchStore store) : IAccountW
 
             alerts.Add(new AccountAlert(
                 $"price:{watch.Id}:{current}",
-                $"{watch.Name} is at {Coin.Format(current!.Value)}",
-                $"{PriceRules.Describe(watch)} — you asked to be told."));
+                L.F("{0} is at {1}", watch.Name, Coin.Format(current!.Value)),
+                L.F("{0} — you asked to be told.", PriceRules.Describe(watch))));
         }
 
         return alerts;

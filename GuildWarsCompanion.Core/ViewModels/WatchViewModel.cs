@@ -29,7 +29,7 @@ public sealed partial class WatchViewModel(WatchService watches, TestEvidence ev
         {
             if (await watches.CandidateAsync(id) is not { } found)
             {
-                ErrorMessage = "The API does not know this item.";
+                ErrorMessage = L.T("The API does not know this item.");
                 return;
             }
 
@@ -44,7 +44,7 @@ public sealed partial class WatchViewModel(WatchService watches, TestEvidence ev
         }
         catch (Gw2ApiException)
         {
-            ErrorMessage = "Could not read this item just now.";
+            ErrorMessage = L.T("Could not read this item just now.");
         }
     }
     [ObservableProperty] private string _search = string.Empty;
@@ -67,7 +67,7 @@ public sealed partial class WatchViewModel(WatchService watches, TestEvidence ev
     /// <summary>Today's market under the chosen item, so the threshold is named against it.</summary>
     public string CandidateBaseline => Candidate is null
         ? string.Empty
-        : $"{Candidate.Baseline} Name the price you are waiting for.";
+        : $"{Candidate.Baseline} {L.T("Name the price you are waiting for.")}";
 
     /// <summary>Drives the empty line: a template cannot reach out to the view model.</summary>
     [ObservableProperty] private bool _hasNoWatches = true;
@@ -76,7 +76,7 @@ public sealed partial class WatchViewModel(WatchService watches, TestEvidence ev
     public ObservableCollection<WatchCandidate> Results { get; } = [];
 
     protected override string DefaultEmptyMessage =>
-        "No watches yet. Find an item below and name the price you are waiting for.";
+        L.T("No watches yet. Find an item below and name the price you are waiting for.");
 
     [RelayCommand]
     public Task RefreshAsync() => RunAsync(async ct =>
@@ -102,7 +102,7 @@ public sealed partial class WatchViewModel(WatchService watches, TestEvidence ev
 
         if (Search.Trim().Length < 2)
         {
-            SearchNote = "Type at least two letters.";
+            SearchNote = L.T("Type at least two letters.");
             return;
         }
 
@@ -117,12 +117,12 @@ public sealed partial class WatchViewModel(WatchService watches, TestEvidence ev
         // has not looked at it yet — and that is fixable, so say where.
         SearchNote = (found.Count > 0, isCatalogue) switch
         {
-            (true, true) => $"{found.Count} of {known:N0} tradable items.",
-            (true, false) => $"{found.Count} of {known:N0} items the app has seen.",
-            (false, true) => $"Nothing tradable matches that, among {known:N0} items.",
+            (true, true) => L.F("{0} of {1:N0} tradable items.", found.Count, known),
+            (true, false) => L.F("{0} of {1:N0} items the app has seen.", found.Count, known),
+            (false, true) => L.F("Nothing tradable matches that, among {0:N0} items.", known),
             (false, false) =>
-                $"No match among the {known:N0} items the app has seen. Download the full " +
-                "item list under Settings to search the whole market."
+                L.F("No match among the {0:N0} items the app has seen. Download the full " +
+                    "item list under Settings to search the whole market.", known)
         };
     });
 
@@ -141,14 +141,14 @@ public sealed partial class WatchViewModel(WatchService watches, TestEvidence ev
     {
         if (Candidate is null)
         {
-            ErrorMessage = "Find an item first.";
+            ErrorMessage = L.T("Find an item first.");
             return;
         }
 
         var price = PriceRules.ParsePrice(Threshold);
         if (price is null)
         {
-            ErrorMessage = "Enter a price like 1g 20s, 45s, or a number of copper.";
+            ErrorMessage = L.T("Enter a price like 1g 20s, 45s, or a number of copper.");
             return;
         }
 
@@ -164,7 +164,7 @@ public sealed partial class WatchViewModel(WatchService watches, TestEvidence ev
                 Watches.Add(row);
 
         HasNoWatches = Watches.Count == 0;
-        Notice = "Watching. You will be told when the price gets there.";
+        Notice = L.T("Watching. You will be told when the price gets there.");
     });
 
     [RelayCommand]

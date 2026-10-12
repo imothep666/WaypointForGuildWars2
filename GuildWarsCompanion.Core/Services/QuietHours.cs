@@ -54,12 +54,12 @@ public static class QuietHours
     /// <summary>What the setting is currently doing, in a line the screen can show.</summary>
     public static string Describe(NotifyWindow window)
     {
-        if (!window.Enabled) return "Notifications arrive at any hour.";
+        if (!window.Enabled) return L.T("Notifications arrive at any hour.");
 
-        if (window.From == window.To) return "Notifications arrive at any hour.";
+        if (window.From == window.To) return L.T("Notifications arrive at any hour.");
 
-        var line = $"Only between {window.From:HH:mm} and {window.To:HH:mm}";
-
-        return window.AllDayAtWeekends ? $"{line}, and all day at weekends." : $"{line}.";
+        return window.AllDayAtWeekends
+            ? L.F("Only between {0:HH:mm} and {1:HH:mm}, and all day at weekends.", window.From, window.To)
+            : L.F("Only between {0:HH:mm} and {1:HH:mm}.", window.From, window.To);
     }
 }

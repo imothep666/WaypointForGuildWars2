@@ -19,8 +19,8 @@ public sealed record EmoteRow(Emote Emote, EmoteState State)
         {
             var parts = new List<string>();
 
-            if (Emote.Loops) parts.Add("Loops");
-            if (Emote.InChairs) parts.Add("Works in chairs");
+            if (Emote.Loops) parts.Add(L.T("Loops"));
+            if (Emote.InChairs) parts.Add(L.T("Works in chairs"));
             if (Emote.Aliases.Length > 0) parts.Add(string.Join(" ", Emote.Aliases));
             if (Emote.Unlock is { } unlock) parts.Add(unlock);
 
@@ -35,9 +35,9 @@ public sealed record EmoteRow(Emote Emote, EmoteState State)
     /// </summary>
     public string StateText => State switch
     {
-        EmoteState.Unlocked => "unlocked",
-        EmoteState.Locked => "locked",
-        EmoteState.Untracked => "not tracked",
+        EmoteState.Unlocked => L.T("unlocked"),
+        EmoteState.Locked => L.T("locked"),
+        EmoteState.Untracked => L.T("not tracked"),
         _ => string.Empty
     };
 
@@ -104,6 +104,6 @@ public sealed class EmoteService(Gw2Client client, ApiKeySession session, Offlin
             Emotes.Matching(search, _owned)
                 .Select(emote => new EmoteRow(emote, Emotes.StateOf(emote, _owned)))
                 .ToList(),
-            Emotes.Note,
+            L.T(Emotes.Note),
             _fetchedAt);
 }

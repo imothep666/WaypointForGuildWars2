@@ -33,7 +33,7 @@
                 <!-- For chat in the game: lands on the PC's clipboard when a bridge is paired. -->
                 <StackPanel Spacing="4">
                     <WrapPanel>
-                        <Button Content="COPY CHAT LINK" Command="{Binding CopyChatLinkCommand}" Classes="quiet"
+                        <Button Content="{ui:T 'COPY CHAT LINK'}" Command="{Binding CopyChatLinkCommand}" Classes="quiet"
                                 Margin="0,0,10,0" />
                         <!-- Onto Today, counted against everything held all the way down its recipe. -->
                         <Button Content="{Binding GoalLabel}" Command="{Binding ToggleGoalCommand}" Classes="quiet" />
@@ -49,7 +49,7 @@
                             <Button Content="+" Command="{Binding MoreCommand}" Classes="quiet" MinWidth="44" />
                         </StackPanel>
                         <!-- Only for what the trading post sells. -->
-                        <Button Content="WATCH PRICE" Command="{Binding WatchPriceCommand}" Classes="quiet"
+                        <Button Content="{ui:T 'WATCH PRICE'}" Command="{Binding WatchPriceCommand}" Classes="quiet"
                                 IsVisible="{Binding Item.HasMarket}" />
                     </StackPanel>
                     <TextBlock Text="{Binding Linked}" IsVisible="{Binding HasLinked}" Classes="caption small"
@@ -59,15 +59,15 @@
                 <Border Classes="rule" />
 
                 <!-- The market, both sides. -->
-                <TextBlock Text="TRADING POST" Classes="heading small" />
+                <TextBlock Text="{ui:T 'TRADING POST'}" Classes="heading small" />
 
                 <Grid ColumnDefinitions="*,14,*" IsVisible="{Binding Item.HasMarket}">
                     <StackPanel Spacing="3">
-                        <TextBlock Text="Buy order" Classes="caption" />
+                        <TextBlock Text="{ui:T 'Buy order'}" Classes="caption" />
                         <TextBlock Text="{Binding Item.BuyText}" Classes="figure" FontSize="18" />
                     </StackPanel>
                     <StackPanel Grid.Column="2" Spacing="3">
-                        <TextBlock Text="Sell listing" Classes="caption" />
+                        <TextBlock Text="{ui:T 'Sell listing'}" Classes="caption" />
                         <TextBlock Text="{Binding Item.SellText}" Classes="figure" FontSize="18" />
                     </StackPanel>
                 </Grid>
@@ -75,7 +75,7 @@
                 <TextBlock Text="{Binding Item.MarketNote}" Classes="caption small" />
 
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock Text="Vendor" Classes="caption" />
+                    <TextBlock Text="{ui:T 'Vendor'}" Classes="caption" />
                     <TextBlock Text="{Binding Item.VendorText}" Classes="caption" />
                 </StackPanel>
 
@@ -84,7 +84,7 @@
                     <Border Classes="rule" />
 
                     <Grid ColumnDefinitions="*,Auto">
-                        <TextBlock Text="CRAFTING" Classes="heading small" />
+                        <TextBlock Text="{ui:T 'CRAFTING'}" Classes="heading small" />
                         <TextBlock Grid.Column="1" Text="{Binding Item.Craft.Heading}" Classes="caption small"
                                    VerticalAlignment="Bottom" />
                     </Grid>
@@ -125,7 +125,7 @@
 
                     <!-- The whole chain, when it says more than the line above it. -->
                     <StackPanel Spacing="6" IsVisible="{Binding Item.Craft.HasMaterials}" Margin="0,8,0,0">
-                        <TextBlock Text="ALL THE WAY DOWN" Classes="heading small" />
+                        <TextBlock Text="{ui:T 'ALL THE WAY DOWN'}" Classes="heading small" />
 
                         <ItemsControl ItemsSource="{Binding Item.Craft.Materials}">
                             <ItemsControl.ItemTemplate>
@@ -154,7 +154,7 @@
                 <!-- The other direction: what this turns into. -->
                 <StackPanel Spacing="8" IsVisible="{Binding Item.HasUsedIn}">
                     <Border Classes="rule" />
-                    <TextBlock Text="USED IN" Classes="heading small" />
+                    <TextBlock Text="{ui:T 'USED IN'}" Classes="heading small" />
                     <TextBlock Text="{Binding Item.UsedInSummary}" Classes="caption" />
 
                     <ItemsControl ItemsSource="{Binding Item.UsedIn}">
@@ -180,7 +180,7 @@
                 <!-- Where yours are, when storage has been read this run. -->
                 <StackPanel Spacing="6" IsVisible="{Binding Item.HasWhere}">
                     <Border Classes="rule" />
-                    <TextBlock Text="YOURS" Classes="heading small" />
+                    <TextBlock Text="{ui:T 'YOURS'}" Classes="heading small" />
                     <TextBlock Text="{Binding Item.WhereText}" TextWrapping="Wrap" />
                 </StackPanel>
 
@@ -191,7 +191,7 @@
                            Foreground="{StaticResource VellumBrush}" />
 
                 <TextBlock Classes="caption small"
-                           Text="The API has no drop tables, no salvage results and no gathering locations — it knows what an item is, what it costs, and what makes it. The wiki knows the rest." />
+                           Text="{ui:T 'The API has no drop tables, no salvage results and no gathering locations — it knows what an item is, what it costs, and what makes it. The wiki knows the rest.'}" />
 
                 <Button Content="{Binding Item.WikiLabel}" Command="{Binding OpenWikiCommand}"
                         Classes="quiet" HorizontalAlignment="Left" />

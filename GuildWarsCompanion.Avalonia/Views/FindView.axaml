@@ -16,8 +16,8 @@
             <ScrollViewer>
                 <StackPanel Margin="20,16,20,32" Spacing="12">
                     <!-- The screen's one statement: where a thing is. -->
-                    <TextBlock Text="WHERE IS MY…" Classes="heading" />
-                    <TextBox Text="{Binding Search}" PlaceholderText="Item name" KeyDown="OnSearchKeyDown" />
+                    <TextBlock Text="{ui:T 'WHERE IS MY…'}" Classes="heading" />
+                    <TextBox Text="{Binding Search}" PlaceholderText="{ui:T 'Item name'}" KeyDown="OnSearchKeyDown" />
                     <TextBlock Text="{Binding SearchNote}" Classes="caption small" />
                     <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
 
@@ -51,7 +51,7 @@
 
                     <!-- Matches from the catalogue that are not in your storage. -->
                     <StackPanel Spacing="8" IsVisible="{Binding HasElsewhere}" Margin="0,4,0,0">
-                        <TextBlock Text="NOT IN YOUR STORAGE" Classes="heading small" />
+                        <TextBlock Text="{ui:T 'NOT IN YOUR STORAGE'}" Classes="heading small" />
                         <ItemsControl ItemsSource="{Binding Elsewhere}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="services:FoundItem">
@@ -77,14 +77,14 @@
 
                     <!-- What you own, place by place. Reading every place is what makes the
                          search above possible, so the breakdown comes free. -->
-                    <TextBlock Text="WHAT YOU OWN" Classes="heading small" Margin="0,4,0,0" />
+                    <TextBlock Text="{ui:T 'WHAT YOU OWN'}" Classes="heading small" Margin="0,4,0,0" />
                     <TextBlock Text="{Binding EmptyMessage}" IsVisible="{Binding NotLoaded}" Classes="caption" />
 
                     <!-- Shown whenever storage has been read. The total inside can be absent
                          on its own: counts survive offline, prices do not. -->
                     <Border Classes="card" IsVisible="{Binding IsLoaded}">
                         <StackPanel Spacing="10">
-                            <TextBlock Text="Everything tradable, sold now" Classes="caption"
+                            <TextBlock Text="{ui:T 'Everything tradable, sold now'}" Classes="caption"
                                        IsVisible="{Binding HasTotal}" />
                             <TextBlock Text="{Binding TotalText}" IsVisible="{Binding HasTotal}" Classes="figure"
                                        FontSize="24" Foreground="{StaticResource MetalGoldBrush}" />

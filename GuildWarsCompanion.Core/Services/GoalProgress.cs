@@ -23,12 +23,12 @@ public static class GoalPrice
         foreach (var need in needs)
         {
             var each = ask(need.ItemId);
-            if (each <= 0) return "some of it cannot be bought";
+            if (each <= 0) return L.T("some of it cannot be bought");
 
             total += each * need.Count;
         }
 
-        return $"about {Coin.Format(total)} to buy";
+        return L.F("about {0} to buy", Coin.Format(total));
     }
 }
 

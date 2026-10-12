@@ -10,7 +10,7 @@ namespace GuildWarsCompanion.Platforms.Android.Widgets;
 /// Exported because the receiver's caller is the system: an unexported provider is simply
 /// never offered in the widget picker.
 /// </summary>
-[BroadcastReceiver(Label = "World Bosses", Exported = true)]
+[BroadcastReceiver(Label = "@string/widget_bosses", Exported = true)]
 [IntentFilter([AppWidgetManager.ActionAppwidgetUpdate])]
 [MetaData("android.appwidget.provider", Resource = "@xml/widget_bosses_info")]
 public sealed class BossWidget : AppWidgetProvider

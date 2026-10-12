@@ -28,7 +28,7 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="services:OrderSection">
                                 <StackPanel>
-                                    <controls:SectionBand Title="{Binding Name}" Summary="{Binding Summary}" />
+                                    <controls:SectionBand Title="{Binding Title}" Summary="{Binding Summary}" />
 
                                     <ItemsControl ItemsSource="{Binding}">
                                         <ItemsControl.ItemTemplate>

@@ -36,7 +36,7 @@ public partial class WatchView : PageView
 
         _confirming = row;
         ConfirmTitle.Text = row.Name;
-        ConfirmMessage.Text = $"{row.Condition}\n\nStop watching this?";
+        ConfirmMessage.Text = $"{row.Condition}\n\n{L.T("Stop watching this?")}";
         ConfirmLayer.IsVisible = true;
     }
 

@@ -43,7 +43,7 @@ public sealed class StoryService(Gw2Client client, OfflineReader offline)
         var completed = await client.GetCharacterQuestsAsync(character, ct);
 
         if (completed.Count == 0)
-            return new StoryJournal([], NothingNote, false);
+            return new StoryJournal([], L.T(NothingNote), false);
 
         // Only the steps this character took, so one request covers a full playthrough.
         var quests = await client.GetQuestsAsync(completed.Distinct(), ct);
@@ -66,12 +66,12 @@ public sealed class StoryService(Gw2Client client, OfflineReader offline)
                     .Select(Describe)))
             .ToList();
 
-        return new StoryJournal(arcs, KnownGapsNote, arcs.Count > 0);
+        return new StoryJournal(arcs, L.T(KnownGapsNote), arcs.Count > 0);
     }
 
     private static StoryStep Describe(Quest quest) =>
         new(quest.Name,
-            quest.Level > 0 ? $"level {quest.Level}" : string.Empty,
+            quest.Level > 0 ? L.F("level {0}", quest.Level) : string.Empty,
             // A step can have several goals; the accounts read as consecutive sentences.
             Prose.Clean(string.Join(" ",
                 (quest.Goals ?? [])
@@ -90,7 +90,7 @@ public sealed class StoryService(Gw2Client client, OfflineReader offline)
 
     private static string Summarise(Story story, int steps)
     {
-        var count = $"{steps} {(steps == 1 ? "step" : "steps")}";
+        var count = steps == 1 ? L.T("1 step") : L.F("{0} steps", steps);
 
         return string.IsNullOrWhiteSpace(story.Timeline) ? count : $"{story.Timeline} · {count}";
     }

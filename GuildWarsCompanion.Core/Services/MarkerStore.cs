@@ -173,11 +173,11 @@ public sealed class MarkerStore(AppEnvironment environment)
     public async Task<MarkerImport> AddAsync(string url, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(url))
-            return new MarkerImport(0, 0, "Paste the address of a .taco pack first.", false);
+            return new MarkerImport(0, 0, L.T("Paste the address of a .taco pack first."), false);
 
         if (!Uri.TryCreate(url.Trim(), UriKind.Absolute, out var address) ||
             address.Scheme != Uri.UriSchemeHttps)
-            return new MarkerImport(0, 0, "That is not an https address.", false);
+            return new MarkerImport(0, 0, L.T("That is not an https address."), false);
 
         var id = MarkerIndex.Name(url);
         var known = Index().FirstOrDefault(p => p.Id == id);
@@ -202,10 +202,10 @@ public sealed class MarkerStore(AppEnvironment environment)
     public async Task<MarkerImport> UpdateAsync(string id, CancellationToken ct = default)
     {
         if (Index().FirstOrDefault(p => p.Id == id) is not { } pack)
-            return new MarkerImport(0, 0, "That pack is not here any more.", false);
+            return new MarkerImport(0, 0, L.T("That pack is not here any more."), false);
 
         if (!Uri.TryCreate(pack.Url, UriKind.Absolute, out var address))
-            return new MarkerImport(0, 0, "That pack's address is no longer valid.", false);
+            return new MarkerImport(0, 0, L.T("That pack's address is no longer valid."), false);
 
         return await FetchAsync(address, id, pack, ct);
     }
@@ -219,7 +219,7 @@ public sealed class MarkerStore(AppEnvironment environment)
     public async Task<MarkerImport> UpdateAllAsync(CancellationToken ct = default)
     {
         if (Index().Count == 0)
-            return new MarkerImport(0, 0, "No packs to check.", false);
+            return new MarkerImport(0, 0, L.T("No packs to check."), false);
 
         var fresh = 0;
         var same = 0;
@@ -240,16 +240,17 @@ public sealed class MarkerStore(AppEnvironment environment)
         // Said plainly rather than as one number: "3 packs" hides that two of them failed.
         var said = new List<string>();
 
-        if (fresh > 0) said.Add($"{fresh} updated");
-        if (same > 0) said.Add($"{same} already up to date");
-        if (failed > 0) said.Add($"{failed} could not be reached");
+        if (fresh > 0) said.Add(L.F("{0} updated", fresh));
+        if (same > 0) said.Add(L.F("{0} already up to date", same));
+        if (failed > 0) said.Add(L.F("{0} could not be reached", failed));
 
         return new MarkerImport(kept, 0, string.Join(" · ", said) + ".", failed == 0);
     }
 
     /// <summary>The words a 304 answers with, in one place so <see cref="UpdateAllAsync"/> can
-    /// recognise them rather than guess from a count.</summary>
-    private const string UpToDate = "Already up to date.";
+    /// recognise them rather than guess from a count. Read once, so the comparison there holds in
+    /// any language.</summary>
+    private static readonly string UpToDate = L.T("Already up to date.");
 
     /// <summary>Puts one pack down, leaving the others alone.</summary>
     public void Remove(string id)
@@ -367,25 +368,25 @@ public sealed class MarkerStore(AppEnvironment environment)
             // "nothing was imported" would be wrong about it in both directions.
             var said = new List<string>();
 
-            if (kept.Count > 0) said.Add($"{kept.Count} markers across {maps} maps");
+            if (kept.Count > 0) said.Add(L.F("{0} markers across {1} maps", kept.Count, maps));
 
             // A count that is exactly the ceiling is a truncation wearing a number's clothes:
             // Metal Marker Myriad read "4000 routes" and meant "4000 of however many there are".
             if (routes.Count > 0)
                 said.Add(routes.Count >= MostRoutes
-                    ? $"{routes.Count} routes — the most this app keeps"
-                    : $"{routes.Count} routes");
+                    ? L.F("{0} routes — the most this app keeps", routes.Count)
+                    : L.F("{0} routes", routes.Count));
 
             return new MarkerImport(
                 kept.Count, maps,
                 said.Count == 0
-                    ? "Nothing in that pack was a chest, a jumping puzzle or a route."
+                    ? L.T("Nothing in that pack was a chest, a jumping puzzle or a route.")
                     : string.Join(" · ", said) + ".",
                 said.Count > 0);
         }
         catch (OperationCanceledException)
         {
-            return new MarkerImport(0, 0, "Download stopped.", false);
+            return new MarkerImport(0, 0, L.T("Download stopped."), false);
         }
         catch (Exception ex)
         {

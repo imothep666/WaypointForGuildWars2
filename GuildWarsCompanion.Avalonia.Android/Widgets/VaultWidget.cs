@@ -5,7 +5,7 @@ using Android.Content;
 namespace GuildWarsCompanion.Platforms.Android.Widgets;
 
 /// <summary>The Wizard's Vault home screen widget. See <see cref="BossWidget"/>.</summary>
-[BroadcastReceiver(Label = "Wizard's Vault", Exported = true)]
+[BroadcastReceiver(Label = "@string/widget_vault", Exported = true)]
 [IntentFilter([AppWidgetManager.ActionAppwidgetUpdate])]
 [MetaData("android.appwidget.provider", Resource = "@xml/widget_vault_info")]
 public sealed class VaultWidget : AppWidgetProvider

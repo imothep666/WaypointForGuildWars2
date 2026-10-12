@@ -34,7 +34,7 @@ public static class Loadouts
     /// "Tab 2" at least matches what the game's own template picker shows.
     /// </summary>
     public static string Label(EquipmentTab tab) =>
-        string.IsNullOrWhiteSpace(tab.Name) ? $"Tab {tab.Tab}" : tab.Name.Trim();
+        string.IsNullOrWhiteSpace(tab.Name) ? L.F("Tab {0}", tab.Tab) : tab.Name.Trim();
 
     /// <summary>
     /// True when a template has no PvP gear at all. Untouched templates report an amulet, a
@@ -59,8 +59,8 @@ public static class Loadouts
         if (pieces > 0) return null;
 
         return templates > 0
-            ? "Nothing is equipped in this template."
-            : "No equipment returned. The API key needs the 'builds' permission to read it.";
+            ? L.T("Nothing is equipped in this template.")
+            : L.T("No equipment returned. The API key needs the 'builds' permission to read it.");
     }
 
     /// <summary>

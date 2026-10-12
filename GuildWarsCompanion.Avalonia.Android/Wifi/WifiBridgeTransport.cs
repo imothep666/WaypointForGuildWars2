@@ -62,7 +62,7 @@ public sealed class WifiBridgeTransport(IBridgeTransport fallback) : IBridgeTran
         try
         {
             connection = (HttpURLConnection?)wifi.OpenConnection(new URL(url));
-            if (connection is null) return BridgeResponse.Failed("Could not open a Wi-Fi connection.");
+            if (connection is null) return BridgeResponse.Failed(L.T("Could not open a Wi-Fi connection."));
 
             connection.RequestMethod = method.Method;
             connection.ConnectTimeout = wait;

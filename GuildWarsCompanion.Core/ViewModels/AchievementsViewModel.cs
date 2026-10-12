@@ -15,7 +15,7 @@ public sealed partial class AchievementsViewModel(
 
     public ObservableCollection<AchievementRow> Rows { get; } = [];
 
-    protected override string DefaultEmptyMessage => "Pull down to see what you are closest to.";
+    protected override string DefaultEmptyMessage => L.T("Pull down to see what you are closest to.");
 
     [RelayCommand]
     public Task RefreshAsync() => RunAsync(async ct =>
@@ -27,13 +27,13 @@ public sealed partial class AchievementsViewModel(
 
         if (!session.IsAuthenticated)
         {
-            Notice = "Add your API key under Settings to see your achievements.";
+            Notice = L.T("Add your API key under Settings to see your achievements.");
             return;
         }
 
         if (!session.HasPermission(Gw2Permissions.Progression))
         {
-            Notice = "This key has no 'progression' permission. Create a new key that includes it.";
+            Notice = L.T("This key has no 'progression' permission. Create a new key that includes it.");
             return;
         }
 

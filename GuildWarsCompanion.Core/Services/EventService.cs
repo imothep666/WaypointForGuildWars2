@@ -41,24 +41,24 @@ public sealed partial class EventRow : ObservableObject
     /// <summary>Spawn time in the player's own timezone — nobody thinks in UTC.</summary>
     public string LocalTime { get; }
 
-    public string LevelNote => OutOfReach ? $"needs level {Level}" : $"level {Level}";
+    public string LevelNote => OutOfReach ? L.F("needs level {0}", Level) : L.F("level {0}", Level);
 
     /// <summary>
     /// A dim spine alone cannot explain itself, so the second line says it in words: the
     /// colour is the glance, this is the answer.
     /// </summary>
-    public string Subtitle => DoneToday ? $"{Location} · done today" : Location;
+    public string Subtitle => DoneToday ? L.F("{0} · done today", Location) : Location;
 
     public void Tick(DateTimeOffset utcNow)
     {
         var remaining = Next - utcNow;
 
         Countdown = remaining <= TimeSpan.Zero
-            ? "now"
+            ? L.T("now")
             : remaining < TimeSpan.FromMinutes(1)
-                ? "< 1 min"
+                ? L.T("< 1 min")
                 : remaining < TimeSpan.FromHours(1)
-                    ? $"{(int)remaining.TotalMinutes} min"
+                    ? L.F("{0} min", (int)remaining.TotalMinutes)
                     : $"{(int)remaining.TotalHours}h {remaining.Minutes:00}m";
 
         // Brass says "go now" — so it must not appear on a boss the current character cannot

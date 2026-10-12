@@ -10,7 +10,8 @@ namespace GuildWarsCompanion.ViewModels;
 
 public sealed partial class TodayViewModel(
     TodayService today, HereService here, GoalService goals, LedgerService ledger, ApiKeySession session,
-    INavigator navigator, BridgeClient bridge, TestEvidence evidence, WidgetService widgets)
+    INavigator navigator, BridgeClient bridge, TestEvidence evidence, WidgetService widgets,
+    LocalMapNames names)
     : BaseViewModel
 {
     /// <summary>The last session, or this one; null until the ledger has seen any play.</summary>
@@ -56,7 +57,7 @@ public sealed partial class TodayViewModel(
 
     public ObservableCollection<TodaySection> Sections { get; } = [];
 
-    protected override string DefaultEmptyMessage => "Pull down to see what is left today.";
+    protected override string DefaultEmptyMessage => L.T("Pull down to see what is left today.");
 
     [RelayCommand]
     public Task RefreshAsync() => RunAsync(async ct =>
@@ -182,13 +183,13 @@ public sealed partial class TodayViewModel(
 
         if (!session.IsAuthenticated)
         {
-            Notice = "Add your API key under Settings to see what is left today.";
+            Notice = L.T("Add your API key under Settings to see what is left today.");
             return false;
         }
 
         if (!session.HasPermission(Gw2Permissions.Progression))
         {
-            Notice = "This key has no 'progression' permission. Create a new key that includes it.";
+            Notice = L.T("This key has no 'progression' permission. Create a new key that includes it.");
             return false;
         }
 
@@ -201,6 +202,9 @@ public sealed partial class TodayViewModel(
 
         return true;
     }
+
+    /// <summary>The goals section's key: its name is in the phone's language, so it is found by this.</summary>
+    private const string GoalsKey = "Goals";
 
     /// <summary>Which pin or unpin the goals on screen were read after.</summary>
     private int _goalsVersion = -1;
@@ -217,7 +221,7 @@ public sealed partial class TodayViewModel(
             {
                 var fresh = await GoalsAsync(ct);
 
-                if (Sections.FirstOrDefault(section => section.Name == "Goals") is { } old) Sections.Remove(old);
+                if (Sections.FirstOrDefault(section => section.Key == GoalsKey) is { } old) Sections.Remove(old);
                 if (fresh is not null) Sections.Add(fresh);
             });
 
@@ -235,7 +239,7 @@ public sealed partial class TodayViewModel(
 
             evidence.Saw("goal-pin");
 
-            return new TodaySection("Goals", TodaySummary.Of(rows), rows.OrderBy(row => row.IsComplete));
+            return new TodaySection(L.T("Goals"), TodaySummary.Of(rows), rows.OrderBy(row => row.IsComplete), GoalsKey);
         }
         catch (Gw2ApiException)
         {
@@ -256,7 +260,9 @@ public sealed partial class TodayViewModel(
 
         try
         {
-            return await bridge.GameAsync(leash.Token, sweep: false);
+            var report = await bridge.GameAsync(leash.Token, sweep: false);
+
+            return report is null ? null : await names.NameAsync(report, ct);
         }
         catch (OperationCanceledException) when (!ct.IsCancellationRequested)
         {
@@ -287,7 +293,7 @@ public sealed partial class TodayViewModel(
 
         ResetIn = remaining.TotalHours >= 1
             ? $"{(int)remaining.TotalHours}h {remaining.Minutes:00}m"
-            : $"{remaining.Minutes} min";
+            : L.F("{0} min", remaining.Minutes);
 
         var passed = _nextReset is { } before && next > before;
         _nextReset = next;

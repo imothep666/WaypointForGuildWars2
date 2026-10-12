@@ -30,10 +30,10 @@ public static class ResetReminder
         var parts = new List<string>();
 
         if (vaultLeft is > 0 and var vault)
-            parts.Add(vault == 1 ? "1 Wizard's Vault daily left" : $"{vault} Wizard's Vault dailies left");
+            parts.Add(vault == 1 ? L.T("1 Wizard's Vault daily left") : L.F("{0} Wizard's Vault dailies left", vault));
 
         if (craftsLeft is > 0 and var crafts)
-            parts.Add(crafts == 1 ? "1 time-gated craft not done" : $"{crafts} time-gated crafts not done");
+            parts.Add(crafts == 1 ? L.T("1 time-gated craft not done") : L.F("{0} time-gated crafts not done", crafts));
 
         if (parts.Count == 0) return null;
 
@@ -41,7 +41,7 @@ public static class ResetReminder
 
         return new AccountAlert(
             $"reset:{day:yyyy-MM-dd}",
-            $"Daily reset in {minutes} min",
+            L.F("Daily reset in {0} min", minutes),
             string.Join(" · ", parts) + ".");
     }
 }

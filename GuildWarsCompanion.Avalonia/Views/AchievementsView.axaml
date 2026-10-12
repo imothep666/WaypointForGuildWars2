@@ -10,7 +10,7 @@
     <Grid RowDefinitions="Auto,*">
         <StackPanel Margin="20,12,20,0" Spacing="8">
             <!-- The screen's statement: these are the ones within reach. -->
-            <TextBlock Text="CLOSEST TO FINISHING" Classes="heading" />
+            <TextBlock Text="{ui:T 'CLOSEST TO FINISHING'}" Classes="heading" />
             <TextBlock Text="{Binding Summary}" Classes="caption" />
             <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
             <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />

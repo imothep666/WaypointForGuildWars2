@@ -38,7 +38,7 @@ public sealed partial class MapPickerViewModel(MapCatalogue catalogue, MapViewMo
 
     [ObservableProperty] private string _resultNote = string.Empty;
 
-    protected override string DefaultEmptyMessage => "No map by that name.";
+    protected override string DefaultEmptyMessage => L.T("No map by that name.");
 
     /// <summary>
     /// Reads the list once and shows the start of it. Called when the page appears.
@@ -89,13 +89,13 @@ public sealed partial class MapPickerViewModel(MapCatalogue catalogue, MapViewMo
         // who knows the game counts 123 maps, thinks of Ascalonian Catacombs, and concludes it
         // is missing rather than one keystroke away.
         ResultNote = Search.Trim().Length == 0
-            ? $"{found.Count} open-world maps — type a name to reach story and dungeon instances."
+            ? L.F("{0} open-world maps — type a name to reach story and dungeon instances.", found.Count)
             : found.Count switch
             {
                 0 => string.Empty,
-                > MostShown => $"{found.Count} maps match — showing the first {MostShown}.",
-                1 => "1 map.",
-                _ => $"{found.Count} maps."
+                > MostShown => L.F("{0} maps match — showing the first {1}.", found.Count, MostShown),
+                1 => L.T("1 map."),
+                _ => L.F("{0} maps.", found.Count)
             };
     }
 }

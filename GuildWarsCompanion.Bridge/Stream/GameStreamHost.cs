@@ -1,3 +1,5 @@
+using System.Collections.Concurrent;
+
 using GuildWarsCompanion.Bridge.Protocol;
 
 using Microsoft.AspNetCore.Builder;
@@ -40,7 +42,18 @@ public sealed class GameStreamHost(Func<BridgeConfig> config, Func<GameReport> r
     public static readonly TimeSpan FrameInterval = TimeSpan.FromMilliseconds(100);
 
     private WebApplication? _app;
-    private int _listeners;
+
+    /// <summary>
+    /// The connections that were let in, by id, rather than a bare count.
+    ///
+    /// A counter went negative two ways. SignalR calls OnDisconnectedAsync for a connection
+    /// refused in OnConnectedAsync too, so a wrong pairing code took one away without ever adding
+    /// one. And <see cref="StopAsync"/> zeroed it before stopping Kestrel, whose shutdown then
+    /// disconnected every open stream and took each away again. Below zero, the first phone
+    /// after that counted as nobody and was fed from the idle poll. A set only forgets what it
+    /// holds.
+    /// </summary>
+    private readonly ConcurrentDictionary<string, byte> _listeners = new();
 
     public Func<BridgeConfig> Config => config;
 
@@ -53,7 +66,7 @@ public sealed class GameStreamHost(Func<BridgeConfig> config, Func<GameReport> r
     /// request/response, which is why the window can say a phone was "in touch recently" and
     /// nothing stronger — a held connection is the one case where "connected now" is honest.
     /// </summary>
-    public int Listeners => Volatile.Read(ref _listeners);
+    public int Listeners => _listeners.Count;
 
     /// <summary>Raised when the first phone joins or the last one leaves, so the poll rate can
     /// follow. Fires on a request thread; marshal before touching anything bound to a window.</summary>
@@ -64,16 +77,16 @@ public sealed class GameStreamHost(Func<BridgeConfig> config, Func<GameReport> r
     /// <summary>Why the hub is not running, or null when it is.</summary>
     public string? Problem { get; private set; }
 
-    public void Joined()
+    public void Joined(string connectionId)
     {
-        Interlocked.Increment(ref _listeners);
-        ListenersChanged?.Invoke();
+        if (_listeners.TryAdd(connectionId, 0)) ListenersChanged?.Invoke();
     }
 
-    public void Left()
+    /// <summary>A connection that never joined, or was already forgotten by
+    /// <see cref="StopAsync"/>, changes nothing.</summary>
+    public void Left(string connectionId)
     {
-        Interlocked.Decrement(ref _listeners);
-        ListenersChanged?.Invoke();
+        if (_listeners.TryRemove(connectionId, out _)) ListenersChanged?.Invoke();
     }
 
     /// <summary>
@@ -130,7 +143,8 @@ public sealed class GameStreamHost(Func<BridgeConfig> config, Func<GameReport> r
         if (_app is not { } app) return;
 
         _app = null;
-        Volatile.Write(ref _listeners, 0);
+        _listeners.Clear();
+        ListenersChanged?.Invoke();
 
         try
         {

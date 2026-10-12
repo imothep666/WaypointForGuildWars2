@@ -134,7 +134,7 @@ public static class PortRoute
     /// "then" rather than "left", because this screen already uses left and right for which way
     /// to turn.
     /// </summary>
-    public static string Line(PortHop hop) => $"via {hop.Waypoint.Name} · then {hop.Walk:0}";
+    public static string Line(PortHop hop) => L.F("via {0} · then {1:0}", hop.Waypoint.Name, hop.Walk);
 
     /// <summary>
     /// The waypoint to port to when a trail leads to the objective: the one that makes the rest of
@@ -169,6 +169,6 @@ public static class PortRoute
     /// <summary>The trail's version of <see cref="Line(PortHop)"/>, built once per objective.</summary>
     public static string Line(TrailHop hop) =>
         hop.ToTrail <= TrailGuide.OnTrail
-            ? $"via {hop.Waypoint.Name} · then {hop.Along:0} along the trail"
-            : $"via {hop.Waypoint.Name} · then {hop.ToTrail:0} to the trail, {hop.Along:0} along it";
+            ? L.F("via {0} · then {1:0} along the trail", hop.Waypoint.Name, hop.Along)
+            : L.F("via {0} · then {1:0} to the trail, {2:0} along it", hop.Waypoint.Name, hop.ToTrail, hop.Along);
 }

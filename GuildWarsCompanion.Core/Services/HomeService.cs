@@ -61,15 +61,15 @@ public sealed class HomeService(Gw2Client client, ApiKeySession session, Offline
                 cats.Select(cat => (
                     cat.Id.ToString(),
                     HomeInstance.CatLure(cat.Hint),
-                    "leave this out to lure it")),
+                    L.T("leave this out to lure it"))),
                 haveCats?.Select(id => id.ToString()))
             .Select(thing => new HomeRow(thing))
             .ToList();
 
         return new HomeView(
-            HomeInstance.Summarise(nodeIds.Count, haveNodes?.Count, "nodes"),
+            HomeInstance.Summarise(nodeIds.Count, haveNodes?.Count, L.T("nodes")),
             nodes,
-            HomeInstance.Summarise(cats.Count, haveCats?.Count, "cats"),
+            HomeInstance.Summarise(cats.Count, haveCats?.Count, L.T("cats")),
             catRows,
             Note(canRead, haveNodes is not null),
             nodeIds.Count > 0);
@@ -100,11 +100,11 @@ public sealed class HomeService(Gw2Client client, ApiKeySession session, Offline
     /// </summary>
     private static string Note(bool canRead, bool known) =>
         !canRead
-            ? "Everything there is to collect. Which of it you already have needs an API key " +
-              "with the 'progression' and 'unlocks' permissions."
+            ? L.T("Everything there is to collect. Which of it you already have needs an API key " +
+                  "with the 'progression' and 'unlocks' permissions.")
             : !known
-                ? "Everything there is to collect. What you already have could not be read " +
-                  "just now, so nothing here is marked."
-                : "Missing first. Nodes are bought from vendors and karma merchants; cats are " +
-                  "lured with the food listed, one at a time.";
+                ? L.T("Everything there is to collect. What you already have could not be read " +
+                      "just now, so nothing here is marked.")
+                : L.T("Missing first. Nodes are bought from vendors and karma merchants; cats are " +
+                      "lured with the food listed, one at a time.");
 }

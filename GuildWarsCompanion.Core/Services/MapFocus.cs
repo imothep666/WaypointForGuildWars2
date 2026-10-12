@@ -35,7 +35,7 @@ public static class MapFocus
         // No game. A pinned map keeps its own name: "Waiting for the bridge…" over a map that is
         // plainly drawn and plainly named would be describing the wrong thing.
         if (report.State is not { } state)
-            return new MapFrame(pinned is null ? report.Note : pinnedName, null, false);
+            return new MapFrame(pinned is null ? GameText.Note(report) : pinnedName, null, false);
 
         // Only on the map being drawn. A character in Kessex is not standing anywhere on
         // Queensdale's tiles, and a dot on the wrong map is worse than no dot.

@@ -221,10 +221,10 @@ public partial class CompassView : PageView
 
         var buttons = new List<Control>
         {
-            Rail("CHOOSE AN OBJECTIVE", ViewModel.TogglePickerCommand, rotation),
-            Rail("CLEAR OBJECTIVE", ViewModel.ClearObjectiveCommand, rotation),
-            Rail("RECHECK PROGRESS", ViewModel.RefreshProgressCommand, rotation),
-            Rail("CLEAR TRAIL", ViewModel.ClearTrailCommand, rotation)
+            Rail(L.T("CHOOSE AN OBJECTIVE"), ViewModel.TogglePickerCommand, rotation),
+            Rail(L.T("CLEAR OBJECTIVE"), ViewModel.ClearObjectiveCommand, rotation),
+            Rail(L.T("RECHECK PROGRESS"), ViewModel.RefreshProgressCommand, rotation),
+            Rail(L.T("CLEAR TRAIL"), ViewModel.ClearTrailCommand, rotation)
         };
 
         // Turned past halfway, the natural reading order runs the other way along the rail.

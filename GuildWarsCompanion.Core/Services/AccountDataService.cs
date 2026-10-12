@@ -29,8 +29,8 @@ public sealed class MaterialSection(string name, IEnumerable<MaterialRow> rows) 
         {
             var value = this.Sum(r => r.StackValue ?? 0);
             return value > 0
-                ? $"{this.Sum(r => r.Count):N0} items · {Coin.Format(value)}"
-                : $"{this.Sum(r => r.Count):N0} items";
+                ? L.F("{0:N0} items · {1}", this.Sum(r => r.Count), Coin.Format(value))
+                : L.F("{0:N0} items", this.Sum(r => r.Count));
         }
     }
 }
@@ -150,7 +150,7 @@ public sealed class AccountDataService(
             .GroupBy(m => m.Category)
             .OrderBy(g => categoryNames.GetValueOrDefault(g.Key)?.Order ?? int.MaxValue)
             .Select(group => new MaterialSection(
-                categoryNames.GetValueOrDefault(group.Key)?.Name ?? $"Category {group.Key}",
+                categoryNames.GetValueOrDefault(group.Key)?.Name ?? L.F("Category {0}", group.Key),
                 group
                     .Select(m =>
                     {
@@ -172,7 +172,7 @@ public sealed class AccountDataService(
 
                         return new MaterialRow(
                             m.Id,
-                            resolved.GetValueOrDefault(m.Id)?.Name ?? $"Item {m.Id}",
+                            resolved.GetValueOrDefault(m.Id)?.Name ?? L.F("Item {0}", m.Id),
                             resolved.GetValueOrDefault(m.Id)?.Icon,
                             m.Count,
                             resolved.GetValueOrDefault(m.Id)?.Rarity,
@@ -184,9 +184,9 @@ public sealed class AccountDataService(
 
         var note = priced
             ? unpriced > 0
-                ? $"After the 15% trading post fee. {unpriced} account-bound materials have no market value."
-                : "After the 15% trading post fee."
-            : "Values need a connection — this is what you are holding, not what it is worth.";
+                ? L.F("After the 15% trading post fee. {0} account-bound materials have no market value.", unpriced)
+                : L.T("After the 15% trading post fee.")
+            : L.T("Values need a connection — this is what you are holding, not what it is worth.");
 
         var view = new MaterialsView(
             sections, new CoinPurse(instant), new CoinPurse(listed), note,

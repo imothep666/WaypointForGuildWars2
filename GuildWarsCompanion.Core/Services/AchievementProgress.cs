@@ -37,11 +37,11 @@ public static class AchievementProgress
 
     /// <summary>"8 of 10" — the raw counts, because a percentage hides how much work is left.</summary>
     public static string ProgressText(Tracked achievement) =>
-        $"{achievement.Current:N0} of {achievement.Max:N0}";
+        L.F("{0:N0} of {1:N0}", achievement.Current, achievement.Max);
 
     /// <summary>"2 to go", or the plural, which is most of the time.</summary>
     public static string RemainingText(Tracked achievement) =>
-        achievement.Remaining == 1 ? "1 to go" : $"{achievement.Remaining:N0} to go";
+        achievement.Remaining == 1 ? L.T("1 to go") : L.F("{0:N0} to go", achievement.Remaining);
 
     /// <summary>
     /// The requirement with this tier's target spliced into it.

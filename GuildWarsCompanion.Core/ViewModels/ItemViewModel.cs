@@ -19,7 +19,7 @@ public sealed partial class ItemViewModel(
     [NotifyPropertyChangedFor(nameof(GoalLabel))]
     private bool _isGoal;
 
-    public string GoalLabel => IsGoal ? "UNPIN GOAL" : "PIN AS GOAL";
+    public string GoalLabel => IsGoal ? L.T("UNPIN GOAL") : L.T("PIN AS GOAL");
 
     /// <summary>How many the goal is for; shown, and changed, only while pinned.</summary>
     [ObservableProperty]
@@ -84,7 +84,7 @@ public sealed partial class ItemViewModel(
         if (RouteQuery.Int(query, "id") is { } id) ItemId = id;
     }
 
-    protected override string DefaultEmptyMessage => "Nothing to show for this item.";
+    protected override string DefaultEmptyMessage => L.T("Nothing to show for this item.");
 
     [RelayCommand]
     public Task LoadAsync() => RunAsync(async ct =>
@@ -92,7 +92,7 @@ public sealed partial class ItemViewModel(
         Item = await inspector.GetAsync(_itemId, ct);
 
         if (Item is null)
-            Notice = "The API does not know this item.";
+            Notice = L.T("The API does not know this item.");
 
         var quantity = await goals.QuantityAsync(_itemId, ct);
         IsGoal = quantity is not null;
@@ -137,26 +137,26 @@ public sealed partial class ItemViewModel(
         {
             await system.CopyAsync(link);
 
-            Linked = $"Copied {link}";
+            Linked = L.F("Copied {0}", link);
             return;
         }
 
         // Said before the network is asked, so the button never looks dead while a PC that is
         // asleep runs out its timeout.
-        Linked = $"Sending {link}…";
+        Linked = L.F("Sending {0}…", link);
 
         var sent = await bridge.SendAsync(link);
 
         if (sent.IsSent)
         {
             // Named, not "the PC": with several paired, the wrong machine has to be visible.
-            Linked = $"Sent {link} to {sent.Pc}";
+            Linked = L.F("Sent {0} to {1}", link, sent.Pc);
             return;
         }
 
         await system.CopyAsync(link);
 
-        Linked = $"{link} · {sent.Text} · copied here";
+        Linked = L.F("{0} · {1} · copied here", link, sent.Text);
     }
 
     /// <summary>
@@ -175,7 +175,7 @@ public sealed partial class ItemViewModel(
         catch (Exception)
         {
             // No browser, or the launch was refused. Nothing is broken here; say so quietly.
-            ErrorMessage = "Could not open a browser on this device.";
+            ErrorMessage = L.T("Could not open a browser on this device.");
         }
     }
 }

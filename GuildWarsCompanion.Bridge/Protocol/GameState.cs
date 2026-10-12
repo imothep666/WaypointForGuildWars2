@@ -190,11 +190,23 @@ public sealed record GameReport(
 {
     public static GameReport Nothing(string note) => new(null, false, note);
 
+    /// <summary>
+    /// The map's name in the phone's language, which the phone puts here itself; never sent.
+    ///
+    /// <see cref="MapName"/> stays the bridge's English one, and is what anything matching on a
+    /// name reads: the wiki's loading screens and meta timetable are filed under English names.
+    /// This is only for showing, so a German phone says "Königintal" in the line over the map it
+    /// has drawn and named in German.
+    /// </summary>
+    [JsonIgnore]
+    public string? LocalMapName { get; init; }
+
     /// <summary>"Wayfarer Foothills", or "Map 28" until it is known. Empty with no state at
-    /// all, because there is no map to name.</summary>
+    /// all, because there is no map to name. In the phone's language once it has put
+    /// <see cref="LocalMapName"/> in.</summary>
     [JsonIgnore]
     public string MapLabel =>
-        MapName ?? (State is null ? string.Empty : $"Map {State.MapId}");
+        LocalMapName ?? MapName ?? (State is null ? string.Empty : $"Map {State.MapId}");
 }
 
 /// <summary>

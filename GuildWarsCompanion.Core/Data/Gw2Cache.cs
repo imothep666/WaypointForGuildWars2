@@ -13,9 +13,21 @@ namespace GuildWarsCompanion.Data;
 /// ~10 requests per screen view into ~10 requests per patch.
 ///
 /// Deliberately hand-written SQL: no ORM reflection, so it survives TrimMode=full.
+///
+/// Everything here is in one language, <see cref="Language"/>, except for two things kept in
+/// English beside it: item names, so a search can match the name every guide and the wiki use,
+/// and map names, which are what the wiki files its loading screens under. Those two survive a
+/// change of language; they are English whichever one the phone is in.
 /// </summary>
-public sealed class Gw2Cache(string databasePath)
+/// <param name="language">
+/// The language the API is being asked for, as <see cref="Gw2Client.Language"/>. A store last
+/// filled in another one drops what it can refetch cheaply when it is opened; see
+/// <see cref="InitializeAsync"/>.
+/// </param>
+public sealed class Gw2Cache(string databasePath, string language = Gw2Language.English)
 {
+    public string Language => language;
+
     private readonly string _connectionString =
         new SqliteConnectionStringBuilder { DataSource = databasePath }.ToString();
 
@@ -44,7 +56,8 @@ public sealed class Gw2Cache(string databasePath)
                 """
                 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS items (
-                    id INTEGER PRIMARY KEY, name TEXT NOT NULL, icon TEXT, rarity TEXT);
+                    id INTEGER PRIMARY KEY, name TEXT NOT NULL, icon TEXT, rarity TEXT,
+                    name_en TEXT, lang TEXT);
                 CREATE TABLE IF NOT EXISTS currencies (
                     id INTEGER PRIMARY KEY, name TEXT NOT NULL, description TEXT NOT NULL,
                     ord INTEGER NOT NULL, icon TEXT NOT NULL);
@@ -68,8 +81,13 @@ public sealed class Gw2Cache(string databasePath)
                     default_floor INTEGER NOT NULL,
                     c_left REAL, c_top REAL, c_right REAL, c_bottom REAL,
                     m_left REAL, m_bottom REAL, m_right REAL, m_top REAL);
+                CREATE TABLE IF NOT EXISTS map_english (id INTEGER PRIMARY KEY, name TEXT NOT NULL);
                 """;
             await command.ExecuteNonQueryAsync(ct);
+
+            await AddLanguageColumnsAsync(connection, ct);
+            await ForgetOtherLanguageAsync(connection, ct);
+
             _initialized = true;
         }
         finally
@@ -77,6 +95,63 @@ public sealed class Gw2Cache(string databasePath)
             _gate.Release();
         }
     }
+
+    /// <summary>
+    /// Brings a store from before languages up to date.
+    ///
+    /// Every row it holds was written without asking for a language, which the API answers in
+    /// English, so its names are already the English ones and are copied across rather than
+    /// fetched again. A full catalogue is 371 requests; this is one statement.
+    /// </summary>
+    private static async Task AddLanguageColumnsAsync(SqliteConnection connection, CancellationToken ct)
+    {
+        if (await HasColumnAsync(connection, "items", "lang", ct)) return;
+
+        await using var command = connection.CreateCommand();
+        command.CommandText =
+            "ALTER TABLE items ADD COLUMN name_en TEXT; ALTER TABLE items ADD COLUMN lang TEXT; " +
+            $"UPDATE items SET name_en = name, lang = '{Gw2Language.English}';";
+        await command.ExecuteNonQueryAsync(ct);
+    }
+
+    private static async Task<bool> HasColumnAsync(
+        SqliteConnection connection, string table, string column, CancellationToken ct)
+    {
+        await using var command = connection.CreateCommand();
+        command.CommandText = $"SELECT COUNT(*) FROM pragma_table_info('{table}') WHERE name = $column";
+        command.Parameters.AddWithValue("$column", column);
+
+        return Convert.ToInt32(await command.ExecuteScalarAsync(ct)) > 0;
+    }
+
+    /// <summary>
+    /// Drops what was stored in another language, when the device's has changed since.
+    ///
+    /// The same tables a new build drops, for the same reason: one request each brings them back.
+    /// Items stay. Their rows say which language they are in, a stale name is better than none
+    /// offline, and <see cref="Services.ItemLookup"/> and <see cref="Services.ItemCatalogue"/>
+    /// replace them as they are next asked for. A store with no language recorded is from
+    /// before there was a choice, and so is English.
+    /// </summary>
+    private async Task ForgetOtherLanguageAsync(SqliteConnection connection, CancellationToken ct)
+    {
+        var stored = await ReadMetaAsync(connection, LanguageKey, ct) ?? Gw2Language.English;
+
+        if (stored == language) return;
+
+        await using (var clear = connection.CreateCommand())
+        {
+            clear.CommandText =
+                "DELETE FROM currencies; DELETE FROM maps; " +
+                "DELETE FROM map_detail; DELETE FROM continents; " +
+                $"DELETE FROM meta WHERE key = '{MapsComplete}';";
+            await clear.ExecuteNonQueryAsync(ct);
+        }
+
+        await WriteMetaAsync(connection, LanguageKey, language, ct);
+    }
+
+    private const string LanguageKey = "lang";
 
     /// <summary>
     /// Drops cached static data if the game build changed since we filled it.
@@ -101,7 +176,7 @@ public sealed class Gw2Cache(string databasePath)
             // existing id are effectively immutable; new ids arrive as additions, which is what
             // ItemCatalogue diffs for. A rename is rare enough to be worth a manual rebuild.
             clear.CommandText =
-                "DELETE FROM currencies; DELETE FROM maps; " +
+                "DELETE FROM currencies; DELETE FROM maps; DELETE FROM map_english; " +
                 "DELETE FROM map_detail; DELETE FROM continents; " +
                 $"DELETE FROM meta WHERE key = '{MapsComplete}';";
             await clear.ExecuteNonQueryAsync(ct);
@@ -113,7 +188,14 @@ public sealed class Gw2Cache(string databasePath)
 
     // --- items -------------------------------------------------------------
 
-    public async Task<Dictionary<int, Item>> GetItemsAsync(IReadOnlyCollection<int> ids, CancellationToken ct = default)
+    /// <summary>The items held for these ids.</summary>
+    /// <param name="currentOnly">
+    /// Only rows in <see cref="Language"/>. Without it a row in an earlier language counts too,
+    /// which is what a screen with no connection wants: a name it can read, if not the one it
+    /// would get online.
+    /// </param>
+    public async Task<Dictionary<int, Item>> GetItemsAsync(
+        IReadOnlyCollection<int> ids, CancellationToken ct = default, bool currentOnly = false)
     {
         await InitializeAsync(ct);
         var found = new Dictionary<int, Item>(ids.Count);
@@ -131,7 +213,9 @@ public sealed class Gw2Cache(string databasePath)
             }
 
             command.CommandText =
-                "SELECT id, name, icon, rarity FROM items WHERE id IN (" + string.Join(",", parameters) + ")";
+                "SELECT id, name, icon, rarity FROM items WHERE id IN (" + string.Join(",", parameters) + ")" +
+                (currentOnly ? " AND lang = $lang" : string.Empty);
+            command.Parameters.AddWithValue("$lang", language);
 
             await using var reader = await command.ExecuteReaderAsync(ct);
             while (await reader.ReadAsync(ct))
@@ -156,12 +240,25 @@ public sealed class Gw2Cache(string databasePath)
         await using var connection = await OpenAsync(ct);
         await using var transaction = await connection.BeginTransactionAsync(ct);
         await using var command = connection.CreateCommand();
+
+        // An upsert rather than a replace: replacing would drop the English name a row already
+        // has, and fetching it again is a request per two hundred items for nothing.
         command.CommandText =
-            "INSERT OR REPLACE INTO items (id, name, icon, rarity) VALUES ($id, $name, $icon, $rarity)";
+            """
+            INSERT INTO items (id, name, icon, rarity, name_en, lang)
+            VALUES ($id, $name, $icon, $rarity, $english, $lang)
+            ON CONFLICT (id) DO UPDATE SET
+                name = excluded.name, icon = excluded.icon, rarity = excluded.rarity,
+                lang = excluded.lang, name_en = coalesce(excluded.name_en, items.name_en)
+            """;
         var id = command.Parameters.Add("$id", SqliteType.Integer);
         var name = command.Parameters.Add("$name", SqliteType.Text);
         var icon = command.Parameters.Add("$icon", SqliteType.Text);
         var rarity = command.Parameters.Add("$rarity", SqliteType.Text);
+        var english = command.Parameters.Add("$english", SqliteType.Text);
+        command.Parameters.AddWithValue("$lang", language);
+
+        var inEnglish = language == Gw2Language.English;
 
         foreach (var item in items)
         {
@@ -169,6 +266,7 @@ public sealed class Gw2Cache(string databasePath)
             name.Value = item.Name;
             icon.Value = (object?)item.Icon ?? DBNull.Value;
             rarity.Value = (object?)item.Rarity ?? DBNull.Value;
+            english.Value = inEnglish ? item.Name : DBNull.Value;
             await command.ExecuteNonQueryAsync(ct);
         }
 
@@ -176,12 +274,51 @@ public sealed class Gw2Cache(string databasePath)
     }
 
     /// <summary>
-    /// Every item id already stored, for working out what is still missing.
+    /// Every item id already stored in <see cref="Language"/>, for working out what is still
+    /// missing. A row in another language is missing: its name is the wrong one.
     ///
     /// Returned whole rather than asked per id: the catalogue compares against 74,000 ids at
     /// once, and that is one scan instead of 74,000 lookups.
     /// </summary>
-    public async Task<HashSet<int>> GetKnownItemIdsAsync(CancellationToken ct = default)
+    public Task<HashSet<int>> GetKnownItemIdsAsync(CancellationToken ct = default) =>
+        ItemIdsAsync("lang = $lang", ct);
+
+    /// <summary>English names for whichever of these items have one stored.</summary>
+    public async Task<Dictionary<int, string>> GetEnglishItemNamesAsync(
+        IReadOnlyCollection<int> ids, CancellationToken ct = default)
+    {
+        await InitializeAsync(ct);
+        var found = new Dictionary<int, string>();
+        if (ids.Count == 0) return found;
+
+        await using var connection = await OpenAsync(ct);
+        foreach (var chunk in ids.Distinct().Chunk(500))
+        {
+            await using var command = connection.CreateCommand();
+            var parameters = new string[chunk.Length];
+            for (var i = 0; i < chunk.Length; i++)
+            {
+                parameters[i] = "$p" + i;
+                command.Parameters.AddWithValue("$p" + i, chunk[i]);
+            }
+
+            command.CommandText =
+                "SELECT id, name_en FROM items WHERE name_en IS NOT NULL AND id IN (" +
+                string.Join(",", parameters) + ")";
+
+            await using var reader = await command.ExecuteReaderAsync(ct);
+            while (await reader.ReadAsync(ct))
+                found[reader.GetInt32(0)] = reader.GetString(1);
+        }
+
+        return found;
+    }
+
+    /// <summary>Item ids stored with their English name, which a search needs as well.</summary>
+    public Task<HashSet<int>> GetItemIdsWithEnglishAsync(CancellationToken ct = default) =>
+        ItemIdsAsync("name_en IS NOT NULL", ct);
+
+    private async Task<HashSet<int>> ItemIdsAsync(string where, CancellationToken ct)
     {
         await InitializeAsync(ct);
 
@@ -189,13 +326,43 @@ public sealed class Gw2Cache(string databasePath)
 
         await using var connection = await OpenAsync(ct);
         await using var command = connection.CreateCommand();
-        command.CommandText = "SELECT id FROM items";
+        command.CommandText = $"SELECT id FROM items WHERE {where}";
+        command.Parameters.AddWithValue("$lang", language);
 
         await using var reader = await command.ExecuteReaderAsync(ct);
         while (await reader.ReadAsync(ct))
             known.Add(reader.GetInt32(0));
 
         return known;
+    }
+
+    /// <summary>
+    /// Records what items are called in English, beside whatever they are called here.
+    ///
+    /// Only fills in rows that exist. An English answer for an item never stored in this
+    /// language has no name to show on its own, and whatever stores the item next asks for the
+    /// English again.
+    /// </summary>
+    public async Task SaveEnglishItemNamesAsync(IReadOnlyCollection<Item> items, CancellationToken ct = default)
+    {
+        if (items.Count == 0) return;
+        await InitializeAsync(ct);
+
+        await using var connection = await OpenAsync(ct);
+        await using var transaction = await connection.BeginTransactionAsync(ct);
+        await using var command = connection.CreateCommand();
+        command.CommandText = "UPDATE items SET name_en = $name WHERE id = $id";
+        var id = command.Parameters.Add("$id", SqliteType.Integer);
+        var name = command.Parameters.Add("$name", SqliteType.Text);
+
+        foreach (var item in items)
+        {
+            id.Value = item.Id;
+            name.Value = item.Name;
+            await command.ExecuteNonQueryAsync(ct);
+        }
+
+        await transaction.CommitAsync(ct);
     }
 
     /// <summary>
@@ -378,6 +545,50 @@ public sealed class Gw2Cache(string databasePath)
         // Inside the same transaction as the rows it describes, so a save that fails partway
         // cannot leave the flag claiming a list that is not there.
         if (replaceAll) await WriteMetaAsync(connection, MapsComplete, "yes", ct);
+
+        await transaction.CommitAsync(ct);
+    }
+
+    /// <summary>One map's English name, or null when it has not been stored.</summary>
+    public async Task<string?> GetEnglishMapNameAsync(int mapId, CancellationToken ct = default)
+    {
+        await InitializeAsync(ct);
+
+        await using var connection = await OpenAsync(ct);
+        await using var command = connection.CreateCommand();
+        command.CommandText = "SELECT name FROM map_english WHERE id = $id";
+        command.Parameters.AddWithValue("$id", mapId);
+
+        return await command.ExecuteScalarAsync(ct) as string;
+    }
+
+    /// <summary>Every map's English name, replacing what was there.</summary>
+    public async Task SaveEnglishMapNamesAsync(
+        IReadOnlyDictionary<int, string> names, CancellationToken ct = default)
+    {
+        if (names.Count == 0) return;
+        await InitializeAsync(ct);
+
+        await using var connection = await OpenAsync(ct);
+        await using var transaction = await connection.BeginTransactionAsync(ct);
+
+        await using (var clear = connection.CreateCommand())
+        {
+            clear.CommandText = "DELETE FROM map_english";
+            await clear.ExecuteNonQueryAsync(ct);
+        }
+
+        await using var command = connection.CreateCommand();
+        command.CommandText = "INSERT INTO map_english (id, name) VALUES ($id, $name)";
+        var id = command.Parameters.Add("$id", SqliteType.Integer);
+        var name = command.Parameters.Add("$name", SqliteType.Text);
+
+        foreach (var (mapId, mapName) in names)
+        {
+            id.Value = mapId;
+            name.Value = mapName;
+            await command.ExecuteNonQueryAsync(ct);
+        }
 
         await transaction.CommitAsync(ct);
     }
@@ -836,7 +1047,9 @@ public sealed class Gw2Cache(string databasePath)
     }
 
     /// <summary>
-    /// Items already seen, matched by name.
+    /// Items already seen, matched by name: in <see cref="Language"/> or in English, so "ecto"
+    /// finds the Ektoplasmakugel on a German phone. What comes back is always the item as this
+    /// language names it.
     ///
     /// The API has no item search endpoint, so this is the only search available without
     /// downloading a hundred thousand item records onto a phone: everything the app has
@@ -857,9 +1070,10 @@ public sealed class Gw2Cache(string databasePath)
         command.CommandText =
             """
             SELECT id, name, icon, rarity FROM items
-            WHERE name LIKE $term ESCAPE '\'
+            WHERE (name LIKE $term ESCAPE '\' OR name_en LIKE $term ESCAPE '\')
               AND ($all = 1 OR id IN (SELECT id FROM tradable))
-            ORDER BY (name LIKE $prefix ESCAPE '\') DESC, length(name), name
+            ORDER BY (name LIKE $prefix ESCAPE '\' OR name_en LIKE $prefix ESCAPE '\') DESC,
+                     length(name), name
             LIMIT $limit
             """;
 
@@ -890,7 +1104,14 @@ public sealed class Gw2Cache(string databasePath)
     }
 
     /// <summary>How many items the cache can search, for telling the user what it covers.</summary>
-    public async Task<int> CountItemsAsync(CancellationToken ct = default)
+    public Task<int> CountItemsAsync(CancellationToken ct = default) =>
+        CountAsync("SELECT COUNT(*) FROM items", ct);
+
+    /// <summary>How many of those are still named in an earlier language.</summary>
+    public Task<int> CountItemsInOtherLanguageAsync(CancellationToken ct = default) =>
+        CountAsync("SELECT COUNT(*) FROM items WHERE lang IS NOT $lang", ct);
+
+    private async Task<int> CountAsync(string sql, CancellationToken ct)
     {
         // Settings asks this first on a fresh install, before anything else has touched the
         // cache; without it the screen opened on "no such table: items".
@@ -898,7 +1119,8 @@ public sealed class Gw2Cache(string databasePath)
 
         await using var connection = await OpenAsync(ct);
         await using var command = connection.CreateCommand();
-        command.CommandText = "SELECT COUNT(*) FROM items";
+        command.CommandText = sql;
+        command.Parameters.AddWithValue("$lang", language);
         return Convert.ToInt32(await command.ExecuteScalarAsync(ct));
     }
 

@@ -29,6 +29,6 @@ public static class GoalAlerts
 {
     public static AccountAlert Ready(Goal goal) =>
         new($"goal:{goal.ItemId}:{goal.Quantity}",
-            "Goal ready",
-            $"Everything for {GoalService.Title(goal)} is in hand.");
+            L.T("Goal ready"),
+            L.F("Everything for {0} is in hand.", GoalService.Title(goal)));
 }

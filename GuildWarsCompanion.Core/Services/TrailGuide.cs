@@ -320,8 +320,8 @@ public sealed class TrailGuide
     public static string Height(double? climb) => climb switch
     {
         null => string.Empty,
-        < -3 => $"{-climb.Value:0} m lower",
-        > 3 => $"{climb.Value:0} m higher",
+        < -3 => L.F("{0:0} m lower", -climb.Value),
+        > 3 => L.F("{0:0} m higher", climb.Value),
         _ => string.Empty
     };
 }

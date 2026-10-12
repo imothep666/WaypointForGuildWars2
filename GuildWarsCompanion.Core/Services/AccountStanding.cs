@@ -37,23 +37,23 @@ public static class AccountStanding
     public static StandingRow Luck(long consumed)
     {
         var note = LuckTable.StillNeeded(consumed) is { } needed
-            ? $"{consumed:N0} luck consumed · {needed:N0} more for " +
-              $"{LuckTable.MagicFind(consumed) + 1}%. Base magic find only."
-            : $"{consumed:N0} luck consumed — the 300% cap, which costs {LuckForCap:N0}.";
+            ? L.F("{0:N0} luck consumed · {1:N0} more for {2}%. Base magic find only.",
+                consumed, needed, LuckTable.MagicFind(consumed) + 1)
+            : L.F("{0:N0} luck consumed — the 300% cap, which costs {1:N0}.", consumed, LuckForCap);
 
-        return new StandingRow("Magic find from luck", LuckTable.Describe(consumed), note);
+        return new StandingRow(L.T("Magic find from luck"), LuckTable.Describe(consumed), note);
     }
 
     /// <summary>Fractal personal level. Zero means fractals have not been started.</summary>
     public static StandingRow? Fractals(int level) =>
         level <= 0
             ? null
-            : new StandingRow("Fractal level", $"{level}",
-                level >= 100 ? "At the maximum." : null);
+            : new StandingRow(L.T("Fractal level"), $"{level}",
+                level >= 100 ? L.T("At the maximum.") : null);
 
     /// <summary>WvW rank, which is account-wide and carries its own ability line.</summary>
     public static StandingRow? Wvw(int rank) =>
-        rank <= 0 ? null : new StandingRow("WvW rank", $"{rank:N0}", null);
+        rank <= 0 ? null : new StandingRow(L.T("WvW rank"), $"{rank:N0}", null);
 
     /// <summary>Mastery points already earned, shown as a total across every region.</summary>
     /// <summary>
@@ -70,8 +70,8 @@ public static class AccountStanding
         var available = Math.Max(0, earned.Value - (spent ?? 0));
 
         return new StandingRow(
-            "Mastery points",
+            L.T("Mastery points"),
             $"{available:N0}",
-            spent is > 0 ? $"{earned:N0} earned, {spent:N0} spent." : null);
+            spent is > 0 ? L.F("{0:N0} earned, {1:N0} spent.", earned, spent) : null);
     }
 }

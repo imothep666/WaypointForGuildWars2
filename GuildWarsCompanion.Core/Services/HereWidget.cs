@@ -34,12 +34,12 @@ public static class HereWidget
     public static HerePanel Panel(HereReading? reading, DateTimeOffset? readAt, DateTimeOffset now)
     {
         if (reading is null || readAt is not { } at)
-            return new HerePanel("Not in the game", "Play with the bridge running on your PC", [], false);
+            return new HerePanel(L.T("Not in the game"), L.T("Play with the bridge running on your PC"), [], false);
 
-        var map = reading.Map is { Length: > 0 } named ? named : "Somewhere in Tyria";
+        var map = reading.Map is { Length: > 0 } named ? named : L.T("Somewhere in Tyria");
 
         if (now - at > LiveFor)
-            return new HerePanel(map, $"{reading.Character} · last seen {Stale.Age(at, now)}", [], false);
+            return new HerePanel(map, L.F("{0} · last seen {1}", reading.Character, Stale.Age(at, now)), [], false);
 
         return new HerePanel(map, reading.Character, Facts(reading.Line), true);
     }
@@ -50,7 +50,10 @@ public static class HereWidget
     {
         if (string.IsNullOrWhiteSpace(line)) return [];
 
-        var text = line.StartsWith("Here: ", StringComparison.Ordinal) ? line[6..] : line;
+        // The prefix in the phone's language, or in English for a reading stored before it had one.
+        var text = line.StartsWith(HereLine.Prefix, StringComparison.Ordinal) ? line[HereLine.Prefix.Length..]
+            : line.StartsWith("Here: ", StringComparison.Ordinal) ? line[6..]
+            : line;
 
         var facts = text.Split(" · ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 

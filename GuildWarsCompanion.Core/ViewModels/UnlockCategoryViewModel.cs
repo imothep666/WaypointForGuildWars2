@@ -61,7 +61,7 @@ public sealed partial class UnlockCategoryViewModel(UnlockService unlocks) : Bas
             _category = Unlocks.All.FirstOrDefault(
                 category => string.Equals(category.Kind.ToString(), value, StringComparison.OrdinalIgnoreCase));
 
-            Heading = _category?.Name.ToUpperInvariant() ?? "UNLOCKS";
+            Heading = _category?.Name.ToUpperInvariant() ?? L.T("UNLOCKS");
 
             _ = LoadAsync();
         }
@@ -72,7 +72,7 @@ public sealed partial class UnlockCategoryViewModel(UnlockService unlocks) : Bas
         if (RouteQuery.Text(query, "kind") is { } kind) Kind = kind;
     }
 
-    protected override string DefaultEmptyMessage => "Nothing to show for this category.";
+    protected override string DefaultEmptyMessage => L.T("Nothing to show for this category.");
 
     [RelayCommand]
     public Task LoadAsync() => RunAsync(async ct =>
@@ -82,7 +82,7 @@ public sealed partial class UnlockCategoryViewModel(UnlockService unlocks) : Bas
 
         if (_category is not { } category)
         {
-            Notice = "That category is not one this app knows.";
+            Notice = L.T("That category is not one this app knows.");
             return;
         }
 

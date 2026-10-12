@@ -142,7 +142,7 @@ public sealed class BridgeFinder(
             if (notes.Count > 0) return string.Join(" ", notes);
 
             if (_swept is { } sweep && discovery.Problem is { } both)
-                return $"{both} Also tried every address on {sweep} directly.";
+                return L.F("{0} Also tried every address on {1} directly.", both, sweep);
 
             return discovery.Problem;
         }
@@ -492,8 +492,8 @@ public sealed class BridgeFinder(
 
         if (await known.SecretAsync(bridge.Id) is not { Length: > 0 } secret)
         {
-            Note($"{bridge.Label} is in the list of paired PCs but this phone has no pairing " +
-                 "secret for it. Forget it and pair it again.");
+            Note(L.F("{0} is in the list of paired PCs but this phone has no pairing " +
+                     "secret for it. Forget it and pair it again.", bridge.Label));
 
             return null;
         }
@@ -504,9 +504,9 @@ public sealed class BridgeFinder(
             {
                 // Something answered and could not prove it holds the secret: either the PC
                 // rotated its code, or that is not the PC it claims to be.
-                Note($"{bridge.Label} answered at {address} but could not prove it holds the " +
-                     "same pairing secret. If the bridge was reinstalled or its settings were " +
-                     "cleared, scan its QR code again.");
+                Note(L.F("{0} answered at {1} but could not prove it holds the " +
+                         "same pairing secret. If the bridge was reinstalled or its settings were " +
+                         "cleared, scan its QR code again.", bridge.Label, address));
 
                 journal.Write("find", $"{address} claims to be {bridge.Label} and failed the " +
                                       "challenge — not using it");

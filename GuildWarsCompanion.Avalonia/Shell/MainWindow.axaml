@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
         x:Class="GuildWarsCompanion.Ava.Shell.MainWindow"
         Title="Waypoint"
         Icon="/Assets/Images/app_icon.png"
@@ -91,19 +92,19 @@
                     <StackPanel Grid.Column="2" Orientation="Horizontal">
                         <!-- Only once an update is downloaded: the one time the bar asks for
                              anything. Brass, because it is the bar's only call to action. -->
-                        <Button x:Name="UpdateButton" Classes="update" Content="RESTART TO UPDATE"
+                        <Button x:Name="UpdateButton" Classes="update" Content="{ui:T 'RESTART TO UPDATE'}"
                                 IsVisible="False" Click="OnRestartToUpdate" Margin="0,0,8,0"
-                                AutomationProperties.Name="Restart to update" />
-                        <Button Classes="caption" Click="OnMinimise" ToolTip.Tip="Minimise"
-                                AutomationProperties.Name="Minimise">
+                                AutomationProperties.Name="{ui:T 'Restart to update'}" />
+                        <Button Classes="caption" Click="OnMinimise" ToolTip.Tip="{ui:T 'Minimise'}"
+                                AutomationProperties.Name="{ui:T 'Minimise'}">
                             <Path Data="M 0,5.5 H 10" />
                         </Button>
                         <Button x:Name="MaximiseButton" Classes="caption" Click="OnMaximise"
-                                ToolTip.Tip="Maximise" AutomationProperties.Name="Maximise">
+                                ToolTip.Tip="{ui:T 'Maximise'}" AutomationProperties.Name="{ui:T 'Maximise'}">
                             <Path x:Name="MaximiseMark" Data="M 0.5,0.5 H 9.5 V 9.5 H 0.5 Z" />
                         </Button>
-                        <Button Classes="caption close" Click="OnClose" ToolTip.Tip="Close"
-                                AutomationProperties.Name="Close">
+                        <Button Classes="caption close" Click="OnClose" ToolTip.Tip="{ui:T 'Close'}"
+                                AutomationProperties.Name="{ui:T 'Close'}">
                             <Path Data="M 0,0 L 10,10 M 10,0 L 0,10" />
                         </Button>
                     </StackPanel>

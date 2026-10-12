@@ -13,7 +13,7 @@ public sealed partial class MetaChoice(string mapKey, string name, MetaReminderS
     private bool _isReminded = store.IsChosen(mapKey, name);
 
     /// <summary>What the button says it is doing, not what it would do.</summary>
-    public string Label => IsReminded ? "REMINDING" : "REMIND";
+    public string Label => IsReminded ? L.T("REMINDING") : L.T("REMIND");
 
     public event Action? Changed;
 
@@ -61,7 +61,7 @@ public sealed partial class MetaRow : ObservableObject
     /// seen without opening it; empty when none is.</summary>
     public string Reminding =>
         Choices.Where(choice => choice.IsReminded).Select(choice => choice.Name).ToList() is { Count: > 0 } names
-            ? $"reminding: {string.Join(", ", names)}"
+            ? L.F("reminding: {0}", string.Join(", ", names))
             : string.Empty;
 
     [RelayCommand]
@@ -77,8 +77,8 @@ public sealed partial class MetaRow : ObservableObject
         if (MetaSchedule.Current(Map, utcNow) is { } now)
         {
             Wait = TimeSpan.Zero;
-            Countdown = "now";
-            Subtitle = $"{now.Name} · until {now.End.ToLocalTime():HH:mm}";
+            Countdown = L.T("now");
+            Subtitle = L.F("{0} · until {1:HH:mm}", now.Name, now.End.ToLocalTime());
             LocalTime = string.Empty;
             EdgeColor = Theme.Brass;
             return;
@@ -108,8 +108,8 @@ public static class Meta
     /// <summary>"25 min", "1h 05m", "&lt; 1 min" — the timetable's own countdown.</summary>
     public static string Until(TimeSpan wait) =>
         wait < TimeSpan.FromMinutes(1)
-            ? "< 1 min"
+            ? L.T("< 1 min")
             : wait < TimeSpan.FromHours(1)
-                ? $"{(int)wait.TotalMinutes} min"
+                ? L.F("{0} min", (int)wait.TotalMinutes)
                 : $"{(int)wait.TotalHours}h {wait.Minutes:00}m";
 }

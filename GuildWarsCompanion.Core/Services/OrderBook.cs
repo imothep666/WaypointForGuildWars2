@@ -55,19 +55,19 @@ public static class OrderBook
         if (IsBeaten(price, best, selling))
         {
             var gap = Coin.Format(Math.Abs(price - best.Value));
-            var queue = ahead is > 0 ? $" · {ahead:N0} ahead of you" : string.Empty;
+            var beaten = selling ? L.F("undercut by {0}", gap) : L.F("outbid by {0}", gap);
 
-            return $"{(selling ? "undercut" : "outbid")} by {gap}{queue}";
+            return ahead is > 0 ? $"{beaten} · {L.F("{0:N0} ahead of you", ahead)}" : beaten;
         }
 
-        var lead = selling ? "best ask" : "best offer";
+        var lead = selling ? L.T("best ask") : L.T("best offer");
 
         // Sitting at the best price and still waiting is the other question worth answering,
         // and the queue is the whole of the answer.
         return tied switch
         {
-            > 0 => $"{lead} · {tied:N0} more at your price",
-            0 => $"{lead} · yours alone",
+            > 0 => $"{lead} · {L.F("{0:N0} more at your price", tied)}",
+            0 => $"{lead} · {L.T("yours alone")}",
             _ => lead
         };
     }
@@ -83,10 +83,10 @@ public static class OrderBook
         int count, long total, int beaten, bool selling, bool capped = false)
     {
         var trouble = beaten > 0
-            ? $" · {beaten:N0} {(selling ? "undercut" : "outbid")}"
+            ? " · " + (selling ? L.F("{0:N0} undercut", beaten) : L.F("{0:N0} outbid", beaten))
             : string.Empty;
 
-        var ration = capped ? " · queue shown for the largest orders only" : string.Empty;
+        var ration = capped ? " · " + L.T("queue shown for the largest orders only") : string.Empty;
 
         return $"{count:N0} · {Coin.Format(total)}{trouble}{ration}";
     }

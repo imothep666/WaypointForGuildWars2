@@ -96,8 +96,8 @@ public sealed class ScanActivity : AppCompatActivity
 
         // Without the camera there is nothing to show: say so instead of a black rectangle.
         _reticle!.Visibility = ViewStates.Gone;
-        _status!.Text = "Scanning needs camera access. Grant it in Android's app settings, " +
-                        "or paste the key by hand under Settings.";
+        _status!.Text = L.T("Scanning needs camera access. Grant it in Android's app settings, " +
+                            "or paste the key by hand under Settings.");
     }
 
     protected override void OnDestroy()

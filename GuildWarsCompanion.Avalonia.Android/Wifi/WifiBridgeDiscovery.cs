@@ -43,15 +43,15 @@ public sealed class WifiBridgeDiscovery : IBridgeDiscovery
 
         if (wifi is null)
         {
-            Problem = "This phone is not on Wi-Fi, so there is no network to look on.";
+            Problem = L.T("This phone is not on Wi-Fi, so there is no network to look on.");
             return [];
         }
 
         var found = await Task.Run(() => Sweep(wifi), ct);
 
         if (found.Count == 0 && Problem is null)
-            Problem = $"Nothing answered on {Network ?? "this network"} " +
-                      $"(tried {string.Join(", ", Targets())}). Is the bridge running?";
+            Problem = L.F("Nothing answered on {0} (tried {1}). Is the bridge running?",
+                          Network ?? L.T("this network"), string.Join(", ", Targets()));
 
         return found;
     }
@@ -100,7 +100,7 @@ public sealed class WifiBridgeDiscovery : IBridgeDiscovery
             }
 
             if (sendFailures.Count == targets)
-                Problem = $"The probe could not be sent — {string.Join("; ", sendFailures)}";
+                Problem = L.F("The probe could not be sent — {0}", string.Join("; ", sendFailures));
 
             var deadline = DateTime.UtcNow + Window;
 
@@ -133,7 +133,7 @@ public sealed class WifiBridgeDiscovery : IBridgeDiscovery
             // No Wi-Fi socket, no discovery. The cached address is still there to try — but say
             // what went wrong, because "nothing found" and "could not look" are different
             // problems and only one of them is about the network.
-            Problem = $"Could not open a Wi-Fi socket to look with — {ex.Message}";
+            Problem = L.F("Could not open a Wi-Fi socket to look with — {0}", ex.Message);
         }
         finally
         {

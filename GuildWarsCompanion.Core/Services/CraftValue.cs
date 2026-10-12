@@ -30,12 +30,12 @@ public static class CraftValue
         var difference = Math.Abs(make - buyOutright);
 
         // Within a copper either way, saying one is cheaper is noise.
-        if (difference == 0) return "Making one costs the same as buying it.";
+        if (difference == 0) return L.T("Making one costs the same as buying it.");
 
         return make < buyOutright
-            ? $"Cheaper to make: {Coin.Format(make)} against {Coin.Format(buyOutright)} to buy, " +
-              $"saving {Coin.Format(difference)} each."
-            : $"Cheaper to buy: {Coin.Format(buyOutright)} against {Coin.Format(make)} to make.";
+            ? L.F("Cheaper to make: {0} against {1} to buy, saving {2} each.",
+                Coin.Format(make), Coin.Format(buyOutright), Coin.Format(difference))
+            : L.F("Cheaper to buy: {0} against {1} to make.", Coin.Format(buyOutright), Coin.Format(make));
     }
 
     /// <summary>
@@ -55,9 +55,9 @@ public static class CraftValue
 
         return margin switch
         {
-            > 0 => $"Making one to sell nets {Coin.Format(margin)} after the trading post's cut.",
-            0 => "Making one to sell breaks even after the trading post's cut.",
-            _ => $"Making one to sell loses {Coin.Format(-margin)} after the trading post's cut."
+            > 0 => L.F("Making one to sell nets {0} after the trading post's cut.", Coin.Format(margin)),
+            0 => L.T("Making one to sell breaks even after the trading post's cut."),
+            _ => L.F("Making one to sell loses {0} after the trading post's cut.", Coin.Format(-margin))
         };
     }
 }

@@ -38,25 +38,38 @@ public sealed class WizardsVaultWatcher(Gw2Client client) : IAccountWatcher
                 continue;
             }
 
-            var label = char.ToUpperInvariant(track[0]) + track[1..];
-
             foreach (var objective in data.Objectives.Where(o => o.IsUnclaimedCompletion))
                 alerts.Add(new AccountAlert(
                     // The period is part of the key: the same daily objective comes round
                     // again tomorrow and deserves to be announced again.
                     $"vault:{track}:{period}:{objective.Id}",
-                    $"{label} objective complete",
-                    $"{objective.Title} — {objective.Acclaim} Astral Acclaim waiting to be claimed."));
+                    ObjectiveTitle(track),
+                    L.F("{0} — {1} Astral Acclaim waiting to be claimed.", objective.Title, objective.Acclaim)));
 
             if (data.IsMetaUnclaimed)
                 alerts.Add(new AccountAlert(
                     $"vault:{track}:{period}:meta",
-                    $"{label} meta reward ready",
-                    $"{data.MetaRewardAstral} Astral Acclaim waiting in the Wizard's Vault."));
+                    MetaTitle(track),
+                    L.F("{0} Astral Acclaim waiting in the Wizard's Vault.", data.MetaRewardAstral)));
         }
 
         return alerts;
     }
+
+    /// <summary>Whole sentences per track: German bends the adjective to the noun after it.</summary>
+    private static string ObjectiveTitle(string track) => track switch
+    {
+        "daily" => L.T("Daily objective complete"),
+        "weekly" => L.T("Weekly objective complete"),
+        _ => L.T("Special objective complete")
+    };
+
+    private static string MetaTitle(string track) => track switch
+    {
+        "daily" => L.T("Daily meta reward ready"),
+        "weekly" => L.T("Weekly meta reward ready"),
+        _ => L.T("Special meta reward ready")
+    };
 
     /// <summary>Dailies reset at 00:00 UTC.</summary>
     private static string DailyPeriod() => DateTime.UtcNow.ToString("yyyy-MM-dd");

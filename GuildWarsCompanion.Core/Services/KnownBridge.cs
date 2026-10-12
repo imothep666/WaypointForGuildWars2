@@ -89,7 +89,7 @@ public sealed record KnownBridge(
     /// "last seen at" with nothing after it reads as a bug rather than as a PC not yet found.
     /// </summary>
     public string Where =>
-        Address is null ? "not found yet — it will be, once it is running" : $"last seen at {Address}";
+        Address is null ? L.T("not found yet — it will be, once it is running") : L.F("last seen at {0}", Address);
 }
 
 [JsonSourceGenerationOptions(PropertyNameCaseInsensitive = true)]

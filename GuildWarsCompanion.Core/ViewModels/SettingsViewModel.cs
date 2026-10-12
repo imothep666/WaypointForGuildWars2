@@ -97,7 +97,7 @@ public sealed partial class SettingsViewModel(
 
     [RelayCommand]
     public Task DownloadMarkersAsync() => RunMarkersAsync(
-        "Downloading…", token => markers.AddAsync(MarkerUrl, token));
+        L.T("Downloading…"), token => markers.AddAsync(MarkerUrl, token));
 
     /// <summary>
     /// Asks a pack's server whether anything changed, and downloads only if it has.
@@ -105,7 +105,7 @@ public sealed partial class SettingsViewModel(
     /// Free when nothing moved — see <see cref="MarkerStore.UpdateAsync"/>.
     /// </summary>
     public Task UpdateMarkerPackAsync(MarkerPackRow row) => RunMarkersAsync(
-        "Checking…", token => markers.UpdateAsync(row.Id, token));
+        L.T("Checking…"), token => markers.UpdateAsync(row.Id, token));
 
     /// <summary>
     /// Asks every pack's server whether anything changed.
@@ -114,14 +114,14 @@ public sealed partial class SettingsViewModel(
     /// </summary>
     [RelayCommand]
     public Task UpdateAllMarkersAsync() => RunMarkersAsync(
-        "Checking…", token => markers.UpdateAllAsync(token));
+        L.T("Checking…"), token => markers.UpdateAllAsync(token));
 
     /// <summary>Puts one pack down, leaving the others alone.</summary>
     public void RemoveMarkerPack(MarkerPackRow row)
     {
         markers.Remove(row.Id);
 
-        MarkerNote = $"{row.Name} removed.";
+        MarkerNote = L.F("{0} removed.", row.Name);
 
         ShowMarkerPacks();
     }
@@ -177,10 +177,10 @@ public sealed partial class SettingsViewModel(
     {
         var said = new List<string>();
 
-        if (pack.Count > 0) said.Add($"{pack.Count} markers · {pack.Maps} maps");
-        if (pack.Routes > 0) said.Add($"{pack.Routes} routes");
+        if (pack.Count > 0) said.Add(L.F("{0} markers · {1} maps", pack.Count, pack.Maps));
+        if (pack.Routes > 0) said.Add(L.F("{0} routes", pack.Routes));
 
-        return said.Count == 0 ? "nothing this app carries" : string.Join(" · ", said);
+        return said.Count == 0 ? L.T("nothing this app carries") : string.Join(" · ", said);
     }
 
     [ObservableProperty] private string _apiKey = string.Empty;
@@ -333,10 +333,10 @@ public sealed partial class SettingsViewModel(
 
                 CatalogueProgress = p.Total == 0 ? 1 : (double)p.Done / p.Total;
                 CatalogueLine = p.Done >= p.Total
-                    ? "Finishing up…"
+                    ? L.T("Finishing up…")
                     // Items and recipes are fetched in one pass and counted together; "items"
                     // alone read as more items than the game has (87,693 against 74,287).
-                    : $"Fetched {p.Done:N0} of {p.Total:N0} new items and recipes.";
+                    : L.F("Fetched {0:N0} of {1:N0} new items and recipes.", p.Done, p.Total);
             });
 
             var added = await catalogue.FillAsync(progress, ct);
@@ -344,16 +344,16 @@ public sealed partial class SettingsViewModel(
             over = true;
             await ShowCatalogueAsync(ct);
             CatalogueOutcome = added == 0
-                ? "Already up to date."
-                : $"Added {added:N0} entries. Search covers the whole market, and the " +
-                  "crafting guide has every recipe.";
+                ? L.T("Already up to date.")
+                : L.F("Added {0:N0} entries. Search covers the whole market, and the " +
+                      "crafting guide has every recipe.", added);
         }
         catch (OperationCanceledException)
         {
             over = true;
             await ShowCatalogueAsync(CancellationToken.None);
             CatalogueOutcome =
-                "Stopped. What arrived is kept — starting again picks up where this left off.";
+                L.T("Stopped. What arrived is kept — starting again picks up where this left off.");
         }
         catch (Gw2ApiException ex)
         {
@@ -376,10 +376,14 @@ public sealed partial class SettingsViewModel(
         var status = await catalogue.StatusAsync(ct);
 
         CatalogueLine = status.Known == 0
-            ? "Nothing downloaded yet. Search only finds what the app has already seen, and " +
-              "the crafting guide has no recipes to work from."
-            : $"{status.Known:N0} items known, {status.Tradable:N0} of them tradable · " +
-              $"{status.Recipes:N0} recipes.";
+            ? L.T("Nothing downloaded yet. Search only finds what the app has already seen, and " +
+                  "the crafting guide has no recipes to work from.")
+            : L.F("{0:N0} items known, {1:N0} of them tradable · {2:N0} recipes.",
+                  status.Known, status.Tradable, status.Recipes) +
+              (status.OtherLanguage == 0
+                  ? string.Empty
+                  : " " + L.F("{0:N0} still named in the phone's earlier language; downloading renames them.",
+                      status.OtherLanguage));
     }
 
     [RelayCommand]
@@ -387,7 +391,7 @@ public sealed partial class SettingsViewModel(
     {
         if (string.IsNullOrWhiteSpace(ApiKey))
         {
-            ErrorMessage = "Paste a key first.";
+            ErrorMessage = L.T("Paste a key first.");
             return;
         }
 
@@ -415,7 +419,7 @@ public sealed partial class SettingsViewModel(
         }
 
         await ShowSessionAsync(ct);
-        Notice = "Key accepted. Pull to refresh on the other screens.";
+        Notice = L.T("Key accepted. Pull to refresh on the other screens.");
     }
 
     [RelayCommand]
@@ -433,7 +437,7 @@ public sealed partial class SettingsViewModel(
         ScopeSummary = SpareScopesLine = null;
         Scopes.Clear();
 
-        Notice = "Key removed from this device.";
+        Notice = L.T("Key removed from this device.");
         OnPropertyChanged(nameof(IsSignedIn));
     });
 
@@ -447,7 +451,7 @@ public sealed partial class SettingsViewModel(
     {
         if (!session.IsAuthenticated)
         {
-            ErrorMessage = "Connect an API key first.";
+            ErrorMessage = L.T("Connect an API key first.");
             return;
         }
 
@@ -455,13 +459,13 @@ public sealed partial class SettingsViewModel(
         Notice = (run.Sent, run.Held) switch
         {
             (0, 0) when run.Quiet > 0 =>
-                $"Checked. {run.Quiet} held back: it is outside your notification hours. " +
-                QuietHours.Describe(schedule.Current),
-            (0, 0) => "Checked. Nothing waiting that you have not already seen.",
-            (_, 0) => run.Sent == 1 ? "Checked. One reminder sent." : $"Checked. {run.Sent} reminders sent.",
+                L.F("Checked. {0} held back: it is outside your notification hours. {1}",
+                    run.Quiet, QuietHours.Describe(schedule.Current)),
+            (0, 0) => L.T("Checked. Nothing waiting that you have not already seen."),
+            (_, 0) => run.Sent == 1 ? L.T("Checked. One reminder sent.") : L.F("Checked. {0} reminders sent.", run.Sent),
             // Said, because a check that found something and showed nothing looks broken.
-            _ => $"Checked. {run.Sent} sent, {run.Held} held back: {run.Player} is in the game, " +
-                 "which shows trading post and vault news itself."
+            _ => L.F("Checked. {0} sent, {1} held back: {2} is in the game, " +
+                     "which shows trading post and vault news itself.", run.Sent, run.Held, run.Player)
         };
     });
 
@@ -474,8 +478,8 @@ public sealed partial class SettingsViewModel(
     /// and an account summary. Nothing here is read top to bottom, so grouping beats ordering.
     /// </summary>
     public ObservableCollection<PageTab> Tabs { get; } = windowMode.IsSupported
-        ? [new("Key", 0), new("Reminders", 1), new("Data", 2), new("Bridge", 3), new("Desktop", 4)]
-        : [new("Key", 0), new("Reminders", 1), new("Data", 2), new("Bridge", 3)];
+        ? [new(L.T("Key"), 0), new(L.T("Reminders"), 1), new(L.T("Data"), 2), new(L.T("Bridge"), 3), new(L.T("Desktop"), 4)]
+        : [new(L.T("Key"), 0), new(L.T("Reminders"), 1), new(L.T("Data"), 2), new(L.T("Bridge"), 3)];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsKey))]
@@ -568,20 +572,20 @@ public sealed partial class SettingsViewModel(
         if (!enable)
         {
             scheduler.Disable();
-            Notice = "Reminders off.";
+            Notice = L.T("Reminders off.");
             return;
         }
 
         if (!await notifier.RequestPermissionAsync())
         {
             SetReminderSwitch(false);
-            ErrorMessage = "Android needs notification permission. Grant it in system settings, then try again.";
+            ErrorMessage = L.T("Android needs notification permission. Grant it in system settings, then try again.");
             return;
         }
 
         scheduler.Enable();
         ErrorMessage = null;
-        Notice = "Reminders on. The app checks every 30 minutes and tells you what is waiting.";
+        Notice = L.T("Reminders on. The app checks every 30 minutes and tells you what is waiting.");
     }
 
     private void SetReminderSwitch(bool value)
@@ -593,11 +597,11 @@ public sealed partial class SettingsViewModel(
 
     private async Task ShowSessionAsync(CancellationToken ct)
     {
-        KeyLine = $"Key: {session.Token?.Name}";
+        KeyLine = L.F("Key: {0}", session.Token?.Name);
 
         var granted = session.Token?.Permissions;
 
-        PermissionsLine = $"This key carries: {string.Join(", ", granted ?? [])}";
+        PermissionsLine = L.F("This key carries: {0}", string.Join(", ", granted ?? []));
 
         // What the app asks for, beside what arrived. Worth a list rather than the flat line
         // this used to be: a missing scope does not always announce itself — heropoints answers
@@ -612,11 +616,11 @@ public sealed partial class SettingsViewModel(
 
         SpareScopesLine = spare.Count == 0
             ? null
-            : $"Also on the key, unused by the app: {string.Join(", ", spare)}.";
+            : L.F("Also on the key, unused by the app: {0}.", string.Join(", ", spare));
 
         AccountLine = session.HasPermission(Gw2Permissions.Account)
-            ? $"Account: {(await client.GetAccountAsync(ct)).Name}"
-            : "Account: (key has no 'account' permission)";
+            ? L.F("Account: {0}", (await client.GetAccountAsync(ct)).Name)
+            : L.T("Account: (key has no 'account' permission)");
 
         OnPropertyChanged(nameof(IsSignedIn));
     }
@@ -639,12 +643,12 @@ public sealed partial class SettingsViewModel(
 
     public bool HasBridgeOutcome => !string.IsNullOrWhiteSpace(BridgeOutcome);
 
-    public string BridgeNote =>
+    public string BridgeNote => L.T(
         "Guild Wars 2 has no Android client, so the phone's clipboard is nowhere near the game. " +
         "Run the bridge app on the PC you play on and scan the QR code it shows — tapping an " +
         "emote here then puts it on that PC's clipboard, ready for Ctrl+V in the chat box. " +
         "Pair as many PCs as you like; whichever one is awake on your network gets the paste, " +
-        "and the one running the game wins if several are. Addresses are found, not typed.";
+        "and the one running the game wins if several are. Addresses are found, not typed.");
 
     /// <summary>The paired PCs, as the list on the page shows them.</summary>
     public ObservableCollection<KnownBridge> Bridges { get; } = [];
@@ -666,9 +670,10 @@ public sealed partial class SettingsViewModel(
     public string MoveNote =>
         Move is not { } move
             ? string.Empty
-            : $"{move.Bridge.Label} is answering at {move.To} instead of {move.From ?? "its old address"}. " +
-              "Use it? This is asked because that PC was paired by typing a code, which cannot " +
-              "prove it is really the same machine. Pairing by QR code never has to ask.";
+            : L.F("{0} is answering at {1} instead of {2}. " +
+                  "Use it? This is asked because that PC was paired by typing a code, which cannot " +
+                  "prove it is really the same machine. Pairing by QR code never has to ask.",
+                  move.Bridge.Label, move.To, move.From ?? L.T("its old address"));
 
     /// <summary>
     /// Brings the shown list of PCs up to date with the stored one.
@@ -716,11 +721,11 @@ public sealed partial class SettingsViewModel(
     {
         if (!await bridge.IsSetUpAsync())
         {
-            BridgeOutcome = "No PC paired yet. Scan the QR code in the bridge window.";
+            BridgeOutcome = L.T("No PC paired yet. Scan the QR code in the bridge window.");
             return;
         }
 
-        BridgeOutcome = "Looking for your PCs…";
+        BridgeOutcome = L.T("Looking for your PCs…");
 
         // Reachability first, because "none of them answered" and "the credential is wrong" are
         // different problems and only one of them is about the pairing.
@@ -736,19 +741,19 @@ public sealed partial class SettingsViewModel(
             // knows the answer and used to bury it behind the guess.
             BridgeOutcome = bridge.Trouble is { } why
                 ? why
-                : "No paired PC answered. Is the bridge running, and is this phone on the same " +
-                  "network?";
+                : L.T("No paired PC answered. Is the bridge running, and is this phone on the same " +
+                      "network?");
 
             return;
         }
 
         // A real paste, because a handshake that does not exercise the credential proves nothing.
-        var sent = await bridge.SendAsync("Paired with the Guild Wars 2 Companion", ct);
+        var sent = await bridge.SendAsync(L.T("Paired with the Guild Wars 2 Companion"), ct);
 
         BridgeOutcome = sent.IsSent
-            ? $"Paired with {sent.Pc}. That sentence is on its clipboard now — paste it anywhere " +
-              "to check."
-            : $"Found {found.Pc} but {sent.Text}.";
+            ? L.F("Paired with {0}. That sentence is on its clipboard now — paste it anywhere " +
+                  "to check.", sent.Pc)
+            : L.F("Found {0} but {1}.", found.Pc, sent.Text);
     });
 
     /// <summary>
@@ -761,15 +766,15 @@ public sealed partial class SettingsViewModel(
 
         LoadBridge();
 
-        BridgeOutcome = $"{paired.Label} paired. Looking for it…";
+        BridgeOutcome = L.F("{0} paired. Looking for it…", paired.Label);
 
-        var sent = await bridge.SendAsync("Paired with the Guild Wars 2 Companion", ct);
+        var sent = await bridge.SendAsync(L.T("Paired with the Guild Wars 2 Companion"), ct);
 
         LoadBridge();
 
         BridgeOutcome = sent.IsSent
-            ? $"Paired with {sent.Pc}. That sentence is on its clipboard now."
-            : $"{paired.Label} is paired but {sent.Text}. It will be found when it is running.";
+            ? L.F("Paired with {0}. That sentence is on its clipboard now.", sent.Pc)
+            : L.F("{0} is paired but {1}. It will be found when it is running.", paired.Label, sent.Text);
     }
 
     /// <summary>
@@ -783,7 +788,7 @@ public sealed partial class SettingsViewModel(
     {
         if (BridgeHost.Trim().Length == 0 || BridgeCode.Trim().Length == 0)
         {
-            BridgeOutcome = "Enter both the address and the code from the bridge window.";
+            BridgeOutcome = L.T("Enter both the address and the code from the bridge window.");
             return;
         }
 
@@ -809,13 +814,13 @@ public sealed partial class SettingsViewModel(
     {
         if (!File.Exists(journal.Location))
         {
-            LogLine = "Nothing logged yet. Use the bridge once and it will be here.";
+            LogLine = L.T("Nothing logged yet. Use the bridge once and it will be here.");
             return;
         }
 
         LogLine = $"{new FileInfo(journal.Location).Length / 1024} KB";
 
-        await system.ShareFileAsync("Guild Wars 2 Companion log", journal.Location);
+        await system.ShareFileAsync(L.T("Guild Wars 2 Companion log"), journal.Location);
     }
 
     [ObservableProperty]
@@ -845,13 +850,13 @@ public sealed partial class SettingsViewModel(
 
         LoadBridge();
 
-        var sent = await bridge.SendAsync("Paired with the Guild Wars 2 Companion", ct);
+        var sent = await bridge.SendAsync(L.T("Paired with the Guild Wars 2 Companion"), ct);
 
         LoadBridge();
 
         BridgeOutcome = sent.IsSent
-            ? $"{sent.Pc} is at {move.To} now."
-            : $"{move.Bridge.Label} moved but {sent.Text}.";
+            ? L.F("{0} is at {1} now.", sent.Pc, move.To)
+            : L.F("{0} moved but {1}.", move.Bridge.Label, sent.Text);
     });
 
     [RelayCommand]
@@ -864,7 +869,7 @@ public sealed partial class SettingsViewModel(
         LoadBridge();
 
         BridgeOutcome = Bridges.Count == 0
-            ? "Forgotten. Emotes now only reach this phone's clipboard."
-            : $"{known.Label} forgotten.";
+            ? L.T("Forgotten. Emotes now only reach this phone's clipboard.")
+            : L.F("{0} forgotten.", known.Label);
     }
 }

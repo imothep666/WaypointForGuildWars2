@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+             xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
              x:Class="GuildWarsCompanion.Ava.Shell.MainView"
              x:DataType="shell:MainView"
              Background="{StaticResource ObsidianBrush}">
@@ -38,7 +39,7 @@
             <SplitView.Pane>
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Top" Background="{StaticResource ObsidianBrush}" Spacing="6">
-                        <TextBlock Text="FOR GUILD WARS 2" Classes="heading small" Margin="20,24,20,0" />
+                        <TextBlock Text="{ui:T 'FOR GUILD WARS 2'}" Classes="heading small" Margin="20,24,20,0" />
                         <TextBlock Text="WAYPOINT" Classes="inscription" FontSize="20" Margin="20,0" />
                         <Border Classes="rule" Margin="20,10,20,12" />
                     </StackPanel>
@@ -192,7 +193,7 @@
                     <Button x:Name="RefreshButton" Grid.Column="2" Classes="row" Width="56"
                             Height="56" HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center" Click="OnRefreshClicked"
-                            ToolTip.Tip="Refresh">
+                            ToolTip.Tip="{ui:T 'Refresh'}">
                         <Path Data="M16,4 A7,7 0 1 0 17,11 M16,0 V4 H12"
                               Stroke="{StaticResource MistBrush}" StrokeThickness="1.6" />
                     </Button>

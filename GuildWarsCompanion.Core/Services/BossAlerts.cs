@@ -66,12 +66,12 @@ public static class BossAlerts
     /// <summary>"Claw of Jormag in 12 minutes".</summary>
     public static string Title(BossCall call) => call.MinutesAway switch
     {
-        <= 0 => $"{call.Name} is up now",
-        1 => $"{call.Name} in a minute",
-        _ => $"{call.Name} in {call.MinutesAway} minutes"
+        <= 0 => L.F("{0} is up now", call.Name),
+        1 => L.F("{0} in a minute", call.Name),
+        _ => L.F("{0} in {1} minutes", call.Name, call.MinutesAway)
     };
 
     /// <summary>The line underneath: where, and why it is being mentioned at all.</summary>
     public static string Body(BossCall call) =>
-        $"{call.Location} — you have not done this one today.";
+        L.F("{0} — you have not done this one today.", call.Location);
 }

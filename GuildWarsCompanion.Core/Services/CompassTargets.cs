@@ -43,7 +43,7 @@ public sealed class CompassTargets(Gw2Client api, MarkerStore markers, Gw2Cache 
             if (Point(task.Coord) is { } at)
                 found.Add(new CompassTarget(
                     task.Objective, TargetKind.Heart, map.Id, map.Name, at.X, at.Y,
-                    Note: $"Level {task.Level}"));
+                    Note: L.F("Level {0}", task.Level)));
 
         foreach (var poi in detail.PointsOfInterest?.Values ?? Enumerable.Empty<MapPoi>())
         {
@@ -61,7 +61,7 @@ public sealed class CompassTargets(Gw2Client api, MarkerStore markers, Gw2Cache 
         foreach (var hero in detail.SkillChallenges ?? Enumerable.Empty<MapSkillChallenge>())
             if (Point(hero.Coord) is { } at)
                 found.Add(new CompassTarget(
-                    "Hero point", TargetKind.HeroPoint, map.Id, map.Name, at.X, at.Y,
+                    L.T("Hero point"), TargetKind.HeroPoint, map.Id, map.Name, at.X, at.Y,
                     Id: hero.Id));
 
         // Whatever a downloaded pack has for this map, on the end. Deliberately not cached
@@ -111,7 +111,7 @@ public sealed class CompassTargets(Gw2Client api, MarkerStore markers, Gw2Cache 
             }
 
             var wait = boss.Next - utcNow;
-            var note = wait < TimeSpan.Zero ? "up now" : $"in {Minutes(wait)}";
+            var note = wait < TimeSpan.Zero ? L.T("up now") : L.F("in {0}", Minutes(wait));
 
             // The arena itself, where ArenaNet's own v1 event data has one and the map publishes
             // both of its rectangles. This is the difference between a needle pointing at a map
@@ -279,10 +279,10 @@ public sealed class CompassTargets(Gw2Client api, MarkerStore markers, Gw2Cache 
 
     private static string Minutes(TimeSpan wait) =>
         wait.TotalMinutes < 1
-            ? "under a minute"
+            ? L.T("under a minute")
             : wait.TotalMinutes < 60
-                ? $"{wait.TotalMinutes:0} min"
-                : $"{wait.Hours}h {wait.Minutes:00}m";
+                ? L.F("{0:0} min", wait.TotalMinutes)
+                : L.F("{0}h {1:00}m", wait.Hours, wait.Minutes);
 
     private static (double X, double Y)? Point(List<double>? coord) =>
         coord is [var x, var y, ..] ? (x, y) : null;
@@ -296,8 +296,8 @@ public sealed class CompassTargets(Gw2Client api, MarkerStore markers, Gw2Cache 
 
     private static string Describe(TargetKind kind) => kind switch
     {
-        TargetKind.Waypoint => "Waypoint",
-        TargetKind.Vista => "Vista",
-        _ => "Point of interest"
+        TargetKind.Waypoint => L.T("Waypoint"),
+        TargetKind.Vista => L.T("Vista"),
+        _ => L.T("Point of interest")
     };
 }

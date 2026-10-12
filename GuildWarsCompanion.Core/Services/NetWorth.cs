@@ -31,11 +31,11 @@ public static class NetWorth
     {
         var parts = new List<WorthPart>
         {
-            new("Coin", coin, "in the wallet"),
-            new("Items", stored, "bags, bank and material storage"),
-            new("Listed", listed, "waiting to sell, at buy-order value"),
-            new("Buy orders", buyOrders, "coin the trading post is holding"),
-            new("Delivery box", deliveryCoin + deliveryItems, "sold and bought, not collected")
+            new(L.T("Coin"), coin, L.T("in the wallet")),
+            new(L.T("Items"), stored, L.T("bags, bank and material storage")),
+            new(L.T("Listed"), listed, L.T("waiting to sell, at buy-order value")),
+            new(L.T("Buy orders"), buyOrders, L.T("coin the trading post is holding")),
+            new(L.T("Delivery box"), deliveryCoin + deliveryItems, L.T("sold and bought, not collected"))
         };
 
         return parts.Where(part => part.HasValue)
@@ -68,14 +68,14 @@ public static class NetWorth
     public static string Caveat(bool priced, IReadOnlyCollection<string> unreadable)
     {
         if (!priced)
-            return "Values need a connection — this is coin only, not what your items are worth.";
+            return L.T("Values need a connection — this is coin only, not what your items are worth.");
 
-        var note = "Everything tradable at what buyers are offering now, after the 15% fee. " +
-                   "Account-bound items, karma and gems are not counted.";
+        var note = L.T("Everything tradable at what buyers are offering now, after the 15% fee. " +
+                       "Account-bound items, karma and gems are not counted.");
 
         if (unreadable.Count > 0)
-            note += $" Could not read {string.Join(", ", unreadable)}, so this is short by " +
-                    "whatever is in there.";
+            note += " " + L.F("Could not read {0}, so this is short by whatever is in there.",
+                string.Join(", ", unreadable));
 
         return note;
     }

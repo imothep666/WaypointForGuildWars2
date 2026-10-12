@@ -27,10 +27,10 @@ public sealed record WatchCandidate(
     /// <summary>Both sides of the market in a sentence, said once the item is chosen.</summary>
     public string Baseline => (Asking, Offered) switch
     {
-        ({ } ask, { } offer) => $"Sellers ask {Coin.Format(ask)}, buyers offer {Coin.Format(offer)}.",
-        ({ } ask, null) => $"Sellers ask {Coin.Format(ask)}. Nobody is buying.",
-        (null, { } offer) => $"Nobody is selling. Buyers offer {Coin.Format(offer)}.",
-        _ => "No market price to hand."
+        ({ } ask, { } offer) => L.F("Sellers ask {0}, buyers offer {1}.", Coin.Format(ask), Coin.Format(offer)),
+        ({ } ask, null) => L.F("Sellers ask {0}. Nobody is buying.", Coin.Format(ask)),
+        (null, { } offer) => L.F("Nobody is selling. Buyers offer {0}.", Coin.Format(offer)),
+        _ => L.T("No market price to hand.")
     };
 }
 
@@ -40,12 +40,25 @@ public sealed record WatchCandidate(
 /// Prices are unauthenticated, so this works with no API key at all — the watch list is the
 /// only feature in the app that does.
 /// </summary>
-public sealed class WatchService(Gw2Client client, WatchStore store, Gw2Cache cache)
+public sealed class WatchService(Gw2Client client, WatchStore store, Gw2Cache cache, ItemLookup lookup)
 {
     public async Task<IReadOnlyList<WatchRow>> ListAsync(CancellationToken ct = default)
     {
         var watches = await store.ListAsync(ct);
         if (watches.Count == 0) return [];
+
+        // A watch keeps the name its item had when it was set, which may be in the language the
+        // phone was in then, so the item's name now wins. Usually from the store; a renamed item
+        // is one request for the lot.
+        Dictionary<int, Item> named;
+        try
+        {
+            named = await lookup.ResolveAsync(watches.Select(w => w.ItemId).ToList(), ct);
+        }
+        catch (Gw2ApiException)
+        {
+            named = [];
+        }
 
         var prices = (await client.GetPricesAsync(watches.Select(w => w.ItemId), ct))
             .ToDictionary(p => p.Id);
@@ -59,10 +72,10 @@ public sealed class WatchService(Gw2Client client, WatchStore store, Gw2Cache ca
 
             rows.Add(new WatchRow(
                 watch.Id,
-                watch.Name,
+                named.GetValueOrDefault(watch.ItemId)?.Name ?? watch.Name,
                 watch.Icon,
                 PriceRules.Describe(watch),
-                current is null ? "no market" : Coin.Format(current.Value),
+                current is null ? L.T("no market") : Coin.Format(current.Value),
                 PriceRules.IsMet(watch, current)));
         }
 
@@ -83,7 +96,7 @@ public sealed class WatchService(Gw2Client client, WatchStore store, Gw2Cache ca
     public async Task<IReadOnlyList<WatchCandidate>> SearchAsync(
         string term, CancellationToken ct = default)
     {
-        var items = await cache.SearchItemsAsync(term, 25, tradableOnly: true, ct);
+        var items = await lookup.SearchTradableAsync(term, 25, ct);
         var prices = await PricesAsync(items.Select(i => i.Id), ct);
 
         return items

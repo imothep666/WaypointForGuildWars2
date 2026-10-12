@@ -16,7 +16,7 @@ public sealed record VaultRow(
 
     /// <summary>What the row says under its reward: the count while it is open, then whether the
     /// reward is still waiting in the vault or has been taken.</summary>
-    public string CountText => IsUnclaimed ? "ready" : Claimed ? "claimed" : ProgressText;
+    public string CountText => IsUnclaimed ? L.T("ready") : Claimed ? L.T("claimed") : ProgressText;
 
     public string AcclaimText => $"+{Acclaim}";
 
@@ -88,8 +88,7 @@ public sealed class VaultService(
 
             var warning = Resets.LastFor(track, DateTimeOffset.UtcNow) is { } reset &&
                           changedAt < reset
-                ? $"This is the previous {TrackName(track).ToLowerInvariant()} cycle. The " +
-                  "Wizard's Vault only updates once you log into the game."
+                ? PreviousCycle(track)
                 : null;
 
             vaultSignal.Saw(track, data, warning is not null);
@@ -105,8 +104,8 @@ public sealed class VaultService(
 
             var waiting = rows.Count(r => r.IsUnclaimed);
             var summary = waiting > 0
-                ? $"{waiting} to claim · meta {data.MetaProgressCurrent}/{data.MetaProgressComplete}"
-                : $"meta {data.MetaProgressCurrent}/{data.MetaProgressComplete}";
+                ? L.F("{0} to claim · meta {1}/{2}", waiting, data.MetaProgressCurrent, data.MetaProgressComplete)
+                : L.F("meta {0}/{1}", data.MetaProgressCurrent, data.MetaProgressComplete);
 
             sections.Add(new VaultSection(TrackName(track), summary, rows, warning));
         }
@@ -116,7 +115,7 @@ public sealed class VaultService(
         var (shop, shopNote) = await ReadShopAsync(acclaim, ct);
 
         return new VaultView(
-            daysLeft > 0 ? $"{_season.Title} · {daysLeft} days left" : _season.Title,
+            daysLeft > 0 ? L.F("{0} · {1} days left", _season.Title, daysLeft) : _season.Title,
             acclaim is null ? string.Empty : $"{acclaim:N0}",
             acclaim is not null,
             sections,
@@ -137,26 +136,39 @@ public sealed class VaultService(
                 "account/wizardsvault/listings", Gw2JsonContext.Default.ListVaultListing,
                 client.GetVaultListingsAsync, ct)).Value;
 
-            var resolved = await items.ResolveAsync(listings.Select(listing => listing.ItemId).Distinct().ToList(), ct);
+            var ids = listings.Select(listing => listing.ItemId).Distinct().ToList();
+            var resolved = await items.ResolveAsync(ids, ct);
+
+            // For the banner paintings, which the wiki files under English names.
+            var english = await items.EnglishNamesAsync(ids, ct);
 
             var shop = VaultShop.Sections(
                 listings,
-                id => resolved.GetValueOrDefault(id) is { } item ? (item.Name, item.Icon) : ($"Item {id}", null),
-                acclaim);
+                id => resolved.GetValueOrDefault(id) is { } item ? (item.Name, item.Icon) : (L.F("Item {0}", id), null),
+                acclaim,
+                english.GetValueOrDefault);
 
             return (shop, VaultShop.Caution);
         }
         catch (Gw2ApiException)
         {
-            return ([], "The vault's shop could not be read just now.");
+            return ([], L.T("The vault's shop could not be read just now."));
         }
     }
 
     private static string TrackName(string track) => track switch
     {
-        "daily" => "Daily",
-        "weekly" => "Weekly",
-        _ => "Special"
+        "daily" => L.T("Daily"),
+        "weekly" => L.T("Weekly"),
+        _ => L.T("Special")
+    };
+
+    /// <summary>Whole sentences per track: German bends the adjective to the noun after it.</summary>
+    private static string PreviousCycle(string track) => track switch
+    {
+        "daily" => L.T("This is the previous daily cycle. The Wizard's Vault only updates once you log into the game."),
+        "weekly" => L.T("This is the previous weekly cycle. The Wizard's Vault only updates once you log into the game."),
+        _ => L.T("This is the previous special cycle. The Wizard's Vault only updates once you log into the game.")
     };
 
     /// <summary>Astral Acclaim is a wallet currency; without that scope the header just omits it.</summary>

@@ -85,7 +85,7 @@ internal static class WidgetDraw
     {
         var views = new RemoteViews(context.PackageName, R.Layout.widget_bosses);
 
-        views.SetImageViewBitmap(R.Id.boss_heading, Carved(context, "World Bosses"));
+        views.SetImageViewBitmap(R.Id.boss_heading, Carved(context, L.T("World Bosses")));
 
         if (panel.Next is { } next)
         {
@@ -121,7 +121,7 @@ internal static class WidgetDraw
     {
         var views = new RemoteViews(context.PackageName, R.Layout.widget_vault);
 
-        views.SetImageViewBitmap(R.Id.vault_heading, Carved(context, "Wizard's Vault"));
+        views.SetImageViewBitmap(R.Id.vault_heading, Carved(context, L.T("Wizard's Vault")));
 
         views.SetTextViewText(R.Id.vault_daily, panel.Daily);
         views.SetTextViewText(R.Id.vault_weekly, panel.Weekly);

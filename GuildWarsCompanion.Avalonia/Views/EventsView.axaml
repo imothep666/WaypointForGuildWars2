@@ -54,7 +54,7 @@
 
                     <!-- Map metas: on now first, then by how soon. Brass while on or about to be. -->
                     <StackPanel IsVisible="{Binding Metas.Count, Converter={x:Static ui:Counts.IsAny}}" Margin="0,18,0,0">
-                        <TextBlock Text="MAP METAS" Classes="heading" Margin="20,0,20,8" />
+                        <TextBlock Text="{ui:T 'MAP METAS'}" Classes="heading" Margin="20,0,20,8" />
                         <ItemsControl ItemsSource="{Binding Metas}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="services:MetaRow">

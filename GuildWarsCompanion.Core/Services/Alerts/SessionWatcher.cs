@@ -36,14 +36,14 @@ public sealed class SessionWatcher(LedgerService ledger) : IAccountWatcher
         {
             0 => null,
             1 => played.Characters[0].Name,
-            _ => $"{played.Characters[0].Name} and {played.Characters.Count - 1} more"
+            _ => L.F("{0} and {1} more", played.Characters[0].Name, played.Characters.Count - 1)
         };
 
         return
         [
             new AccountAlert(
                 $"session:{played.Before.At.ToUnixTimeSeconds()}",
-                $"Session recap · {SessionRecap.Duration(played.PlayedSeconds)}",
+                L.F("Session recap · {0}", SessionRecap.Duration(played.PlayedSeconds)),
                 who is null ? text.Wallet : $"{who} · {text.Wallet}")
         ];
     }

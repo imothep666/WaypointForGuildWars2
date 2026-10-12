@@ -82,7 +82,7 @@ public sealed class PackRepository(AppEnvironment environment, ISettings setting
         }
         catch (Exception ex) when (ex is JsonException or InvalidOperationException)
         {
-            Problem = "The kept copy of the list could not be read.";
+            Problem = L.T("The kept copy of the list could not be read.");
             return new PackCatalogue([], 0);
         }
     }
@@ -91,7 +91,7 @@ public sealed class PackRepository(AppEnvironment environment, ISettings setting
     {
         if (!Uri.TryCreate(Address, UriKind.Absolute, out var address) || address.Scheme != Uri.UriSchemeHttps)
         {
-            Problem = "The list's address is not an https address.";
+            Problem = L.T("The list's address is not an https address.");
             return;
         }
 
@@ -104,7 +104,7 @@ public sealed class PackRepository(AppEnvironment environment, ISettings setting
 
             if (Parse(json).Packs.Count == 0)
             {
-                Problem = "That address answered, but not with a list of marker packs.";
+                Problem = L.T("That address answered, but not with a list of marker packs.");
                 return;
             }
 
@@ -116,8 +116,8 @@ public sealed class PackRepository(AppEnvironment environment, ISettings setting
             if (ct.IsCancellationRequested) throw;
 
             Problem = File.Exists(FilePath)
-                ? "The list could not be fetched just now; this is the last copy."
-                : $"The list could not be fetched: {ex.Message}";
+                ? L.T("The list could not be fetched just now; this is the last copy.")
+                : L.F("The list could not be fetched: {0}", ex.Message);
         }
     }
 

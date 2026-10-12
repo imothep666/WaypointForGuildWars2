@@ -61,7 +61,7 @@ public static class CraftPlan
     public static string Verdict(IReadOnlyList<CraftLine> lines, int output, bool storageKnown)
     {
         if (!storageKnown)
-            return "Open Find once to have the app count what you are holding.";
+            return L.T("Open Find once to have the app count what you are holding.");
 
         var batches = Batches(lines);
 
@@ -71,16 +71,16 @@ public static class CraftPlan
 
             return missing.Count switch
             {
-                0 => "You have none of what this needs.",
-                1 => $"Short {missing[0].Short:N0} {missing[0].Name}.",
-                _ => $"Short {missing.Count} of the {lines.Count} ingredients."
+                0 => L.T("You have none of what this needs."),
+                1 => L.F("Short {0:N0} {1}.", missing[0].Short, missing[0].Name),
+                _ => L.F("Short {0} of the {1} ingredients.", missing.Count, lines.Count)
             };
         }
 
         var made = batches.Value * Math.Max(output, 1);
 
         return made == 1
-            ? "You can make one right now."
-            : $"You can make {made:N0} right now.";
+            ? L.T("You can make one right now.")
+            : L.F("You can make {0:N0} right now.", made);
     }
 }

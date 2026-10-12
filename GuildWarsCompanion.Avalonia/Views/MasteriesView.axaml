@@ -27,7 +27,7 @@
                             <DataTemplate x:DataType="services:RegionPoints">
                                 <Grid ColumnDefinitions="4,*,Auto" MinHeight="44" Margin="0,0,0,2">
                                     <Border Background="{StaticResource BrassDimBrush}" />
-                                    <TextBlock Grid.Column="1" Text="{Binding Region}" Margin="16,0,10,0"
+                                    <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="16,0,10,0"
                                                VerticalAlignment="Center" />
                                     <TextBlock Grid.Column="2" Text="{Binding Line}" Classes="caption"
                                                VerticalAlignment="Center" />
@@ -37,7 +37,7 @@
                     </ItemsControl>
 
                     <Border Classes="rule" Margin="0,8,0,0" />
-                    <TextBlock Text="TRACKS" Classes="heading" />
+                    <TextBlock Text="{ui:T 'TRACKS'}" Classes="heading" />
 
                     <ItemsControl ItemsSource="{Binding Tracks}">
                         <ItemsControl.ItemTemplate>

@@ -7,7 +7,8 @@ public sealed record MasteryRow(MasteryStep Step)
 {
     public string Name => Step.Name;
 
-    public string Region => Step.Region;
+    /// <summary>For the screen; <see cref="MasteryStep.Region"/> stays the English join key.</summary>
+    public string Region => Masteries.RegionName(Step.Region);
 
     public string ProgressText => Step.ProgressText;
 
@@ -38,7 +39,7 @@ public sealed class MasteryService(Gw2Client client, ApiKeySession session, Offl
             "masteries", Gw2JsonContext.Default.ListMastery, client.GetMasteriesAsync, ct)).Value;
 
         if (!session.HasPermission(Gw2Permissions.Progression))
-            return new MasteryView(string.Empty, [], [], NeedsProgression, false);
+            return new MasteryView(string.Empty, [], [], L.T(NeedsProgression), false);
 
         var points = (await offline.ReadOptionalAsync(
             "account/mastery/points", Gw2JsonContext.Default.MasteryPoints,
@@ -71,7 +72,7 @@ public sealed class MasteryService(Gw2Client client, ApiKeySession session, Offl
             Masteries.Summarise(regions),
             regions,
             steps.Select(step => new MasteryRow(step)).ToList(),
-            Note,
+            L.T(Note),
             steps.Count > 0);
     }
 

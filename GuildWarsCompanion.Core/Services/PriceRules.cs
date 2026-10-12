@@ -41,8 +41,13 @@ public static class PriceRules
         (watch.Below ? current <= watch.Threshold : current >= watch.Threshold);
 
     public static string Describe(PriceWatch watch) =>
-        $"{(watch.WatchSellPrice ? "Sell price" : "Buy price")} " +
-        $"{(watch.Below ? "at or below" : "at or above")} {Coin.Format(watch.Threshold)}";
+        (watch.WatchSellPrice, watch.Below) switch
+        {
+            (true, true) => L.F("Sell price at or below {0}", Coin.Format(watch.Threshold)),
+            (true, false) => L.F("Sell price at or above {0}", Coin.Format(watch.Threshold)),
+            (false, true) => L.F("Buy price at or below {0}", Coin.Format(watch.Threshold)),
+            (false, false) => L.F("Buy price at or above {0}", Coin.Format(watch.Threshold))
+        };
 
     /// <summary>
     /// Parses "1g 20s 5c", "20s", or a bare number of copper. Anything it cannot read with

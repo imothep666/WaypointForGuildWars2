@@ -32,19 +32,19 @@
                 <Border Classes="card">
                     <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,14,Auto">
                         <StackPanel Spacing="3">
-                            <TextBlock Text="PLAYED" Classes="heading small" />
+                            <TextBlock Text="{ui:T 'PLAYED'}" Classes="heading small" />
                             <TextBlock Text="{Binding Playtime}" Classes="figure" FontSize="18" />
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="3" IsVisible="{Binding HasHeroChallenges}">
-                            <TextBlock Text="HERO CHALLENGES" Classes="heading small" />
+                            <TextBlock Text="{ui:T 'HERO CHALLENGES'}" Classes="heading small" />
                             <TextBlock Text="{Binding HeroChallenges}" Classes="figure" FontSize="18" />
                         </StackPanel>
                         <StackPanel Grid.Row="2" Spacing="3">
-                            <TextBlock Text="DEATHS" Classes="heading small" />
+                            <TextBlock Text="{ui:T 'DEATHS'}" Classes="heading small" />
                             <TextBlock Text="{Binding Deaths}" Classes="figure" FontSize="18" />
                         </StackPanel>
                         <StackPanel Grid.Row="2" Grid.Column="1" Spacing="3">
-                            <TextBlock Text="BORN" Classes="heading small" />
+                            <TextBlock Text="{ui:T 'BORN'}" Classes="heading small" />
                             <TextBlock Text="{Binding Created}" Classes="figure" FontSize="15" />
                         </StackPanel>
                     </Grid>
@@ -55,7 +55,7 @@
 
                 <!-- Who the character said they were at creation. The journal line is short
                      enough to list; the full answer is a tap away. -->
-                <TextBlock Text="BACKSTORY" Classes="heading" Margin="0,6,0,0" />
+                <TextBlock Text="{ui:T 'BACKSTORY'}" Classes="heading" Margin="0,6,0,0" />
 
                 <ItemsControl ItemsSource="{Binding Backstory}">
                     <ItemsControl.ItemTemplate>
@@ -76,7 +76,7 @@
             </StackPanel>
 
             <StackPanel IsVisible="{Binding IsBuild}" Spacing="14">
-                <TextBlock Text="BUILD" Classes="heading" Margin="0,6,0,0" />
+                <TextBlock Text="{ui:T 'BUILD'}" Classes="heading" Margin="0,6,0,0" />
                 <TextBlock Text="{Binding TemplateName}" IsVisible="{Binding HasTemplateName}" Classes="caption" />
                 <TextBlock Text="{Binding BuildNotice}" IsVisible="{Binding HasBuildNotice}" Classes="caption" />
 
@@ -110,7 +110,7 @@
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                                 <TextBlock Text="{Binding Note}" Classes="caption small" />
-                                <TextBlock Text="Tap a skill to read what it does." Classes="caption"
+                                <TextBlock Text="{ui:T 'Tap a skill to read what it does.'}" Classes="caption"
                                            FontSize="10.5" IsVisible="{Binding IsUtilityRow}" />
                             </StackPanel>
                         </DataTemplate>
@@ -216,7 +216,7 @@
             </StackPanel>
 
             <StackPanel IsVisible="{Binding IsGear}" Spacing="14">
-                <TextBlock Text="LOADOUT" Classes="heading" Margin="0,6,0,0" />
+                <TextBlock Text="{ui:T 'LOADOUT'}" Classes="heading" Margin="0,6,0,0" />
 
                 <!-- A character keeps several equipment templates and wears one. Without this
                      strip the other sets were invisible: the API's top-level equipment array is
@@ -287,7 +287,7 @@
                      cloth, leather and metal, so these are mixed for this profession's armour
                      weight rather than shown as the dye's own swatch. -->
                 <StackPanel IsVisible="{Binding HasDyes}" Spacing="8">
-                    <TextBlock Text="DYES" Classes="heading small" />
+                    <TextBlock Text="{ui:T 'DYES'}" Classes="heading small" />
 
                     <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
                         <ItemsControl ItemsSource="{Binding Dyes}">
@@ -317,7 +317,7 @@
                 </StackPanel>
 
                 <!-- Trinkets have no place on a body outline, so they get their own row. -->
-                <TextBlock Text="TRINKETS" Classes="heading small" Margin="0,4,0,0" />
+                <TextBlock Text="{ui:T 'TRINKETS'}" Classes="heading small" Margin="0,4,0,0" />
                 <ItemsControl ItemsSource="{Binding Trinkets}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -338,7 +338,7 @@
                 </ItemsControl>
 
                 <Border Classes="rule" Margin="0,10,0,0" />
-                <TextBlock Text="EQUIPMENT" Classes="heading" Margin="0,4,0,0" />
+                <TextBlock Text="{ui:T 'EQUIPMENT'}" Classes="heading" Margin="0,4,0,0" />
                 <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
                 <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
 
@@ -365,7 +365,7 @@
                 <!-- PvP gear is a separate id space and only reachable through the template, so
                      this is the first screen that can show it at all. -->
                 <Border Classes="rule" Margin="0,10,0,0" />
-                <TextBlock Text="PVP" Classes="heading" Margin="0,4,0,0" />
+                <TextBlock Text="{ui:T 'PVP'}" Classes="heading" Margin="0,4,0,0" />
                 <TextBlock Text="{Binding PvpNotice}" IsVisible="{Binding HasPvpNotice}" Classes="caption" />
 
                 <ItemsControl ItemsSource="{Binding PvpGear}">
@@ -386,7 +386,7 @@
             <StackPanel IsVisible="{Binding IsCheck}" Spacing="14">
                 <!-- Completeness, not taste: every finding is a fact with a fix. -->
                 <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
-                    <TextBlock Text="BUILD CHECK" Classes="heading" />
+                    <TextBlock Text="{ui:T 'BUILD CHECK'}" Classes="heading" />
                     <TextBlock Grid.Column="1" Text="{Binding CheckScore}" Classes="figure"
                                Foreground="{StaticResource BrassBrush}" />
                 </Grid>
@@ -417,7 +417,7 @@
                 <!-- Prices for finishing what the gear already started. Never a suggestion about
                      which rune or sigil to run: the API has no view on that. -->
                 <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
-                    <TextBlock Text="TO COMPLETE" Classes="heading" />
+                    <TextBlock Text="{ui:T 'TO COMPLETE'}" Classes="heading" />
                     <TextBlock Grid.Column="1" Text="{Binding ShoppingTotal}" Classes="figure"
                                Foreground="{StaticResource MetalGoldBrush}" />
                 </Grid>
@@ -447,9 +447,9 @@
                 completed IS the record of the decisions taken.
             -->
             <StackPanel IsVisible="{Binding IsStory}" Spacing="14">
-                <TextBlock Text="PERSONAL STORY" Classes="heading" Margin="0,6,0,0" />
+                <TextBlock Text="{ui:T 'PERSONAL STORY'}" Classes="heading" Margin="0,6,0,0" />
 
-                <TextBlock Text="Reading this character's story…" IsVisible="{Binding IsBusy}" Classes="caption" />
+                <TextBlock Text="{ui:T 'Reading this character\'s story…'}" IsVisible="{Binding IsBusy}" Classes="caption" />
 
                 <!-- A screen that fetches has to be able to say why it did not. -->
                 <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />

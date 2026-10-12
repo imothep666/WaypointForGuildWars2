@@ -83,7 +83,7 @@ public partial class MainView : UserControl
     private readonly List<AreaItem> _loose = Routes.Areas.Where(area => !area.InBar).Select(area => new AreaItem(area)).ToList();
     private readonly ObservableCollection<AreaItem> _bar = [];
     private readonly ObservableCollection<AreaItem> _more = [];
-    private readonly AreaItem _moreItem = new(null, "More", Glyphs.More, "#C8A34E");
+    private readonly AreaItem _moreItem = new(null, L.T("More"), Glyphs.More, "#C8A34E");
     private readonly ISettings? _settings = HostServices.Current?.GetService<ISettings>();
     private AreaItem? _fourth;
 
@@ -490,8 +490,8 @@ public partial class MainView : UserControl
         var wait = next.Next - now;
 
         return wait < TimeSpan.FromHours(1)
-            ? $"{next.Name} in {Math.Max(1, (int)Math.Ceiling(wait.TotalMinutes))} min"
-            : $"{next.Name} at {next.Next.ToLocalTime():HH:mm}";
+            ? L.F("{0} in {1} min", next.Name, Math.Max(1, (int)Math.Ceiling(wait.TotalMinutes)))
+            : L.F("{0} at {1:HH:mm}", next.Name, next.Next.ToLocalTime());
     }
 
     private static string? Beaten()
@@ -501,7 +501,10 @@ public partial class MainView : UserControl
         var parts = orders.Sections
             .Select(section => (section.Name, Count: section.Count(row => row.IsBeaten)))
             .Where(part => part.Count > 0)
-            .Select(part => part.Name == "Selling" ? $"{part.Count} undercut" : $"{part.Count} outbid")
+            // The section's name is its identity here; it may reach this point translated or not.
+            .Select(part => part.Name == "Selling" || part.Name == L.T("Selling")
+                ? L.F("{0} undercut", part.Count)
+                : L.F("{0} outbid", part.Count))
             .ToList();
 
         return parts.Count == 0 ? null : string.Join(" · ", parts);

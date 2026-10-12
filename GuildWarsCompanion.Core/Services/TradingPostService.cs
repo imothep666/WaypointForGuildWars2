@@ -23,7 +23,12 @@ public sealed record OrderRow(
 public sealed class OrderSection(string name, string summary, IEnumerable<OrderRow> rows)
     : List<OrderRow>(rows)
 {
+    /// <summary>English, always: the shell tells the sides apart by it.</summary>
     public string Name { get; } = name;
+
+    /// <summary>The name as the screen shows it, in the phone's language.</summary>
+    public string Title => L.T(Name);
+
     public string Summary { get; } = summary;
 }
 
@@ -266,7 +271,7 @@ public sealed class TradingPostService(Gw2Client client, ItemLookup lookup, Offl
             {
                 var item = items.GetValueOrDefault(entry.Id);
                 return new OrderRow(
-                    item?.Name ?? $"Item {entry.Id}",
+                    item?.Name ?? L.F("Item {0}", entry.Id),
                     item?.Icon,
                     item?.Rarity,
                     entry.Count.ToString("N0"),
@@ -307,7 +312,7 @@ public sealed class TradingPostService(Gw2Client client, ItemLookup lookup, Offl
             side is null ? null : OrderBook.Tied(side, order.Price, order.Quantity));
 
         return new OrderRow(
-            item?.Name ?? $"Item {order.ItemId}",
+            item?.Name ?? L.F("Item {0}", order.ItemId),
             item?.Icon,
             item?.Rarity,
             $"×{order.Quantity:N0}",
@@ -322,7 +327,7 @@ public sealed class TradingPostService(Gw2Client client, ItemLookup lookup, Offl
         var item = items.GetValueOrDefault(trade.ItemId);
 
         return new OrderRow(
-            item?.Name ?? $"Item {trade.ItemId}",
+            item?.Name ?? L.F("Item {0}", trade.ItemId),
             item?.Icon,
             item?.Rarity,
             $"×{trade.Quantity:N0}",

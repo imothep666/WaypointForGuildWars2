@@ -72,7 +72,7 @@ public static class WidgetContent
 
         var footnote = trusted is null
             ? string.Empty
-            : $"{calls.Count(call => call.Needed == true)} of {calls.Count} timed bosses left";
+            : L.F("{0} of {1} timed bosses left", calls.Count(call => call.Needed == true), calls.Count);
 
         return new BossPanel(shown.FirstOrDefault(), shown.Skip(1).Take(2).ToList(), footnote);
     }
@@ -93,8 +93,8 @@ public static class WidgetContent
         return new VaultPanel(
             Progress(daily),
             Progress(weekly),
-            claimable > 0 ? $"{claimable} to claim" : string.Empty,
-            $"Resets in {Until(Resets.NextDaily(now) - now)}",
+            claimable > 0 ? L.F("{0} to claim", claimable) : string.Empty,
+            L.F("Resets in {0}", Until(Resets.NextDaily(now) - now)),
             readAt is { } at && now - at >= StaleAfter ? Stale.Age(at, now) : null,
             claimable > 0);
     }
@@ -114,7 +114,7 @@ public static class WidgetContent
     /// </summary>
     public static string Until(TimeSpan left)
     {
-        if (left <= TimeSpan.Zero) return "now";
+        if (left <= TimeSpan.Zero) return L.T("now");
 
         var hours = (int)left.TotalHours;
         var minutes = left.Minutes;

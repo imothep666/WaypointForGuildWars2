@@ -1,3 +1,5 @@
+using GuildWarsCompanion.Gw2;
+
 namespace GuildWarsCompanion.Services;
 
 /// <summary>
@@ -32,14 +34,25 @@ public static class Wiki
         return mark < 0 ? whole : whole[(mark + 2)..].Trim();
     }
 
-    public static string UrlFor(string? itemName)
+    /// <param name="language">
+    /// The language the name is in, as <see cref="Gw2Client.Language"/>. German, French and
+    /// Spanish each have a wiki of their own, which is where a name in those languages finds its
+    /// page; checked by following the search redirect on each. There is no Chinese one.
+    /// </param>
+    public static string UrlFor(string? itemName, string language = Gw2Language.English)
     {
         var term = (itemName ?? string.Empty).Trim();
+        var root = HasOwnWiki(language)
+            ? $"https://wiki-{language}.guildwars2.com/"
+            : "https://wiki.guildwars2.com/";
 
         return term.Length == 0
-            ? "https://wiki.guildwars2.com/"
-            : $"https://wiki.guildwars2.com/index.php?search={Uri.EscapeDataString(term)}";
+            ? root
+            : $"{root}index.php?search={Uri.EscapeDataString(term)}";
     }
+
+    /// <summary>Whether a language has a wiki of its own, rather than only the English one.</summary>
+    public static bool HasOwnWiki(string language) => language is "de" or "fr" or "es";
 }
 
 /// <summary>
@@ -74,7 +87,7 @@ public static class ItemFacts
 
         return Meaningful
             .Where(pair => set.Contains(pair.Key))
-            .Select(pair => pair.Value)
+            .Select(pair => L.T(pair.Value))
             .ToList();
     }
 
@@ -84,6 +97,9 @@ public static class ItemFacts
     /// Item types come back in PascalCase, unlike the snake_case ids everywhere else in the
     /// API, so <see cref="Ids.ToDisplayName"/> leaves them run together — it splits on
     /// underscores and there are none.
+    ///
+    /// English, since it only respaces the API's word; a screen puts it through <see cref="L.T"/>,
+    /// where the types the API uses have their translations.
     /// </summary>
     public static string ReadableType(string? type)
     {

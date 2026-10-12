@@ -35,7 +35,7 @@ public sealed partial class CollectionViewModel(AchievementService achievements,
         if (RouteQuery.Int(query, "id") is { } id) AchievementId = id;
     }
 
-    protected override string DefaultEmptyMessage => "Nothing to list for this achievement.";
+    protected override string DefaultEmptyMessage => L.T("Nothing to list for this achievement.");
 
     [RelayCommand]
     public Task LoadAsync() => RunAsync(async ct =>
@@ -46,8 +46,8 @@ public sealed partial class CollectionViewModel(AchievementService achievements,
 
         if (view is null)
         {
-            Notice = "This achievement has no checklist — it counts progress rather than " +
-                     "listing what to collect.";
+            Notice = L.T("This achievement has no checklist — it counts progress rather than " +
+                         "listing what to collect.");
             return;
         }
 
@@ -84,7 +84,7 @@ public sealed partial class CollectionViewModel(AchievementService achievements,
         catch (Exception ex)
         {
             // A phone with no browser is unlikely, but silence would look like a dead row.
-            ErrorMessage = $"Could not open the wiki: {ex.Message}";
+            ErrorMessage = L.F("Could not open the wiki: {0}", ex.Message);
         }
     }
 }

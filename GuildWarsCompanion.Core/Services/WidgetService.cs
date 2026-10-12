@@ -20,7 +20,7 @@ namespace GuildWarsCompanion.Services;
 /// </summary>
 public sealed class WidgetService(
     Gw2Client client, ApiKeySession session, SnapshotStore snapshots, BridgeClient bridge, HereService here,
-    IWidgetRedraw? redraw = null)
+    LocalMapNames names, IWidgetRedraw? redraw = null)
 {
     private const string BossesKey = "widget/worldbosses";
     private const string HereKey = "widget/here";
@@ -96,6 +96,8 @@ public sealed class WidgetService(
 
         if (report is not { IsLive: true }) return;
 
+        report = await names.NameAsync(report, ct);
+
         string? line;
 
         try
@@ -120,7 +122,8 @@ public sealed class WidgetService(
         if (report is not { IsLive: true, State: { CharacterName.Length: > 0 } state }) return;
 
         await snapshots.SaveAsync(
-            HereKey, new HereReading(state.CharacterName, report.MapName, line), Gw2JsonContext.Default.HereReading, ct);
+            HereKey, new HereReading(state.CharacterName, report.LocalMapName ?? report.MapName, line),
+            Gw2JsonContext.Default.HereReading, ct);
 
         redraw?.Redraw();
     }

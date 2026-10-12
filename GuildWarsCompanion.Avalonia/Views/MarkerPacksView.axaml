@@ -10,11 +10,11 @@
 
         <!-- The search stays put while the list scrolls under it, as on Emotes. -->
         <StackPanel Margin="20,12,20,12" Spacing="10">
-            <TextBox Text="{Binding Search}" PlaceholderText="chests, jumping, Tekkit…" />
+            <TextBox Text="{Binding Search}" PlaceholderText="{ui:T 'chests, jumping, Tekkit…'}" />
 
             <Grid ColumnDefinitions="*,Auto">
                 <TextBlock Text="{Binding Summary}" Classes="caption" VerticalAlignment="Center" />
-                <Button Grid.Column="1" Content="STOP" Command="{Binding StopCommand}" Classes="quiet"
+                <Button Grid.Column="1" Content="{ui:T 'STOP'}" Command="{Binding StopCommand}" Classes="quiet"
                         FontSize="10" Padding="12,6" IsVisible="{Binding IsAdding}" />
             </Grid>
         </StackPanel>
@@ -38,7 +38,7 @@
 
                                         <!-- ADD where it can be added, the word where it is here
                                              already: removing belongs to Settings, with UPDATE. -->
-                                        <Button Grid.Column="1" Content="ADD" Classes="quiet" FontSize="10"
+                                        <Button Grid.Column="1" Content="{ui:T 'ADD'}" Classes="quiet" FontSize="10"
                                                 Padding="14,6" Margin="10,0,0,0" Click="OnAddPack"
                                                 IsVisible="{Binding CanAdd}" VerticalAlignment="Center" />
                                         <TextBlock Grid.Column="1" Text="{Binding Mark}" Classes="caption small"
@@ -64,15 +64,15 @@
 
                     <!-- Where the list comes from. Blish HUD's by default; any list in its format
                          or TacO's will do, for the day the default moves. -->
-                    <TextBlock Text="LIST" Classes="heading small" Margin="0,8,0,0" />
+                    <TextBlock Text="{ui:T 'LIST'}" Classes="heading small" Margin="0,8,0,0" />
                     <TextBox Text="{Binding Address}" />
                     <WrapPanel>
-                        <Button Content="USE THIS LIST" Command="{Binding UseAddressCommand}" Classes="quiet"
+                        <Button Content="{ui:T 'USE THIS LIST'}" Command="{Binding UseAddressCommand}" Classes="quiet"
                                 Margin="0,0,10,0" />
-                        <Button Content="BLISH HUD'S LIST" Command="{Binding UseDefaultCommand}" Classes="quiet" />
+                        <Button Content="{ui:T 'BLISH HUD\'S LIST'}" Command="{Binding UseDefaultCommand}" Classes="quiet" />
                     </WrapPanel>
                     <TextBlock Classes="caption"
-                               Text="The list only names each pack's own download address. Adding one fetches it from its author, as a pasted address does, and nothing is copied into the app." />
+                               Text="{ui:T 'The list only names each pack\'s own download address. Adding one fetches it from its author, as a pasted address does, and nothing is copied into the app.'}" />
                 </StackPanel>
             </ScrollViewer>
         </RefreshContainer>

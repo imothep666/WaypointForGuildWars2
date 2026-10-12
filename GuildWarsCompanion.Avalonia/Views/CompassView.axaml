@@ -3,6 +3,7 @@
                 xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
                 xmlns:vm="using:GuildWarsCompanion.ViewModels"
                 xmlns:controls="using:GuildWarsCompanion.Ava.Controls"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
                 x:Class="GuildWarsCompanion.Ava.Views.CompassView"
                 x:DataType="vm:CompassViewModel"
                 ShowsBand="True">
@@ -78,7 +79,7 @@
                  would, then the map's own list for the finished hearts the API cannot report. -->
             <ScrollViewer Grid.Row="1" Margin="20,12,20,0" IsVisible="{Binding IsFilterOpen}">
                 <StackPanel Spacing="10" Margin="0,0,0,20">
-                    <TextBlock Text="KINDS" Classes="heading" />
+                    <TextBlock Text="{ui:T 'KINDS'}" Classes="heading" />
 
                     <ItemsControl ItemsSource="{Binding KindRows}">
                         <ItemsControl.ItemTemplate>
@@ -104,10 +105,10 @@
 
                     <TextBlock Text="{Binding FilterLine}" Classes="caption" />
 
-                    <Button Content="SHOW EVERYTHING HIDDEN BY HAND" Command="{Binding RestoreHiddenCommand}"
+                    <Button Content="{ui:T 'SHOW EVERYTHING HIDDEN BY HAND'}" Command="{Binding RestoreHiddenCommand}"
                             Classes="quiet" HorizontalAlignment="Left" />
 
-                    <TextBlock Text="ON THIS MAP" Classes="heading" Margin="0,6,0,0" />
+                    <TextBlock Text="{ui:T 'ON THIS MAP'}" Classes="heading" Margin="0,6,0,0" />
 
                     <!-- Everything, hidden ones included. A target taken off the dial has to stay
                          somewhere reachable or there is no way back to it. -->

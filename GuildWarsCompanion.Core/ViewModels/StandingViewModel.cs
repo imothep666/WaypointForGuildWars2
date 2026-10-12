@@ -32,7 +32,7 @@ public sealed partial class StandingViewModel(
 
     public bool HasExpansions => Expansions.Count > 0;
 
-    protected override string DefaultEmptyMessage => "Pull down to read your account.";
+    protected override string DefaultEmptyMessage => L.T("Pull down to read your account.");
 
     [RelayCommand]
     public Task RefreshAsync() => RunAsync(async ct =>
@@ -46,13 +46,13 @@ public sealed partial class StandingViewModel(
 
         if (!session.IsAuthenticated)
         {
-            Notice = "Add your API key under Settings to see your account.";
+            Notice = L.T("Add your API key under Settings to see your account.");
             return;
         }
 
         if (!session.HasPermission(Gw2Permissions.Account))
         {
-            Notice = "This key has no 'account' permission. Create a new key that includes it.";
+            Notice = L.T("This key has no 'account' permission. Create a new key that includes it.");
             return;
         }
 
@@ -75,7 +75,7 @@ public sealed partial class StandingViewModel(
 
         // The account still has something to say even with nothing to report.
         if (!view.HasAny)
-            Notice = "Nothing to report: no luck consumed, no fractals, no WvW rank.";
+            Notice = L.T("Nothing to report: no luck consumed, no fractals, no WvW rank.");
     });
 
     /// <summary>

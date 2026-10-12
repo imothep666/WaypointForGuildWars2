@@ -25,8 +25,8 @@ public sealed class TodayService(
         // The vault first: its objectives are what most players are actually chasing.
         foreach (var (track, label, bucket) in new[]
                  {
-                     ("daily", "Wizard's Vault dailies", daily),
-                     ("weekly", "Wizard's Vault weekly", weekly)
+                     ("daily", L.T("Wizard's Vault dailies"), daily),
+                     ("weekly", L.T("Wizard's Vault weekly"), weekly)
                  })
         {
             try
@@ -62,15 +62,15 @@ public sealed class TodayService(
             }
         }
 
-        daily.Add(await TrackAsync("World bosses",
+        daily.Add(await TrackAsync(L.T("World bosses"),
             client.GetWorldBossIdsAsync, client.GetCompletedWorldBossesAsync, ct, "//events",
             "worldbosses"));
 
-        daily.Add(await TrackAsync("Map bonus chests",
+        daily.Add(await TrackAsync(L.T("Map bonus chests"),
             client.GetMapChestIdsAsync, client.GetCompletedMapChestsAsync, ct,
             key: "mapchests"));
 
-        daily.Add(await TrackAsync("Time-gated crafting",
+        daily.Add(await TrackAsync(L.T("Time-gated crafting"),
             client.GetDailyCraftingIdsAsync, client.GetCompletedDailyCraftingAsync, ct,
             key: "dailycrafting"));
 
@@ -85,12 +85,12 @@ public sealed class TodayService(
         var live = TodaySummary.Worth(daily);
         if (live.Count > 0)
             sections.Add(new TodaySection(
-                "Today", TodaySummary.Of(live), live.OrderBy(r => r.IsComplete)));
+                L.T("Today"), TodaySummary.Of(live), live.OrderBy(r => r.IsComplete)));
 
         var week = TodaySummary.Worth(weekly);
         if (week.Count > 0)
             sections.Add(new TodaySection(
-                "This week", TodaySummary.Of(week), week.OrderBy(r => r.IsComplete)));
+                L.T("This week"), TodaySummary.Of(week), week.OrderBy(r => r.IsComplete)));
 
         return sections;
     }
@@ -158,11 +158,11 @@ public sealed class TodayService(
                 .Select(d => Ids.ToDisplayName(d.Id))
                 .ToList();
 
-            return new TodayRow("Dungeon paths", count.Done, count.Total, Join(unfinished));
+            return new TodayRow(L.T("Dungeon paths"), count.Done, count.Total, Join(unfinished));
         }
         catch (Gw2ApiException)
         {
-            return new TodayRow("Dungeon paths", 0, 0, null, Unread: true);
+            return new TodayRow(L.T("Dungeon paths"), 0, 0, null, Unread: true);
         }
     }
 
@@ -191,11 +191,11 @@ public sealed class TodayService(
 
             var count = ResetProgress.Of(bosses, done);
 
-            return new TodayRow("Raid encounters", count.Done, count.Total, Join(count.Remaining));
+            return new TodayRow(L.T("Raid encounters"), count.Done, count.Total, Join(count.Remaining));
         }
         catch (Gw2ApiException)
         {
-            return new TodayRow("Raid encounters", 0, 0, null, Unread: true);
+            return new TodayRow(L.T("Raid encounters"), 0, 0, null, Unread: true);
         }
     }
 
@@ -204,7 +204,7 @@ public sealed class TodayService(
     {
         0 => null,
         <= 3 => string.Join(" · ", remaining),
-        _ => string.Join(" · ", remaining.Take(3)) + $" · and {remaining.Count - 3} more"
+        _ => L.F("{0} · and {1} more", string.Join(" · ", remaining.Take(3)), remaining.Count - 3)
     };
 
 

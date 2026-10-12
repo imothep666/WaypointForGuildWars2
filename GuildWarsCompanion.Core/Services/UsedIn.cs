@@ -22,7 +22,7 @@ public static class UsedIn
     /// </summary>
     public static string Describe(UsedInRow row)
     {
-        var needed = $"{row.Needed:N0} needed";
+        var needed = L.F("{0:N0} needed", row.Needed);
         var disciplines = Names(row.Disciplines);
 
         if (disciplines.Length == 0) return needed;
@@ -38,7 +38,8 @@ public static class UsedIn
     /// </summary>
     public static string Names(string? disciplines) =>
         string.Join(" · ", (disciplines ?? string.Empty)
-            .Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+            .Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(L.T));
 
     /// <summary>
     /// The heading, and what it admits. A list capped at fifteen out of two hundred has to say
@@ -46,9 +47,9 @@ public static class UsedIn
     /// </summary>
     public static string Summarise(int shown, int total) => total switch
     {
-        0 => "Nothing in the catalogue uses this.",
-        1 => "Used in one recipe.",
-        _ when shown < total => $"Used in {total:N0} recipes — the {shown} soonest to reach.",
-        _ => $"Used in {total:N0} recipes."
+        0 => L.T("Nothing in the catalogue uses this."),
+        1 => L.T("Used in one recipe."),
+        _ when shown < total => L.F("Used in {0:N0} recipes — the {1} soonest to reach.", total, shown),
+        _ => L.F("Used in {0:N0} recipes.", total)
     };
 }

@@ -15,7 +15,7 @@ public sealed record TestCheck(string Id, string Area, string Do, string Expect,
 /// </summary>
 public static class TestPlan
 {
-    public const string Built = "built 5–7 October";
+    public const string Built = "built 5–12 October";
 
     public static readonly IReadOnlyList<TestCheck> Checks =
     [
@@ -82,6 +82,25 @@ public static class TestPlan
 
         new("voe-access", "Account",
             "Visit a Visions of Eternity map, then pull Account › Standing down.",
-            "Note whether Visions of Eternity is listed now.", Auto: true)
+            "Note whether Visions of Eternity is listed now.", Auto: true),
+
+        new("lang-names", "Language",
+            "With the phone in German, open storage, the map picker and the Wizard's Vault.",
+            "Items, maps and objectives are named in German. The app's own words stay English."),
+        new("lang-search", "Language",
+            "Under Price Watch, search for an English name such as \"ecto\".",
+            "The item comes up under its German name, Ektoplasmakugel."),
+        new("lang-catalogue", "Language",
+            "Open Settings where the item catalogue is, then download it.",
+            "Before: how many items are still named in English. After: none, and searching in English still works."),
+        new("lang-art", "Language",
+            "Open the map, a character with an elite specialization, and the vault's featured rewards.",
+            "The loading screen, the specialization painting and the banners all still show."),
+        new("lang-map-line", "Language",
+            "Play with the compass and Today open.",
+            "The map is named in German above the compass and in Today's \"in …\" line."),
+        new("lang-mastery", "Language",
+            "Open the mastery plan with points to spend.",
+            "Tracks your points cover are still marked as affordable.")
     ];
 }

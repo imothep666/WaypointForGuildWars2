@@ -51,7 +51,7 @@ public sealed partial class FindViewModel(StorageService storage, ItemLookup ite
     [ObservableProperty] private bool _hasElsewhere;
 
     protected override string DefaultEmptyMessage =>
-        "Pull down to read your bank, your bags and material storage.";
+        L.T("Pull down to read your bank, your bags and material storage.");
 
     /// <summary>
     /// Reads every storage place. Costs four account requests plus item lookups, so it is
@@ -88,7 +88,7 @@ public sealed partial class FindViewModel(StorageService storage, ItemLookup ite
 
             Elsewhere.Add(new FoundItem(
                 item.Id, item.Name, item.Icon, item.Rarity,
-                0, string.Empty, "none — tap to see what it takes", string.Empty));
+                0, string.Empty, L.T("none — tap to see what it takes"), string.Empty));
         }
 
         HasElsewhere = Elsewhere.Count > 0;
@@ -110,14 +110,14 @@ public sealed partial class FindViewModel(StorageService storage, ItemLookup ite
 
         if (!storage.HasSnapshot)
         {
-            SearchNote = "Pull down to read your storage first.";
+            SearchNote = L.T("Pull down to read your storage first.");
             HasResults = false;
             return;
         }
 
         if (Search.Trim().Length < 2)
         {
-            SearchNote = "Type at least two letters.";
+            SearchNote = L.T("Type at least two letters.");
             HasResults = false;
             return;
         }
@@ -133,8 +133,7 @@ public sealed partial class FindViewModel(StorageService storage, ItemLookup ite
         // The count matters: it says the search covered everything owned, not everything
         // the app happens to have looked at before.
         SearchNote = found.Count > 0
-            ? $"{found.Count} of the {storage.DistinctItems:N0} different items you own."
-            : $"Nothing matching that among the {storage.DistinctItems:N0} different items " +
-              "you own.";
+            ? L.F("{0} of the {1:N0} different items you own.", found.Count, storage.DistinctItems)
+            : L.F("Nothing matching that among the {0:N0} different items you own.", storage.DistinctItems);
     }
 }

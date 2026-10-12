@@ -40,7 +40,7 @@ public sealed partial class EmotesViewModel(EmoteService emotes, ApiKeySession s
 
     public ObservableCollection<EmoteRow> Emotes { get; } = [];
 
-    protected override string DefaultEmptyMessage => "No emote goes by that name.";
+    protected override string DefaultEmptyMessage => L.T("No emote goes by that name.");
 
     /// <summary>Filtering is local, so it happens as the letters arrive.</summary>
     partial void OnSearchChanged(string value) => Show();
@@ -57,7 +57,7 @@ public sealed partial class EmotesViewModel(EmoteService emotes, ApiKeySession s
         // Not a blocker: the list is complete and correct without a key. Only the 14 verdicts
         // are missing, and the summary already says so.
         if (!session.IsAuthenticated)
-            Notice = "Add your API key under Settings to see which emotes you have unlocked.";
+            Notice = L.T("Add your API key under Settings to see which emotes you have unlocked.");
     });
 
     private void Show()
@@ -72,7 +72,7 @@ public sealed partial class EmotesViewModel(EmoteService emotes, ApiKeySession s
         Footnote = view.Note;
 
         if (view.FetchedAt is { } taken)
-            Notice = Stale.Describe("your unlocks", taken, DateTimeOffset.UtcNow);
+            Notice = Stale.Describe(L.T("your unlocks"), taken, DateTimeOffset.UtcNow);
     }
 
     /// <summary>
@@ -104,13 +104,13 @@ public sealed partial class EmotesViewModel(EmoteService emotes, ApiKeySession s
         {
             await system.CopyAsync(row.Command);
 
-            Copied = $"Copied {row.Command}";
+            Copied = L.F("Copied {0}", row.Command);
             return;
         }
 
         // Said before the network is asked, so the row never looks unresponsive while a PC that
         // is asleep runs out its timeout.
-        Copied = $"Sending {row.Command}…";
+        Copied = L.F("Sending {0}…", row.Command);
 
         // Done in the game when the PC has the Blish HUD module running, copied there when not;
         // the bridge decides and the answer says which.
@@ -121,8 +121,8 @@ public sealed partial class EmotesViewModel(EmoteService emotes, ApiKeySession s
             // Named, not "the PC". With several paired, a paste that went to the laptop when
             // the game is on the desktop has to be visibly the wrong machine.
             Copied = sent.InGame
-                ? $"{row.Command} · done in game on {sent.Pc}"
-                : $"Sent {row.Command} to {sent.Pc}";
+                ? L.F("{0} · done in game on {1}", row.Command, sent.Pc)
+                : L.F("Sent {0} to {1}", row.Command, sent.Pc);
             return;
         }
 
@@ -130,6 +130,6 @@ public sealed partial class EmotesViewModel(EmoteService emotes, ApiKeySession s
         // up on is said outright, because that is the one thing the user cannot see.
         await system.CopyAsync(row.Command);
 
-        Copied = $"{row.Command} · {sent.Text} · copied here";
+        Copied = L.F("{0} · {1} · copied here", row.Command, sent.Text);
     }
 }

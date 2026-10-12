@@ -49,23 +49,23 @@ public static class StorageTally
     /// <summary>How one place is named mid-sentence.</summary>
     public static string PlaceName(StoragePlace place, string where) => place switch
     {
-        StoragePlace.Materials => "in material storage",
-        StoragePlace.Bank => "in the bank",
-        StoragePlace.Shared => "in shared slots",
-        StoragePlace.Character => $"on {where}",
-        StoragePlace.Equipped => $"equipped on {where}",
-        _ => "somewhere"
+        StoragePlace.Materials => L.T("in material storage"),
+        StoragePlace.Bank => L.T("in the bank"),
+        StoragePlace.Shared => L.T("in shared slots"),
+        StoragePlace.Character => L.F("on {0}", where),
+        StoragePlace.Equipped => L.F("equipped on {0}", where),
+        _ => L.T("somewhere")
     };
 
     /// <summary>The heading a place gets when it is a row of its own rather than part of a sentence.</summary>
     public static string PlaceHeading(StoragePlace place, string where) => place switch
     {
-        StoragePlace.Materials => "Material storage",
-        StoragePlace.Bank => "Bank",
-        StoragePlace.Shared => "Shared slots",
+        StoragePlace.Materials => L.T("Material storage"),
+        StoragePlace.Bank => L.T("Bank"),
+        StoragePlace.Shared => L.T("Shared slots"),
         StoragePlace.Character => where,
-        StoragePlace.Equipped => $"{where} — equipped",
-        _ => "Elsewhere"
+        StoragePlace.Equipped => L.F("{0} — equipped", where),
+        _ => L.T("Elsewhere")
     };
 
     /// <summary>
@@ -80,11 +80,11 @@ public static class StorageTally
 
         return parts.Count switch
         {
-            0 => "None anywhere the app can see.",
+            0 => L.T("None anywhere the app can see."),
             1 => parts[0],
             // "and" before the last, so a three-place answer reads as a sentence rather
             // than a log line.
-            _ => string.Join(", ", parts.Take(parts.Count - 1)) + " and " + parts[^1]
+            _ => L.F("{0} and {1}", string.Join(", ", parts.Take(parts.Count - 1)), parts[^1])
         };
     }
 

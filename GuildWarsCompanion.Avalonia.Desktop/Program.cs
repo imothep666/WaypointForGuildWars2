@@ -37,7 +37,8 @@ internal static class Program
                 provider.GetRequiredService<Bridge.Protocol.Journal>(),
                 args,
                 exit: () => provider.GetRequiredService<IMainThread>().BeginInvokeOnMainThread(() =>
-                    (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.Shutdown())));
+                    (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.Shutdown()),
+                say: L.F));
         };
 
         BuildAvaloniaApp(args.Contains("--wayland"), args.Contains("--software")).StartWithClassicDesktopLifetime(args);

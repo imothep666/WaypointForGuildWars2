@@ -87,7 +87,7 @@ public static class Access
             if (token.Equals("PathOfFire", StringComparison.OrdinalIgnoreCase) &&
                 !tokens.Contains("HeartOfThorns", StringComparer.OrdinalIgnoreCase))
                 owned.Add(new Owned(
-                    "Heart of Thorns", "included with Path of Fire", Emblem("HeartOfThorns")));
+                    "Heart of Thorns", L.T("included with Path of Fire"), Emblem("HeartOfThorns")));
 
             owned.Add(new Owned(Name(token), null, Emblem(token)));
         }
@@ -128,10 +128,13 @@ public static class Access
         var tokens = (access ?? []).ToList();
         var expansions = Expansions(tokens);
 
-        var owned = expansions.Count == 0
-            ? "No expansions"
-            : $"{expansions.Count} expansion{(expansions.Count == 1 ? string.Empty : "s")}";
+        var owned = expansions.Count switch
+        {
+            0 => L.T("No expansions"),
+            1 => L.T("1 expansion"),
+            _ => L.F("{0} expansions", expansions.Count)
+        };
 
-        return IsFree(tokens) ? $"Free account · {owned}" : $"Guild Wars 2 · {owned}";
+        return IsFree(tokens) ? L.F("Free account · {0}", owned) : $"Guild Wars 2 · {owned}";
     }
 }

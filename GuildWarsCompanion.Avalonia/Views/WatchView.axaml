@@ -15,9 +15,9 @@
 
             <ScrollViewer Grid.Row="1">
                 <StackPanel Margin="20,14,20,28" Spacing="12">
-                    <TextBlock Text="PRICE WATCH" Classes="heading" />
+                    <TextBlock Text="{ui:T 'PRICE WATCH'}" Classes="heading" />
                     <TextBlock Classes="caption small"
-                               Text="Checked with the background poll, so it works even with no API key — market prices are public. You are told once when a price arrives, and again if it comes back." />
+                               Text="{ui:T 'Checked with the background poll, so it works even with no API key — market prices are public. You are told once when a price arrives, and again if it comes back.'}" />
 
                     <!-- Existing watches -->
                     <TextBlock Text="{Binding EmptyMessage}" IsVisible="{Binding HasNoWatches}"
@@ -51,15 +51,15 @@
                     <Border Classes="rule" Margin="0,8,0,0" />
 
                     <!-- Adding one: search, then a price -->
-                    <TextBlock Text="ADD A WATCH" Classes="heading small" Margin="0,4,0,0" />
+                    <TextBlock Text="{ui:T 'ADD A WATCH'}" Classes="heading small" Margin="0,4,0,0" />
 
-                    <TextBox Text="{Binding Search}" PlaceholderText="Item name">
+                    <TextBox Text="{Binding Search}" PlaceholderText="{ui:T 'Item name'}">
                         <TextBox.KeyBindings>
                             <KeyBinding Gesture="Enter" Command="{Binding FindCommand}" />
                         </TextBox.KeyBindings>
                     </TextBox>
 
-                    <Button Content="FIND" Command="{Binding FindCommand}" Classes="quiet"
+                    <Button Content="{ui:T 'FIND'}" Command="{Binding FindCommand}" Classes="quiet"
                             HorizontalAlignment="Left" />
 
                     <TextBlock Text="{Binding SearchNote}" Classes="caption small" />
@@ -90,12 +90,12 @@
 
                         <Grid ColumnDefinitions="*,12,Auto">
                             <TextBox Text="{Binding Threshold}" PlaceholderText="1g 20s" />
-                            <Button Grid.Column="2" Content="WATCH" Command="{Binding AddCommand}" />
+                            <Button Grid.Column="2" Content="{ui:T 'WATCH'}" Command="{Binding AddCommand}" />
                         </Grid>
 
                         <Grid ColumnDefinitions="*,Auto">
                             <TextBlock VerticalAlignment="Center" Classes="caption"
-                                       Text="Tell me when I can buy it (sell price falls). Off: when it is worth selling (buy price rises)." />
+                                       Text="{ui:T 'Tell me when I can buy it (sell price falls). Off: when it is worth selling (buy price rises).'}" />
                             <ToggleSwitch Grid.Column="1" IsChecked="{Binding WatchSellPrice}"
                                           OnContent="" OffContent="" Margin="12,0,0,0" />
                         </Grid>
@@ -117,8 +117,8 @@
                     <TextBlock x:Name="ConfirmTitle" Classes="heading" TextWrapping="Wrap" />
                     <TextBlock x:Name="ConfirmMessage" TextWrapping="Wrap" />
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
-                        <Button Content="Keep" Classes="quiet" Click="OnKeepClicked" />
-                        <Button Content="Stop watching" Click="OnStopClicked" />
+                        <Button Content="{ui:T 'Keep'}" Classes="quiet" Click="OnKeepClicked" />
+                        <Button Content="{ui:T 'Stop watching'}" Click="OnStopClicked" />
                     </StackPanel>
                 </StackPanel>
             </Border>

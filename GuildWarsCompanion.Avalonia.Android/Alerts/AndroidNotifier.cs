@@ -55,9 +55,9 @@ public sealed class AndroidNotifier(Func<Task<bool>> requestPermission) : INotif
     {
         if (!OperatingSystem.IsAndroidVersionAtLeast(26)) return;
 
-        var channel = new NotificationChannel(ChannelId, "Account reminders", NotificationImportance.Default)
+        var channel = new NotificationChannel(ChannelId, L.T("Account reminders"), NotificationImportance.Default)
         {
-            Description = "Wizard's Vault rewards waiting to be claimed, and trades that closed."
+            Description = L.T("Wizard's Vault rewards waiting to be claimed, and trades that closed.")
         };
 
         var manager = (NotificationManager?)context.GetSystemService(Context.NotificationService);

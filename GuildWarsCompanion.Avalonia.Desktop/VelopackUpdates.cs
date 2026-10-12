@@ -38,6 +38,7 @@ public sealed partial class VelopackUpdates : ObservableObject, IAppUpdates
     private readonly Journal _journal;
     private readonly string[] _args;
     private readonly Action _exit;
+    private readonly Func<string, object?[], string> _say;
 
     private VelopackAsset? _ready;
     private Timer? _timer;
@@ -49,12 +50,16 @@ public sealed partial class VelopackUpdates : ObservableObject, IAppUpdates
 
     /// <param name="exit">Closes the app the way its own Quit does, so it can save and let go of
     /// what it holds before the update replaces it.</param>
-    public VelopackUpdates(IMainThread mainThread, Journal journal, string[] args, Action exit)
+    /// <param name="say">Puts a status line into the app's language: L.F in the app. The bridge
+    /// compiles this file without the app's translations, so it leaves this out and stays English.</param>
+    public VelopackUpdates(IMainThread mainThread, Journal journal, string[] args, Action exit,
+        Func<string, object?[], string>? say = null)
     {
         _mainThread = mainThread;
         _journal = journal;
         _args = args;
         _exit = exit;
+        _say = say ?? ((text, values) => string.Format(text, values));
 
         var releases = typeof(VelopackUpdates).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
             .FirstOrDefault(attribute => attribute.Key == "WaypointReleases")?.Value;
@@ -76,7 +81,7 @@ public sealed partial class VelopackUpdates : ObservableObject, IAppUpdates
         }
 
         if (_manager is not null)
-            _status = $"Waypoint {_manager.CurrentVersion}. Looks for updates a minute after start, then every six hours.";
+            _status = _say("Waypoint {0}. Looks for updates a minute after start, then every six hours.", [_manager.CurrentVersion]);
     }
 
     public bool IsSupported => _manager is not null;
@@ -101,21 +106,21 @@ public sealed partial class VelopackUpdates : ObservableObject, IAppUpdates
 
         try
         {
-            await Show(busy: true, "Looking for an update…");
+            await Show(busy: true, _say("Looking for an update…", []));
 
             var update = await _manager.CheckForUpdatesAsync();
             if (update is null)
             {
-                await Show(busy: false, $"Up to date: {_manager.CurrentVersion}, checked {DateTime.Now:HH:mm}.");
+                await Show(busy: false, _say("Up to date: {0}, checked {1:HH:mm}.", [_manager.CurrentVersion, DateTime.Now]));
                 return;
             }
 
             var version = update.TargetFullRelease.Version;
             _journal.Write("update", $"{version} found, downloading");
-            await Show(busy: true, $"Downloading {version}…");
+            await Show(busy: true, _say("Downloading {0}…", [version]));
 
             await _manager.DownloadUpdatesAsync(update, progress =>
-                _mainThread.BeginInvokeOnMainThread(() => Status = $"Downloading {version}… {progress}%"));
+                _mainThread.BeginInvokeOnMainThread(() => Status = _say("Downloading {0}… {1}%", [version, progress])));
 
             _journal.Write("update", $"{version} downloaded");
             Ready(update.TargetFullRelease);
@@ -124,7 +129,7 @@ public sealed partial class VelopackUpdates : ObservableObject, IAppUpdates
         {
             // Offline is the usual reason, and the next check is only hours away.
             _journal.Write("update", $"check failed: {e.Message}");
-            await Show(busy: false, $"Could not check for an update ({e.Message}). It tries again later.");
+            await Show(busy: false, _say("Could not check for an update ({0}). It tries again later.", [e.Message]));
         }
         finally
         {
@@ -153,7 +158,7 @@ public sealed partial class VelopackUpdates : ObservableObject, IAppUpdates
         {
             IsBusy = false;
             IsReady = true;
-            Status = $"Waypoint {asset.Version} is ready. Restart to use it, or it is applied on the next start.";
+            Status = _say("Waypoint {0} is ready. Restart to use it, or it is applied on the next start.", [asset.Version]);
         });
     }
 

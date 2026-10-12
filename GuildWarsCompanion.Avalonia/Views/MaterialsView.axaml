@@ -18,10 +18,10 @@
                  wait" are different decisions and the gap between them is the point. -->
             <Border Classes="card" IsVisible="{Binding HasValue}" Margin="0,14,0,0">
                 <StackPanel Spacing="10">
-                    <TextBlock Text="ESTIMATED VALUE" Classes="heading small" />
+                    <TextBlock Text="{ui:T 'ESTIMATED VALUE'}" Classes="heading small" />
                     <Grid ColumnDefinitions="*,14,*">
                         <StackPanel Spacing="4">
-                            <TextBlock Text="Sell instantly" Classes="caption" />
+                            <TextBlock Text="{ui:T 'Sell instantly'}" Classes="caption" />
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <TextBlock Text="{Binding InstantValue.Gold}" FontFamily="{StaticResource BarlowSemiBold}"
                                            FontSize="24" Foreground="{StaticResource MetalGoldBrush}" />
@@ -34,7 +34,7 @@
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Grid.Column="2" Spacing="4">
-                            <TextBlock Text="If listed" Classes="caption" />
+                            <TextBlock Text="{ui:T 'If listed'}" Classes="caption" />
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <TextBlock Text="{Binding ListedValue.Gold}" FontFamily="{StaticResource BarlowSemiBold}"
                                            FontSize="24" Foreground="{StaticResource MetalGoldBrush}" />

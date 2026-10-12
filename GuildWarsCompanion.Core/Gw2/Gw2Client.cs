@@ -91,6 +91,13 @@ public sealed class Gw2Client(HttpClient http)
         Timeout = TimeSpan.FromSeconds(20)
     };
 
+    /// <summary>
+    /// What the API is asked to write its names and descriptions in. The device's language by
+    /// default; see <see cref="Gw2Language"/>. Settable for tests, which must not depend on the
+    /// machine they run on.
+    /// </summary>
+    public string Language { get; set; } = Gw2Language.Current;
+
     /// <summary>Set the key used for authenticated endpoints. Null clears it.</summary>
     public void UseApiKey(string? apiKey) => _apiKey = string.IsNullOrWhiteSpace(apiKey) ? null : apiKey.Trim();
 
@@ -169,6 +176,14 @@ public sealed class Gw2Client(HttpClient http)
     /// </summary>
     public Task<List<MapInfo>> GetAllMapsAsync(CancellationToken ct = default) =>
         GetAsync("maps?ids=all", Gw2JsonContext.Default.ListMapInfo, ct);
+
+    /// <summary>
+    /// Every map's English name, by id. The wiki files its loading screens under those, so a
+    /// page showing "Königintal" still has to ask it for "Queensdale loading screen.jpg".
+    /// </summary>
+    public async Task<Dictionary<int, string>> GetEnglishMapNamesAsync(CancellationToken ct = default) =>
+        (await GetAsync("maps?ids=all", Gw2JsonContext.Default.ListMapInfo, ct, Gw2Language.English))
+        .ToDictionary(map => map.Id, map => map.Name);
 
     /// <summary>
     /// One continent's dimensions and zoom range, which is what the map tile service needs before
@@ -455,12 +470,23 @@ public sealed class Gw2Client(HttpClient http)
     public Task<List<int>> GetTradableItemIdsAsync(CancellationToken ct = default) =>
         GetAsync("commerce/prices", Gw2JsonContext.Default.ListInt32, ct);
 
-    public async Task<List<Item>> GetItemsAsync(IEnumerable<int> ids, CancellationToken ct = default)
+    public Task<List<Item>> GetItemsAsync(IEnumerable<int> ids, CancellationToken ct = default) =>
+        GetItemsAsync(ids, null, ct);
+
+    /// <summary>
+    /// Items as English names them, whatever <see cref="Language"/> is: what a search has to
+    /// match when somebody playing in German types the name every guide and the wiki use.
+    /// </summary>
+    public Task<List<Item>> GetEnglishItemsAsync(IEnumerable<int> ids, CancellationToken ct = default) =>
+        GetItemsAsync(ids, Gw2Language.English, ct);
+
+    private async Task<List<Item>> GetItemsAsync(IEnumerable<int> ids, string? language, CancellationToken ct)
     {
         var result = new List<Item>();
         foreach (var chunk in ids.Distinct().Chunk(MaxIdsPerRequest))
         {
-            var batch = await GetAsync($"items?ids={string.Join(',', chunk)}", Gw2JsonContext.Default.ListItem, ct);
+            var batch = await GetAsync(
+                $"items?ids={string.Join(',', chunk)}", Gw2JsonContext.Default.ListItem, ct, language);
             result.AddRange(batch);
         }
 
@@ -491,12 +517,18 @@ public sealed class Gw2Client(HttpClient http)
     /// <summary>
     /// Mastery points, account-wide. Requires "progression". Returns null when the key
     /// cannot read it, so callers fall back to showing the level.
+    ///
+    /// Always in English. Its regions are names ("Central Tyria", "Path of Fire"), not ids, and
+    /// <see cref="Services.Masteries"/> pairs them with the tracks' region ids through a table
+    /// of those English names; a "Zentraltyria" would match nothing, and every track would read
+    /// as unaffordable.
     /// </summary>
     public async Task<MasteryPoints?> GetMasteryPointsAsync(CancellationToken ct = default)
     {
         try
         {
-            return await GetAsync("account/mastery/points", Gw2JsonContext.Default.MasteryPoints, ct);
+            return await GetAsync(
+                "account/mastery/points", Gw2JsonContext.Default.MasteryPoints, ct, Gw2Language.English);
         }
         catch (Gw2ApiException ex) when (ex.Kind is Gw2ErrorKind.MissingScope or Gw2ErrorKind.NotFound)
         {
@@ -534,6 +566,14 @@ public sealed class Gw2Client(HttpClient http)
     /// <summary>Specialization names. Unauthenticated and static between patches.</summary>
     public Task<List<Specialization>> GetSpecializationsAsync(IEnumerable<int> ids, CancellationToken ct = default) =>
         GetBulkAsync("specializations", ids, Gw2JsonContext.Default.ListSpecialization, ct);
+
+    /// <summary>
+    /// One specialization's English name, which is what the wiki files its painting under:
+    /// "Spec image Scrapper.jpg", whatever a German client calls the Schrotter.
+    /// </summary>
+    public async Task<string?> GetEnglishSpecializationNameAsync(int id, CancellationToken ct = default) =>
+        (await GetAsync($"specializations?ids={id}", Gw2JsonContext.Default.ListSpecialization, ct, Gw2Language.English))
+        .FirstOrDefault()?.Name;
 
     public Task<List<Trait>> GetTraitsAsync(IEnumerable<int> ids, CancellationToken ct = default) =>
         GetBulkAsync("traits", ids, Gw2JsonContext.Default.ListTrait, ct);
@@ -786,8 +826,7 @@ public sealed class Gw2Client(HttpClient http)
     {
         await PaceAsync(ct);
 
-        var separator = path.Contains('?') ? '&' : '?';
-        using var request = new HttpRequestMessage(HttpMethod.Get, $"{path}{separator}v={SchemaVersion}");
+        using var request = new HttpRequestMessage(HttpMethod.Get, Address(path, null));
         if (_apiKey is not null)
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
 
@@ -797,12 +836,12 @@ public sealed class Gw2Client(HttpClient http)
 
     // --- plumbing ----------------------------------------------------------
 
-    private async Task<T> GetAsync<T>(string path, JsonTypeInfo<T> typeInfo, CancellationToken ct)
+    private async Task<T> GetAsync<T>(
+        string path, JsonTypeInfo<T> typeInfo, CancellationToken ct, string? language = null)
     {
         await PaceAsync(ct);
 
-        var separator = path.Contains('?') ? '&' : '?';
-        using var request = new HttpRequestMessage(HttpMethod.Get, $"{path}{separator}v={SchemaVersion}");
+        using var request = new HttpRequestMessage(HttpMethod.Get, Address(path, language));
 
         // Header auth, not ?access_token= — query strings leak into logs and proxies.
         if (_apiKey is not null)
@@ -815,7 +854,7 @@ public sealed class Gw2Client(HttpClient http)
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException && !ct.IsCancellationRequested)
         {
-            throw new Gw2ApiException("Could not reach the Guild Wars 2 API.", Gw2ErrorKind.Network);
+            throw new Gw2ApiException(L.T("Could not reach the Guild Wars 2 API."), Gw2ErrorKind.Network);
         }
 
         using (response)
@@ -824,8 +863,21 @@ public sealed class Gw2Client(HttpClient http)
                 throw Translate(response.StatusCode, await ReadErrorTextAsync(response, ct));
 
             return await response.Content.ReadFromJsonAsync(typeInfo, ct)
-                   ?? throw new Gw2ApiException($"Empty response from /{path}.", Gw2ErrorKind.Network);
+                   ?? throw new Gw2ApiException(L.F("Empty response from /{0}.", path), Gw2ErrorKind.Network);
         }
+    }
+
+    /// <summary>
+    /// The path with the pinned schema and the language on it.
+    ///
+    /// A query parameter rather than Accept-Language, though the API honours both: it is in
+    /// the address, so a request in a log says which language it asked for.
+    /// </summary>
+    private string Address(string path, string? language)
+    {
+        var separator = path.Contains('?') ? '&' : '?';
+
+        return $"{path}{separator}v={SchemaVersion}&lang={language ?? Language}";
     }
 
     /// <summary>The error body is tiny; reading it is what makes 400s intelligible.</summary>
@@ -853,14 +905,14 @@ public sealed class Gw2Client(HttpClient http)
     {
         // A key the API does not recognise comes back as 400 "invalid key", not 401.
         HttpStatusCode.BadRequest when IsAboutTheKey(detail) =>
-            new Gw2ApiException("API key is missing, malformed or revoked.", Gw2ErrorKind.InvalidKey),
+            new Gw2ApiException(L.T("API key is missing, malformed or revoked."), Gw2ErrorKind.InvalidKey),
         HttpStatusCode.BadRequest =>
-            new Gw2ApiException($"The API rejected the request: {detail ?? "bad request"}.", Gw2ErrorKind.BadRequest),
-        HttpStatusCode.Unauthorized => new Gw2ApiException("API key is missing, malformed or revoked.", Gw2ErrorKind.InvalidKey),
-        HttpStatusCode.Forbidden => new Gw2ApiException("API key lacks the permission this endpoint needs.", Gw2ErrorKind.MissingScope),
-        HttpStatusCode.NotFound => new Gw2ApiException("Unknown endpoint or id.", Gw2ErrorKind.NotFound),
-        HttpStatusCode.TooManyRequests => new Gw2ApiException("Rate limited — slow down and retry.", Gw2ErrorKind.RateLimited),
-        HttpStatusCode.ServiceUnavailable => new Gw2ApiException("The API is temporarily unavailable.", Gw2ErrorKind.ServiceUnavailable),
-        _ => new Gw2ApiException($"Unexpected response: {(int)status} {status}.", Gw2ErrorKind.Network)
+            new Gw2ApiException(L.F("The API rejected the request: {0}.", detail ?? L.T("bad request")), Gw2ErrorKind.BadRequest),
+        HttpStatusCode.Unauthorized => new Gw2ApiException(L.T("API key is missing, malformed or revoked."), Gw2ErrorKind.InvalidKey),
+        HttpStatusCode.Forbidden => new Gw2ApiException(L.T("API key lacks the permission this endpoint needs."), Gw2ErrorKind.MissingScope),
+        HttpStatusCode.NotFound => new Gw2ApiException(L.T("Unknown endpoint or id."), Gw2ErrorKind.NotFound),
+        HttpStatusCode.TooManyRequests => new Gw2ApiException(L.T("Rate limited — slow down and retry."), Gw2ErrorKind.RateLimited),
+        HttpStatusCode.ServiceUnavailable => new Gw2ApiException(L.T("The API is temporarily unavailable."), Gw2ErrorKind.ServiceUnavailable),
+        _ => new Gw2ApiException(L.F("Unexpected response: {0} {1}.", (int)status, status), Gw2ErrorKind.Network)
     };
 }

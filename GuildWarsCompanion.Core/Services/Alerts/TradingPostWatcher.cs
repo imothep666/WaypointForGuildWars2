@@ -30,7 +30,7 @@ public sealed class TradingPostWatcher(Gw2Client client, ItemLookup lookup) : IA
         var alerts = new List<AccountAlert>();
         var cutoff = DateTimeOffset.UtcNow - Recent;
 
-        foreach (var (side, verb) in new[] { ("sells", "sold"), ("buys", "bought") })
+        foreach (var side in new[] { "sells", "buys" })
         {
             List<Transaction> history;
             try
@@ -51,15 +51,22 @@ public sealed class TradingPostWatcher(Gw2Client client, ItemLookup lookup) : IA
 
             foreach (var trade in closed)
             {
-                var name = names.GetValueOrDefault(trade.ItemId) ?? $"Item {trade.ItemId}";
+                var name = names.GetValueOrDefault(trade.ItemId) ?? L.F("Item {0}", trade.ItemId);
                 var total = Coin.Format(trade.Price * trade.Quantity);
+                var sold = side == "sells";
 
                 alerts.Add(new AccountAlert(
                     $"tp:{side}:{trade.Id}",
-                    trade.Quantity > 1 ? $"{trade.Quantity} × {name} {verb}" : $"{name} {verb}",
-                    side == "sells"
-                        ? $"{total} is waiting for pickup at the trading post."
-                        : $"{total} spent. Collect it at any trading post."));
+                    (sold, trade.Quantity > 1) switch
+                    {
+                        (true, true) => L.F("{0} × {1} sold", trade.Quantity, name),
+                        (true, false) => L.F("{0} sold", name),
+                        (false, true) => L.F("{0} × {1} bought", trade.Quantity, name),
+                        (false, false) => L.F("{0} bought", name)
+                    },
+                    sold
+                        ? L.F("{0} is waiting for pickup at the trading post.", total)
+                        : L.F("{0} spent. Collect it at any trading post.", total)));
             }
         }
 

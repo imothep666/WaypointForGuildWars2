@@ -45,14 +45,16 @@ public sealed class GameHub(GameStreamHost host) : Hub
             return Task.CompletedTask;
         }
 
-        host.Joined();
+        host.Joined(Context.ConnectionId);
 
         return base.OnConnectedAsync();
     }
 
     public override Task OnDisconnectedAsync(Exception? exception)
     {
-        host.Left();
+        // Also called for a connection refused above, which never joined; see
+        // GameStreamHost._listeners.
+        host.Left(Context.ConnectionId);
 
         return base.OnDisconnectedAsync(exception);
     }

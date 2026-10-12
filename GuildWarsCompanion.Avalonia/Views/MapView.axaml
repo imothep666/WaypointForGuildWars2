@@ -4,6 +4,7 @@
                 xmlns:vm="using:GuildWarsCompanion.ViewModels"
                 xmlns:services="using:GuildWarsCompanion.Services"
                 xmlns:controls="using:GuildWarsCompanion.Ava.Controls"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
                 x:Class="GuildWarsCompanion.Ava.Views.MapView"
                 x:DataType="vm:MapViewModel"
                 ShowsBand="True">
@@ -39,17 +40,17 @@
                      and a wrap keeps them in a stable order and breaks the line where it must.
                      Ordered by how often each is wanted. -->
                 <WrapPanel>
-                    <Button Content="RECENTRE" Command="{Binding RecentreCommand}" Classes="quiet"
+                    <Button Content="{ui:T 'RECENTRE'}" Command="{Binding RecentreCommand}" Classes="quiet"
                             FontSize="11" Padding="16,10" Margin="0,0,10,8" />
-                    <Button Content="CHOOSE MAP" Command="{Binding ChooseMapCommand}" Classes="quiet"
+                    <Button Content="{ui:T 'CHOOSE MAP'}" Command="{Binding ChooseMapCommand}" Classes="quiet"
                             FontSize="11" Padding="16,10" Margin="0,0,10,8" />
-                    <Button Content="ROUTES" Command="{Binding ChooseRoutesCommand}"
+                    <Button Content="{ui:T 'ROUTES'}" Command="{Binding ChooseRoutesCommand}"
                             IsVisible="{Binding HasRoutes}" Classes="quiet" FontSize="11"
                             Padding="16,10" Margin="0,0,10,8" />
-                    <Button Content="FOLLOW CHARACTER" Command="{Binding FollowCommand}"
+                    <Button Content="{ui:T 'FOLLOW CHARACTER'}" Command="{Binding FollowCommand}"
                             IsVisible="{Binding IsPinned}" Classes="quiet" FontSize="11"
                             Padding="16,10" Margin="0,0,10,8" />
-                    <Button Content="CLEAR OBJECTIVE" Command="{Binding ClearObjectiveCommand}"
+                    <Button Content="{ui:T 'CLEAR OBJECTIVE'}" Command="{Binding ClearObjectiveCommand}"
                             IsVisible="{Binding HasObjective}" Classes="quiet" FontSize="11"
                             Padding="16,10" Margin="0,0,10,8" />
                 </WrapPanel>

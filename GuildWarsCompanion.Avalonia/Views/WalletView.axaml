@@ -43,11 +43,11 @@
                         <StackPanel Grid.Column="1" Spacing="10" Margin="16,10,0,10">
                             <Grid ColumnDefinitions="*,Auto">
                                 <StackPanel Spacing="2" VerticalAlignment="Center">
-                                    <TextBlock Text="Net worth" />
-                                    <TextBlock Text="Every character, the bank and storage, at today's prices"
+                                    <TextBlock Text="{ui:T 'Net worth'}" />
+                                    <TextBlock Text="{ui:T 'Every character, the bank and storage, at today\'s prices'}"
                                                Classes="caption small" />
                                 </StackPanel>
-                                <Button Grid.Column="1" Content="ADD UP" Command="{Binding CountCommand}"
+                                <Button Grid.Column="1" Content="{ui:T 'ADD UP'}" Command="{Binding CountCommand}"
                                         IsVisible="{Binding CanCount}" Classes="quiet" Padding="14,9"
                                         Margin="12,0,0,0" VerticalAlignment="Center" />
                             </Grid>
@@ -101,10 +101,10 @@
                         <StackPanel Grid.Column="1" Spacing="8" Margin="16,10,0,10">
                             <Grid ColumnDefinitions="*,Auto">
                                 <StackPanel Spacing="2" VerticalAlignment="Center">
-                                    <TextBlock Text="Gems" />
-                                    <TextBlock Text="What your coin buys at today's exchange" Classes="caption small" />
+                                    <TextBlock Text="{ui:T 'Gems'}" />
+                                    <TextBlock Text="{ui:T 'What your coin buys at today\'s exchange'}" Classes="caption small" />
                                 </StackPanel>
-                                <Button Grid.Column="1" Content="ASK" Command="{Binding QuoteGemsCommand}"
+                                <Button Grid.Column="1" Content="{ui:T 'ASK'}" Command="{Binding QuoteGemsCommand}"
                                         IsVisible="{Binding CanQuote}" Classes="quiet" Padding="14,9"
                                         Margin="12,0,0,0" VerticalAlignment="Center" />
                             </Grid>

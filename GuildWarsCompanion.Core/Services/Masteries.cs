@@ -7,7 +7,10 @@ public sealed record RegionPoints(string Region, int Earned, int Spent)
 
     /// <summary>"6 to spend · 9 earned" — the spendable number leads, since that is the
     /// one that decides anything.</summary>
-    public string Line => $"{Available:N0} to spend · {Earned:N0} earned";
+    /// <summary>The region as the screen names it; <see cref="Region"/> stays the join key.</summary>
+    public string Name => Masteries.RegionName(Region);
+
+    public string Line => L.F("{0:N0} to spend · {1:N0} earned", Available, Earned);
 }
 
 /// <summary>One track, and what the next step of it would take.</summary>
@@ -17,7 +20,7 @@ public sealed record MasteryStep(
 {
     public bool IsComplete => Done >= Total && Total > 0;
 
-    public string ProgressText => $"{Done} of {Total}";
+    public string ProgressText => L.F("{0} of {1}", Done, Total);
 }
 
 /// <summary>
@@ -74,6 +77,18 @@ public static class Masteries
     /// How many levels of a track are done. The API's level is a position, not a count: a
     /// track sitting at level 4 has five of them finished.
     /// </summary>
+    /// <summary>
+    /// A points region in the phone's language, for display only. The names above are join keys
+    /// against the API's English totals, so they are never translated where they are compared.
+    /// </summary>
+    public static string RegionName(string region) => region switch
+    {
+        "Central Tyria" => L.T("Central Tyria"),
+        "Icebrood Saga" => L.T("Icebrood Saga"),
+        "Unknown" => L.T("Unknown"),
+        _ => region
+    };
+
     public static int LevelsDone(int? reported) => reported is { } level ? level + 1 : 0;
 
     /// <summary>
@@ -127,13 +142,13 @@ public static class Masteries
     /// </summary>
     public static string Describe(MasteryStep step)
     {
-        if (step.IsComplete) return "Trained";
+        if (step.IsComplete) return L.T("Trained");
 
-        var cost = $"{step.NextCost} point{(step.NextCost == 1 ? string.Empty : "s")}";
+        var cost = step.NextCost == 1 ? L.T("1 point") : L.F("{0} points", step.NextCost);
 
         return step.Affordable
             ? $"{step.NextLevel} · {cost}"
-            : $"{step.NextLevel} · {cost} — not enough in {step.Region}";
+            : L.F("{0} · {1} — not enough in {2}", step.NextLevel, cost, RegionName(step.Region));
     }
 
     /// <summary>
@@ -145,7 +160,9 @@ public static class Masteries
         var spendable = regions.Sum(region => region.Available);
 
         return spendable == 0
-            ? "No mastery points waiting to be spent."
-            : $"{spendable:N0} mastery point{(spendable == 1 ? string.Empty : "s")} waiting to be spent.";
+            ? L.T("No mastery points waiting to be spent.")
+            : spendable == 1
+                ? L.T("1 mastery point waiting to be spent.")
+                : L.F("{0:N0} mastery points waiting to be spent.", spendable);
     }
 }

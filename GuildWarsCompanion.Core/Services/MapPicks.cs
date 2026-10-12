@@ -68,7 +68,7 @@ public static class MapPicks
         [.. maps
             .Where(Offerable)
             .Select(map => new MapChoice(
-                map.Id, map.Name, map.RegionName ?? "Elsewhere", map.ContinentName ?? string.Empty,
+                map.Id, map.Name, map.RegionName ?? L.T("Elsewhere"), map.ContinentName ?? string.Empty,
                 Browsable(map)))
             .OrderBy(choice => choice.Name, StringComparer.CurrentCultureIgnoreCase)];
 

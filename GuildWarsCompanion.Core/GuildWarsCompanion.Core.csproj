@@ -15,6 +15,9 @@
         <RootNamespace>GuildWarsCompanion</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <!-- The language of the text in the code, which is what Localization\L falls back to.
+             Declared so an English phone never goes looking for an English satellite. -->
+        <NeutralLanguage>en</NeutralLanguage>
     </PropertyGroup>
 
     <ItemGroup>
@@ -63,4 +66,8 @@
         <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- L.T and L.F, the app's own words in the phone's language; everywhere, like string. -->
+        <Using Include="GuildWarsCompanion.Localization" />
+    </ItemGroup>
 </Project>

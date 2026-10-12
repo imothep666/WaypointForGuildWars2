@@ -15,7 +15,7 @@
                  the headline, on the dawn wash. -->
             <StackPanel Spacing="2">
                 <TextBlock Text="{Binding ResetIn}" FontFamily="{StaticResource BarlowSemiBold}" FontSize="60" />
-                <TextBlock Text="until the daily reset" Classes="caption" />
+                <TextBlock Text="{ui:T 'until the daily reset'}" Classes="caption" />
             </StackPanel>
             <!-- Only while the PC says a character is in the game; see PlayingLine. A tap opens them. -->
             <Button Classes="row" Command="{Binding OpenPlayingCommand}" IsVisible="{Binding HasPlaying}"

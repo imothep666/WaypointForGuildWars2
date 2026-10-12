@@ -81,7 +81,7 @@ public static class PlayedNow
     {
         // The game itself said so. Nothing below can outrank that, and nothing below is allowed
         // to contradict it either — see the next branch.
-        if (Matches(name, live.Name)) return "playing now";
+        if (Matches(name, live.Name)) return L.T("playing now");
 
         // The game has been asked, so the guess has nothing to add and every way to be wrong.
         // Either somebody else is demonstrably at the keyboard, in which case no other row may
@@ -90,7 +90,7 @@ public static class PlayedNow
         // put "playing now" beside a closed game.
         if (live.Answered) return Stored(name, detected, now);
 
-        if (Matches(name, grew)) return "playing now";
+        if (Matches(name, grew)) return L.T("playing now");
 
         return Stored(name, detected, now);
     }
@@ -102,10 +102,10 @@ public static class PlayedNow
         var elapsed = now - was.At;
 
         return elapsed < Recent
-            ? "played just now"
+            ? L.T("played just now")
             : elapsed < TimeSpan.FromHours(24)
-                ? $"last played {(int)elapsed.TotalHours}h ago"
-                : $"last played {(int)elapsed.TotalDays}d ago";
+                ? L.F("last played {0}h ago", (int)elapsed.TotalHours)
+                : L.F("last played {0}d ago", (int)elapsed.TotalDays);
     }
 
     /// <summary>

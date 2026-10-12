@@ -32,7 +32,7 @@ public sealed partial class MarkerPacksViewModel(PackRepository repository, Mark
 
     public ObservableCollection<PackRow> Packs { get; } = [];
 
-    protected override string DefaultEmptyMessage => "No pack matches that.";
+    protected override string DefaultEmptyMessage => L.T("No pack matches that.");
 
     partial void OnSearchChanged(string value) => Show();
 
@@ -49,9 +49,9 @@ public sealed partial class MarkerPacksViewModel(PackRepository repository, Mark
         Show();
 
         var host = Uri.TryCreate(repository.Address, UriKind.Absolute, out var uri) ? uri.Host : repository.Address;
-        var left = catalogue.Skipped > 0 ? $" · {catalogue.Skipped} left out, offered over plain http" : "";
-
-        Summary = $"{_all.Count} packs from {host}{left}";
+        Summary = catalogue.Skipped > 0
+            ? L.F("{0} packs from {1} · {2} left out, offered over plain http", _all.Count, host, catalogue.Skipped)
+            : L.F("{0} packs from {1}", _all.Count, host);
         ErrorMessage = repository.Problem;
     });
 
@@ -81,7 +81,7 @@ public sealed partial class MarkerPacksViewModel(PackRepository repository, Mark
         if (IsAdding || row.IsAdded) return;
 
         IsAdding = true;
-        row.Status = row.Listing.SizeMb is { } size ? $"Downloading {Megabytes(size)}…" : "Downloading…";
+        row.Status = row.Listing.SizeMb is { } size ? L.F("Downloading {0}…", Megabytes(size)) : L.T("Downloading…");
 
         _adding?.Dispose();
         _adding = new CancellationTokenSource();
@@ -95,7 +95,7 @@ public sealed partial class MarkerPacksViewModel(PackRepository repository, Mark
         }
         catch (OperationCanceledException)
         {
-            row.Status = "Stopped.";
+            row.Status = L.T("Stopped.");
         }
         finally
         {
@@ -139,14 +139,14 @@ public sealed partial class MarkerPacksViewModel(PackRepository repository, Mark
         if (listing.Author is { } author) said.Add(author);
         if (listing.SizeMb is { } size) said.Add(Megabytes(size));
         if (listing.Updated is { } updated)
-            said.Add("updated " + updated.ToString("MMM yyyy", CultureInfo.InvariantCulture));
-        if (listing.Maps > 0) said.Add(listing.Maps == 1 ? "1 map" : $"{listing.Maps} maps");
+            said.Add(L.F("updated {0:MMM yyyy}", updated));
+        if (listing.Maps > 0) said.Add(listing.Maps == 1 ? L.T("1 map") : L.F("{0} maps", listing.Maps));
 
         return string.Join(" · ", said);
     }
 
     private static string Megabytes(double size) =>
-        size < 1 ? "under 1 MB" : $"{size.ToString("0.#", CultureInfo.InvariantCulture)} MB";
+        size < 1 ? L.T("under 1 MB") : L.F("{0:0.#} MB", size);
 }
 
 public sealed partial class PackRow(PackListing listing, bool isAdded, string byline) : ObservableObject
@@ -172,7 +172,7 @@ public sealed partial class PackRow(PackListing listing, bool isAdded, string by
     public bool CanAdd => !IsAdded;
 
     /// <summary>Said on the row rather than as a button that does nothing.</summary>
-    public string Mark => IsAdded ? "ADDED" : string.Empty;
+    public string Mark => IsAdded ? L.T("ADDED") : string.Empty;
 
     /// <summary>What the last add of this pack did: downloading, kept, or why not.</summary>
     [ObservableProperty]

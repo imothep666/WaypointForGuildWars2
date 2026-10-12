@@ -37,7 +37,7 @@
                 <StackPanel Orientation="Horizontal" Spacing="10">
                     <TextBlock Text="{Binding AcclaimText}" FontFamily="{StaticResource BarlowSemiBold}"
                                FontSize="60" />
-                    <TextBlock Text="Astral Acclaim" Foreground="{DynamicResource AreaTintBrush}"
+                    <TextBlock Text="{ui:T 'Astral Acclaim'}" Foreground="{DynamicResource AreaTintBrush}"
                                VerticalAlignment="Bottom" Margin="0,0,0,8" />
                 </StackPanel>
             </StackPanel>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The few words Android itself shows for the app: the widget names in the launcher's picker,
+    and the labels a widget layout draws before the app has filled anything in. Everything else
+    goes through Localization/L in Core; these cannot, because the system reads them without
+    running any of the app's code. German beside them in values-de.
+-->
+<resources>
+    <string name="widget_bosses">World Bosses</string>
+    <string name="widget_here">Here</string>
+    <string name="widget_vault">Wizard\'s Vault</string>
+    <string name="widget_daily">DAILY</string>
+    <string name="widget_weekly">WEEKLY</string>
+</resources>

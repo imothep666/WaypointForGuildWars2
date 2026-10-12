@@ -84,10 +84,10 @@ public static class Makeable
     public static string Describe(MakeablePlan plan)
     {
         var batches = plan.Batches == 1
-            ? "once"
+            ? L.T("once")
             : $"{plan.Batches:N0}×";
 
-        return $"{plan.Discipline} · {plan.Character} · {batches}";
+        return $"{CraftingLevels.DisciplineName(plan.Discipline)} · {plan.Character} · {batches}";
     }
 
     /// <summary>
@@ -95,8 +95,8 @@ public static class Makeable
     /// </summary>
     public static string Summarise(int count) => count switch
     {
-        0 => "Nothing can be made outright from what you are holding.",
-        1 => "One recipe can be made from what you are holding.",
-        _ => $"{count:N0} recipes can be made from what you are holding."
+        0 => L.T("Nothing can be made outright from what you are holding."),
+        1 => L.T("One recipe can be made from what you are holding."),
+        _ => L.F("{0:N0} recipes can be made from what you are holding.", count)
     };
 }

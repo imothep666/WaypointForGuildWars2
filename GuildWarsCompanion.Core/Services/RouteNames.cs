@@ -141,11 +141,11 @@ public static class RouteNames
     public static string Describe(
         string type, IReadOnlyDictionary<string, string> names, int deep = 2)
     {
-        if (string.IsNullOrWhiteSpace(type)) return "Unfiled route";
+        if (string.IsNullOrWhiteSpace(type)) return L.T("Unfiled route");
 
         var segments = type.Split('.', StringSplitOptions.RemoveEmptyEntries);
 
-        if (segments.Length == 0) return "Unfiled route";
+        if (segments.Length == 0) return L.T("Unfiled route");
 
         var said = new StringBuilder();
 

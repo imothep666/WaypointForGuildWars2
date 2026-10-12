@@ -4,7 +4,9 @@ using GuildWarsCompanion.Gw2;
 namespace GuildWarsCompanion.Services;
 
 /// <summary>What the catalogue holds right now.</summary>
-public sealed record CatalogueStatus(int Known, int Tradable, int Recipes);
+/// <param name="OtherLanguage">Items still named in the language the phone was in before, which
+/// a download renames.</param>
+public sealed record CatalogueStatus(int Known, int Tradable, int Recipes, int OtherLanguage);
 
 /// <summary>How far through a fill we are.</summary>
 public sealed record CatalogueProgress(int Done, int Total);
@@ -33,7 +35,8 @@ public sealed class ItemCatalogue(Gw2Client client, Gw2Cache cache)
     public async Task<CatalogueStatus> StatusAsync(CancellationToken ct = default) =>
         new(await cache.CountItemsAsync(ct),
             await cache.CountTradableAsync(ct),
-            await cache.CountRecipesAsync(ct));
+            await cache.CountRecipesAsync(ct),
+            await cache.CountItemsInOtherLanguageAsync(ct));
 
     /// <summary>
     /// Fetches everything not already held. Reports after each batch so the screen can show
@@ -50,14 +53,22 @@ public sealed class ItemCatalogue(Gw2Client client, Gw2Cache cache)
         var everything = await client.GetItemIdsAsync(ct);
         var known = await cache.GetKnownItemIdsAsync(ct);
 
-        var missing = CataloguePlan.Missing(everything, known, tradable.ToHashSet());
+        var tradableSet = tradable.ToHashSet();
+        var missing = CataloguePlan.Missing(everything, known, tradableSet);
         progress?.Report(new CatalogueProgress(0, missing.Count));
+
+        // English names beside the local ones, so a search typed from a guide or the wiki finds
+        // the item on a phone set to German. Nothing to do in English, and nothing for a
+        // catalogue filled before there were languages: its names are the English ones already.
+        IReadOnlyList<int> english = client.Language == Gw2Language.English
+            ? []
+            : CataloguePlan.Missing(everything, await cache.GetItemIdsWithEnglishAsync(ct), tradableSet);
 
         // Recipes are filled in the same pass. They are what turns "your Jeweler is 36" into
         // "make these five things next", and without them the crafting guide has nothing to
         // work from — the account endpoint reports only recipes learned from an item.
         var missingRecipes = await MissingRecipesAsync(ct);
-        var total = missing.Count + missingRecipes.Count;
+        var total = missing.Count + english.Count + missingRecipes.Count;
 
         progress?.Report(new CatalogueProgress(0, total));
 
@@ -67,8 +78,20 @@ public sealed class ItemCatalogue(Gw2Client client, Gw2Cache cache)
         {
             ct.ThrowIfCancellationRequested();
 
-            var items = await FetchAsync(batch, ct);
+            var items = await FetchAsync(batch, client.GetItemsAsync, ct);
             await cache.SaveItemsAsync(items, ct);
+
+            done += batch.Length;
+            progress?.Report(new CatalogueProgress(done, total));
+        }
+
+        // After the pass above, so every row it names is there to take its English name.
+        foreach (var batch in english.Chunk(CataloguePlan.BatchSize))
+        {
+            ct.ThrowIfCancellationRequested();
+
+            var items = await FetchAsync(batch, client.GetEnglishItemsAsync, ct);
+            await cache.SaveEnglishItemNamesAsync(items, ct);
 
             done += batch.Length;
             progress?.Report(new CatalogueProgress(done, total));
@@ -102,13 +125,14 @@ public sealed class ItemCatalogue(Gw2Client client, Gw2Cache cache)
     ///
     /// Giving up on the first 429 would strand a fill two thirds of the way through.
     /// </summary>
-    private async Task<List<Item>> FetchAsync(int[] batch, CancellationToken ct)
+    private static async Task<List<Item>> FetchAsync(
+        int[] batch, Func<IEnumerable<int>, CancellationToken, Task<List<Item>>> fetch, CancellationToken ct)
     {
         for (var attempt = 0; ; attempt++)
         {
             try
             {
-                        return await client.GetItemsAsync(batch, ct);
+                return await fetch(batch, ct);
             }
             catch (Gw2ApiException ex)
                 when (ex.Kind == Gw2ErrorKind.RateLimited && attempt < Backoff.Length)

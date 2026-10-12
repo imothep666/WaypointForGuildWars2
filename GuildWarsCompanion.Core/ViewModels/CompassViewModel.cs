@@ -29,7 +29,7 @@ public sealed partial class TargetRow(CompassTarget target, double distance) : O
     public string Detail =>
         Target.Note is { Length: > 0 } note
             ? $"{Target.KindLabel} · {note}"
-            : $"{Target.KindLabel} · {Distance:0} away";
+            : L.F("{0} · {1:0} away", Target.KindLabel, Distance);
 
     /// <summary>
     /// The list's order: what is on this map nearest first, the heart you are standing next to
@@ -56,7 +56,7 @@ public sealed partial class TargetRow(CompassTarget target, double distance) : O
     private bool _isDismissed;
 
     /// <summary>What the button on this row does next, rather than what the row is.</summary>
-    public string DismissLabel => IsDismissed ? "SHOW" : "HIDE";
+    public string DismissLabel => IsDismissed ? L.T("SHOW") : L.T("HIDE");
 
     /// <summary>A plain double rather than a converter in XAML: a Converter there forces a
     /// reflection-based binding, which the trimmer cannot see through.</summary>
@@ -78,7 +78,7 @@ public sealed partial class KindRow(TargetKind kind, string label) : ObservableO
 
     /// <summary>What the kind is now, not what the button does — the row above it names the kind,
     /// so "HIDDEN" reads as a state and "HIDE" would read as a second thing to tap.</summary>
-    public string StateLabel => IsShown ? "SHOWN" : "HIDDEN";
+    public string StateLabel => IsShown ? L.T("SHOWN") : L.T("HIDDEN");
 
     /// <summary>How many of this kind the current map has, so a switch that would change nothing
     /// says so instead of looking broken.</summary>
@@ -88,9 +88,9 @@ public sealed partial class KindRow(TargetKind kind, string label) : ObservableO
 
     public string Detail => Count switch
     {
-        0 => "none on this map",
-        1 => "1 on this map",
-        _ => $"{Count} on this map"
+        0 => L.T("none on this map"),
+        1 => L.T("1 on this map"),
+        _ => L.F("{0} on this map", Count)
     };
 }
 
@@ -163,17 +163,17 @@ public sealed partial class CompassViewModel(
         (Hidden, Filtered) switch
         {
             (0, 0) => string.Empty,
-            (0, var filter) => $"{filter} hidden by the filter.",
+            (0, var filter) => L.F("{0} hidden by the filter.", filter),
             (var done, 0) =>
-                $"{done} finished hero points and bosses hidden. Hearts, waypoints and vistas " +
-                "stay: the API publishes no completion for them — hide them yourself under Filter.",
+                L.F("{0} finished hero points and bosses hidden. Hearts, waypoints and vistas " +
+                    "stay: the API publishes no completion for them — hide them yourself under Filter.", done),
             var (done, filter) =>
-                $"{done} finished hero points and bosses hidden, {filter} by the filter."
+                L.F("{0} finished hero points and bosses hidden, {1} by the filter.", done, filter)
         };
 
     /// <summary>What the filter sheet's own footer says about the pile it is holding back.</summary>
     public string FilterLine =>
-        Filtered == 0 ? "Nothing hidden by hand." : $"{Filtered} hidden by hand.";
+        Filtered == 0 ? L.T("Nothing hidden by hand.") : L.F("{0} hidden by hand.", Filtered);
 
     /// <summary>The rose's own state, handed to the drawable each frame.</summary>
     public double? Relative { get; private set; }
@@ -264,7 +264,7 @@ public sealed partial class CompassViewModel(
     /// value on it being a bound property redrawing the whole layout.</summary>
     public event Action? Moved;
 
-    [ObservableProperty] private string _characterLine = "Waiting for the bridge…";
+    [ObservableProperty] private string _characterLine = L.T("Waiting for the bridge…");
 
     [ObservableProperty] private string _mapLine = string.Empty;
 
@@ -282,7 +282,7 @@ public sealed partial class CompassViewModel(
     /// </summary>
     [ObservableProperty] private string _routeLine = string.Empty;
 
-    [ObservableProperty] private string _targetLine = "No objective chosen";
+    [ObservableProperty] private string _targetLine = L.T("No objective chosen");
 
     /// <summary>Shown under the needle when the target is only placed to the nearest map.</summary>
     [ObservableProperty]
@@ -330,7 +330,7 @@ public sealed partial class CompassViewModel(
     /// </summary>
     public ObservableCollection<PageTab> Tabs { get; } =
     [
-        new("Objectives", 0) { IsSelected = true }, new("Filter", 1)
+        new(L.T("Objectives"), 0) { IsSelected = true }, new(L.T("Filter"), 1)
     ];
 
     /// <summary>Switches which half of the sheet is on screen.</summary>
@@ -481,7 +481,7 @@ public sealed partial class CompassViewModel(
 
         if (report.State is not { } state)
         {
-            Set(nameof(CharacterLine), CharacterLine, report.Note, v => CharacterLine = v);
+            Set(nameof(CharacterLine), CharacterLine, GameText.Note(report), v => CharacterLine = v);
             SceneMap = null;
             Relative = null;
             Moved?.Invoke();
@@ -491,7 +491,7 @@ public sealed partial class CompassViewModel(
 
         _last = state;
 
-        Set(nameof(CharacterLine), CharacterLine, state.Line, v => CharacterLine = v);
+        Set(nameof(CharacterLine), CharacterLine, GameText.Line(state), v => CharacterLine = v);
         Set(nameof(MapLine), MapLine, report.MapLabel, v => MapLine = v);
 
         // Every frame, but the property only notifies on a change of map.
@@ -603,7 +603,7 @@ public sealed partial class CompassViewModel(
         {
             Relative = null;
 
-            Set(nameof(Instruction), Instruction, "you are on this map", v => Instruction = v);
+            Set(nameof(Instruction), Instruction, L.T("you are on this map"), v => Instruction = v);
             Set(nameof(DistanceLine), DistanceLine, string.Empty, v => DistanceLine = v);
             Set(nameof(RouteLine), RouteLine, string.Empty, v => RouteLine = v);
 
@@ -626,10 +626,10 @@ public sealed partial class CompassViewModel(
         Set(nameof(Instruction), Instruction,
             _last?.HasHeading == true
                 ? Bearing.Describe(Relative.Value)
-                : "no heading from the PC",
+                : L.T("no heading from the PC"),
             v => Instruction = v);
 
-        Set(nameof(DistanceLine), DistanceLine, $"{away:0} away", v => DistanceLine = v);
+        Set(nameof(DistanceLine), DistanceLine, L.F("{0:0} away", away), v => DistanceLine = v);
 
         // Only the decision moves with the character; the words were built when the objective was
         // chosen. Advice that appears as the walk grows and goes again as it shrinks, without
@@ -656,12 +656,12 @@ public sealed partial class CompassViewModel(
 
         Set(nameof(Instruction), Instruction,
             _last?.HasHeading == true
-                ? leg.IsOnTrail ? Bearing.Describe(Relative.Value) : $"back to the trail, {Bearing.Describe(Relative.Value)}"
-                : "no heading from the PC",
+                ? leg.IsOnTrail ? Bearing.Describe(Relative.Value) : L.F("back to the trail, {0}", Bearing.Describe(Relative.Value))
+                : L.T("no heading from the PC"),
             v => Instruction = v);
 
         Set(nameof(DistanceLine), DistanceLine,
-            leg.IsOnTrail ? $"{leg.Along:0} along the trail" : $"{leg.OffTrail:0} to the trail",
+            leg.IsOnTrail ? L.F("{0:0} along the trail", leg.Along) : L.F("{0:0} to the trail", leg.OffTrail),
             v => DistanceLine = v);
 
         if (_trailHop?.BeatsWalking(leg) == true)
@@ -678,8 +678,8 @@ public sealed partial class CompassViewModel(
         {
             _guideHeight = height;
             _guideLine = height.Length > 0
-                ? $"following {guide.Route.Name} · {height}"
-                : $"following {guide.Route.Name}";
+                ? L.F("following {0} · {1}", guide.Route.Name, height)
+                : L.F("following {0}", guide.Route.Name);
         }
 
         Set(nameof(RouteLine), RouteLine, _guideLine, v => RouteLine = v);
@@ -1163,7 +1163,7 @@ public sealed partial class CompassViewModel(
         if (target is null)
         {
             Relative = null;
-            TargetLine = "No objective chosen";
+            TargetLine = L.T("No objective chosen");
             Instruction = string.Empty;
             DistanceLine = string.Empty;
             RouteLine = string.Empty;
@@ -1185,8 +1185,8 @@ public sealed partial class CompassViewModel(
 
         PrecisionWarning = target.Precise
             ? null
-            : $"Pointing at the middle of {target.MapName}. The API publishes no spawn " +
-              "coordinate for a world boss, so this is the map, not the arena.";
+            : L.F("Pointing at the middle of {0}. The API publishes no spawn " +
+                  "coordinate for a world boss, so this is the map, not the arena.", target.MapName);
 
         if (_started) Aim(_renderX, _renderY);
 
@@ -1207,7 +1207,7 @@ public sealed partial class CompassViewModel(
     {
         if (_chosen is not { } target)
         {
-            TargetLine = "No objective chosen";
+            TargetLine = L.T("No objective chosen");
 
             return;
         }
@@ -1228,5 +1228,5 @@ public sealed partial class CompassViewModel(
     }
 
     protected override string DefaultEmptyMessage =>
-        "Nothing on this map has coordinates the API will give.";
+        L.T("Nothing on this map has coordinates the API will give.");
 }

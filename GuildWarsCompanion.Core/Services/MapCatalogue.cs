@@ -71,6 +71,41 @@ public sealed class MapCatalogue(Gw2Client api, Gw2Cache cache)
         return _choices;
     }
 
+    /// <summary>Whether every map's English name has been asked for this run, so a map the
+    /// answer did not include is not asked about again on each visit.</summary>
+    private bool _englishAsked;
+
+    /// <summary>
+    /// What the map is called in English, which is what the wiki files its loading screen
+    /// under: "Queensdale loading screen.jpg", never "Königintal loading screen.jpg".
+    ///
+    /// Every map at once when it is not stored yet, since that is one request and a single map
+    /// is also one. Null with no connection and nothing stored, which costs the page its art
+    /// and nothing else.
+    /// </summary>
+    public async Task<string?> EnglishNameAsync(MapInfo map, CancellationToken ct = default)
+    {
+        if (api.Language == Gw2Language.English) return map.Name;
+
+        if (await cache.GetEnglishMapNameAsync(map.Id, ct) is { } stored) return stored;
+
+        if (_englishAsked) return null;
+
+        try
+        {
+            var names = await api.GetEnglishMapNamesAsync(ct);
+
+            await cache.SaveEnglishMapNamesAsync(names, ct);
+            _englishAsked = true;
+
+            return names.GetValueOrDefault(map.Id);
+        }
+        catch (Gw2ApiException)
+        {
+            return null;
+        }
+    }
+
     /// <summary>Maps whose name contains what was typed. See <see cref="MapPicks.Search"/>.</summary>
     public async Task<IReadOnlyList<MapChoice>> SearchAsync(
         string term, CancellationToken ct = default) =>
@@ -79,8 +114,8 @@ public sealed class MapCatalogue(Gw2Client api, Gw2Cache cache)
     private static string Describe(Gw2ApiException ex) => ex.Kind switch
     {
         Gw2ErrorKind.Network =>
-            "No connection, and no map list stored yet. Open this once with a connection and it " +
-            "works offline from then on.",
-        _ => $"The map list could not be read — {ex.Message}"
+            L.T("No connection, and no map list stored yet. Open this once with a connection and it " +
+                "works offline from then on."),
+        _ => L.F("The map list could not be read — {0}", ex.Message)
     };
 }

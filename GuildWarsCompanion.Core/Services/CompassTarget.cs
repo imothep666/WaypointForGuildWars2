@@ -57,14 +57,14 @@ public sealed record CompassTarget(
 
     public string KindLabel => Kind switch
     {
-        TargetKind.Heart => "Heart",
-        TargetKind.Waypoint => "Waypoint",
-        TargetKind.Landmark => "Landmark",
-        TargetKind.Vista => "Vista",
-        TargetKind.HeroPoint => "Hero point",
-        TargetKind.Chest => "Chest",
-        TargetKind.JumpingPuzzle => "Jumping puzzle",
-        _ => "World boss"
+        TargetKind.Heart => L.T("Heart"),
+        TargetKind.Waypoint => L.T("Waypoint"),
+        TargetKind.Landmark => L.T("Landmark"),
+        TargetKind.Vista => L.T("Vista"),
+        TargetKind.HeroPoint => L.T("Hero point"),
+        TargetKind.Chest => L.T("Chest"),
+        TargetKind.JumpingPuzzle => L.T("Jumping puzzle"),
+        _ => L.T("World boss")
     };
 }
 

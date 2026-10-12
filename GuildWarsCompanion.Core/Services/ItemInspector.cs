@@ -78,14 +78,14 @@ public sealed record ItemView(
     public string? Acquisition => HasCraft
         ? null
         : HasMarket
-            ? "No recipe makes this. Buy it above, or gather it — the wiki says where."
-            : "No recipe makes this, and it is not traded. The wiki says where it comes from.";
+            ? L.T("No recipe makes this. Buy it above, or gather it — the wiki says where.")
+            : L.T("No recipe makes this, and it is not traded. The wiki says where it comes from.");
 
     /// <summary>
     /// The button answers the question being asked. On something you have to go and find,
     /// "open the wiki" buries the point.
     /// </summary>
-    public string WikiLabel => HasCraft ? "OPEN THE WIKI" : "WHERE TO FIND THIS";
+    public string WikiLabel => HasCraft ? L.T("OPEN THE WIKI") : L.T("WHERE TO FIND THIS");
 }
 
 /// <summary>
@@ -130,12 +130,26 @@ public sealed class ItemInspector(
             sell,
             hasMarket,
             note,
-            item.VendorValue > 0 ? Coin.Format(item.VendorValue) : "cannot be sold to a vendor",
+            item.VendorValue > 0 ? Coin.Format(item.VendorValue) : L.T("cannot be sold to a vendor"),
             storage.WhereIs(id),
-            Wiki.UrlFor(item.Name),
+            await WikiUrlAsync(item, ct),
             await CraftAsync(id, buyPrice, sellPrice, ct),
             usedIn.Summary,
             usedIn.Rows);
+    }
+
+    /// <summary>
+    /// The item's wiki page: in the phone's language where that has a wiki of its own, and on
+    /// the English one otherwise, under the English name where it is stored, since a Chinese
+    /// name searched there finds nothing.
+    /// </summary>
+    private async Task<string> WikiUrlAsync(ItemDetail item, CancellationToken ct)
+    {
+        if (Wiki.HasOwnWiki(client.Language)) return Wiki.UrlFor(item.Name, client.Language);
+
+        var english = await items.EnglishNamesAsync([item.Id], ct);
+
+        return Wiki.UrlFor(english.GetValueOrDefault(item.Id, item.Name));
     }
 
     /// <summary>How many recipes to list before the page becomes a catalogue.</summary>
@@ -160,7 +174,7 @@ public sealed class ItemInspector(
             return (UsedIn.Summarise(rows.Count, total),
                 rows.Select(row => new UsedInItemRow(
                         row.OutputItemId,
-                        row.OutputName ?? $"Item {row.OutputItemId}",
+                        row.OutputName ?? L.F("Item {0}", row.OutputItemId),
                         UsedIn.Describe(row)))
                     .ToList());
         }
@@ -196,7 +210,7 @@ public sealed class ItemInspector(
             var lines = ingredients
                 .Select(i => new CraftLine(
                     i.Id,
-                    names.GetValueOrDefault(i.Id)?.Name ?? $"Item {i.Id}",
+                    names.GetValueOrDefault(i.Id)?.Name ?? L.F("Item {0}", i.Id),
                     i.Count,
                     count(i.Id)))
                 .ToList();
@@ -213,7 +227,7 @@ public sealed class ItemInspector(
             return new CraftView(
                 Heading(recipe, found.Count),
                 CraftPlan.Verdict(lines, recipe.OutputItemCount, known),
-                known ? $"Counted from {source}." : "Could not read what you are holding.",
+                known ? source : L.T("Could not read what you are holding."),
                 lines.Select(line => Show(line, names.GetValueOrDefault(line.ItemId)?.Icon)).ToList(),
                 await ShortfallCostAsync(lines, ct),
                 materials,
@@ -266,7 +280,7 @@ public sealed class ItemInspector(
             .Select(need => Show(
                 new CraftLine(
                     need.ItemId,
-                    names.GetValueOrDefault(need.ItemId)?.Name ?? $"Item {need.ItemId}",
+                    names.GetValueOrDefault(need.ItemId)?.Name ?? L.F("Item {0}", need.ItemId),
                     need.Count,
                     // These are what is still wanted after holdings were spent, so anything
                     // listed here is by definition not held.
@@ -275,10 +289,10 @@ public sealed class ItemInspector(
             .ToList();
 
         var note = deep
-            ? "Stopped following the chain at six levels — the rest is listed as it stands."
+            ? L.T("Stopped following the chain at six levels — the rest is listed as it stands.")
             : known
-                ? "What is left to gather or buy after what you are already holding."
-                : "What one costs in raw materials. Open Find to have your own counted.";
+                ? L.T("What is left to gather or buy after what you are already holding.")
+                : L.T("What one costs in raw materials. Open Find to have your own counted.");
 
         return (lines, note);
 
@@ -359,8 +373,8 @@ public sealed class ItemInspector(
         new(line.ItemId,
             line.Name,
             icon,
-            $"{line.Needed:N0} needed",
-            line.Held is null ? "not counted" : $"{line.Held.Value:N0} held",
+            L.F("{0:N0} needed", line.Needed),
+            line.Held is null ? L.T("not counted") : L.F("{0:N0} held", line.Held.Value),
             line.IsSatisfied);
 
     /// <summary>"Refinement · Artificer 75", plus a note when other disciplines make it too.</summary>
@@ -369,23 +383,24 @@ public sealed class ItemInspector(
         var discipline = recipe.Disciplines?.FirstOrDefault();
         var parts = new List<string>();
 
-        if (!string.IsNullOrWhiteSpace(recipe.Type)) parts.Add(ItemFacts.ReadableType(recipe.Type));
+        if (!string.IsNullOrWhiteSpace(recipe.Type)) parts.Add(L.T(ItemFacts.ReadableType(recipe.Type)));
         if (discipline is not null)
-            parts.Add(recipe.MinRating > 0 ? $"{discipline} {recipe.MinRating}" : discipline);
+            parts.Add(recipe.MinRating > 0 ? $"{L.T(discipline)} {recipe.MinRating}" : L.T(discipline));
 
-        var heading = parts.Count > 0 ? string.Join(" · ", parts) : "Recipe";
+        var heading = parts.Count > 0 ? string.Join(" · ", parts) : L.T("Recipe");
 
-        return recipeCount > 1 ? $"{heading} · {recipeCount - 1} other recipe(s)" : heading;
+        return recipeCount > 1 ? L.F("{0} · {1} other recipe(s)", heading, recipeCount - 1) : heading;
     }
 
     /// <summary>
     /// Where the held counts come from. The full snapshot when the Find screen has been
-    /// opened, material storage alone otherwise — never a silent guess.
+    /// opened, material storage alone otherwise — never a silent guess. The source comes back as
+    /// the sentence the screen says, empty when nothing could be read.
     /// </summary>
     private async Task<(Func<int, int?> Count, string Source)> CountsAsync(CancellationToken ct)
     {
         if (storage.HasSnapshot)
-            return (storage.HeldCount, "everywhere you keep things");
+            return (storage.HeldCount, L.T("Counted from everywhere you keep things."));
 
         try
         {
@@ -393,7 +408,7 @@ public sealed class ItemInspector(
                 .Where(material => material.Count > 0)
                 .ToDictionary(material => material.Id, material => material.Count);
 
-            return (id => _materials.GetValueOrDefault(id), "material storage");
+            return (id => _materials.GetValueOrDefault(id), L.T("Counted from material storage."));
         }
         catch (Gw2ApiException)
         {
@@ -425,7 +440,7 @@ public sealed class ItemInspector(
                 total += ask * line.Short!.Value;
             }
 
-            return $"Buying the rest costs about {Coin.Format(total)}.";
+            return L.F("Buying the rest costs about {0}.", Coin.Format(total));
         }
         catch (Gw2ApiException)
         {
@@ -438,15 +453,15 @@ public sealed class ItemInspector(
     {
         var words = new List<string>();
 
-        if (!string.IsNullOrWhiteSpace(item.Rarity)) words.Add(item.Rarity);
+        if (!string.IsNullOrWhiteSpace(item.Rarity)) words.Add(L.T(item.Rarity));
 
         // The subtype is the useful half: "Sword" says more than "Weapon".
         var type = item.Details?.Type ?? item.Type;
-        if (!string.IsNullOrWhiteSpace(type)) words.Add(ItemFacts.ReadableType(type));
+        if (!string.IsNullOrWhiteSpace(type)) words.Add(L.T(ItemFacts.ReadableType(type)));
 
         var kind = string.Join(" ", words);
 
-        return item.Level > 0 ? $"{kind} · level {item.Level}" : kind;
+        return item.Level > 0 ? L.F("{0} · level {1}", kind, item.Level) : kind;
     }
 
     /// <summary>
@@ -464,19 +479,19 @@ public sealed class ItemInspector(
             var sell = price?.Sells?.UnitPrice ?? 0;
 
             if (buy == 0 && sell == 0)
-                return (string.Empty, string.Empty, false, "Not traded on the trading post.", 0, 0);
+                return (string.Empty, string.Empty, false, L.T("Not traded on the trading post."), 0, 0);
 
             return (
                 buy > 0 ? Coin.Format(buy) : "—",
                 sell > 0 ? Coin.Format(sell) : "—",
                 true,
-                $"You would keep {Coin.Format(PriceRules.AfterFees(buy))} selling one instantly.",
+                L.F("You would keep {0} selling one instantly.", Coin.Format(PriceRules.AfterFees(buy))),
                 buy,
                 sell);
         }
         catch (Gw2ApiException)
         {
-            return (string.Empty, string.Empty, false, "Prices need a connection.", 0, 0);
+            return (string.Empty, string.Empty, false, L.T("Prices need a connection."), 0, 0);
         }
     }
 }

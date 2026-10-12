@@ -18,8 +18,8 @@ public partial class SettingsView : PageView
 
         var camera = App.Services.GetRequiredService<IQrScanner>().UsesCamera;
 
-        ScanButton.Content = camera ? "SCAN QR" : "QR FROM IMAGE";
-        ScanBridgeButton.Content = camera ? "SCAN A PC" : "PC FROM IMAGE";
+        ScanButton.Content = camera ? L.T("SCAN QR") : L.T("QR FROM IMAGE");
+        ScanBridgeButton.Content = camera ? L.T("SCAN A PC") : L.T("PC FROM IMAGE");
     }
 
     private SettingsViewModel ViewModel => (SettingsViewModel)DataContext!;

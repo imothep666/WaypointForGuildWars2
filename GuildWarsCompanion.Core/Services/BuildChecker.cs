@@ -65,16 +65,18 @@ public sealed class BuildChecker
         // --- gear present ---------------------------------------------------
 
         var missingArmour = ArmourSlots.Where(s => !worn.ContainsKey(s)).ToList();
-        Check(missingArmour.Count == 0, "Armour incomplete",
-            $"{missingArmour.Count} of 6 pieces missing: {string.Join(", ", missingArmour)}.");
+        Check(missingArmour.Count == 0, L.T("Armour incomplete"),
+            L.F("{0} of 6 pieces missing: {1}.", missingArmour.Count,
+                string.Join(", ", missingArmour.Select(SlotWord))));
 
         var missingTrinkets = TrinketSlots.Where(s => !worn.ContainsKey(s)).ToList();
-        Check(missingTrinkets.Count == 0, "Trinkets incomplete",
-            $"{missingTrinkets.Count} of 6 missing: {string.Join(", ", missingTrinkets)}.");
+        Check(missingTrinkets.Count == 0, L.T("Trinkets incomplete"),
+            L.F("{0} of 6 missing: {1}.", missingTrinkets.Count,
+                string.Join(", ", missingTrinkets.Select(SlotWord))));
 
         var mainHand = worn.GetValueOrDefault("WeaponA1");
-        Check(mainHand is not null, "No main-hand weapon",
-            "The first weapon set has nothing in the main hand.");
+        Check(mainHand is not null, L.T("No main-hand weapon"),
+            L.T("The first weapon set has nothing in the main hand."));
 
         // --- runes ----------------------------------------------------------
 
@@ -84,13 +86,14 @@ public sealed class BuildChecker
             .ToList();
 
         var withoutRune = runes.Count(r => r is null);
-        Check(armourWorn.Count == 0 || withoutRune == 0, "Rune missing",
-            $"{withoutRune} of {armourWorn.Count} armour pieces have no rune.");
+        Check(armourWorn.Count == 0 || withoutRune == 0, L.T("Rune missing"),
+            L.F("{0} of {1} armour pieces have no rune.", withoutRune, armourWorn.Count));
 
         var runeNames = runes.OfType<WeaponItem>().Select(r => r.Name).Distinct().ToList();
-        Check(runeNames.Count <= 1, "Rune set mixed",
+        Check(runeNames.Count <= 1, L.T("Rune set mixed"),
             runeNames.Count > 1
-                ? $"{runeNames.Count} different runes: {string.Join(", ", runeNames.Take(3))}. A set of six gives the full bonus."
+                ? L.F("{0} different runes: {1}. A set of six gives the full bonus.",
+                    runeNames.Count, string.Join(", ", runeNames.Take(3)))
                 : string.Empty);
 
         // --- sigils ---------------------------------------------------------
@@ -107,18 +110,18 @@ public sealed class BuildChecker
                 .Count(id => details.GetValueOrDefault(id)?.Details?.Type == "Sigil");
 
             if (actual < expected)
-                sigilGaps.Add($"{type ?? slot} ({actual}/{expected})");
+                sigilGaps.Add($"{(type is not null ? WeaponTypeName(type) : SlotWord(slot))} ({actual}/{expected})");
         }
 
-        Check(sigilGaps.Count == 0, "Sigil missing",
-            $"Empty sigil slots on: {string.Join(", ", sigilGaps)}.");
+        Check(sigilGaps.Count == 0, L.T("Sigil missing"),
+            L.F("Empty sigil slots on: {0}.", string.Join(", ", sigilGaps)));
 
         // Identical sigils on the same weapon set do not stack, so the second one is doing
         // nothing. This is a game rule rather than an opinion, which is why it belongs here.
-        foreach (var (label, slots) in new[]
+        foreach (var (first, slots) in new[]
                  {
-                     ("first", new[] { "WeaponA1", "WeaponA2" }),
-                     ("second", new[] { "WeaponB1", "WeaponB2" })
+                     (true, new[] { "WeaponA1", "WeaponA2" }),
+                     (false, new[] { "WeaponB1", "WeaponB2" })
                  })
         {
             var sigils = slots
@@ -130,12 +133,18 @@ public sealed class BuildChecker
             var duplicated = sigils
                 .GroupBy(id => id)
                 .Where(g => g.Count() > 1)
-                .Select(g => details.GetValueOrDefault(g.Key)?.Name ?? $"item {g.Key}")
+                .Select(g => details.GetValueOrDefault(g.Key)?.Name ?? L.F("item {0}", g.Key))
                 .ToList();
 
             if (slots.Any(worn.ContainsKey))
-                Check(duplicated.Count == 0, "Duplicate sigil wasted",
-                    $"The {label} weapon set carries {string.Join(", ", duplicated)} twice. Identical sigils do not stack.");
+                Check(duplicated.Count == 0, L.T("Duplicate sigil wasted"),
+                    // Two whole sentences rather than "first" dropped into one: the ordinal
+                    // declines in German.
+                    first
+                        ? L.F("The first weapon set carries {0} twice. Identical sigils do not stack.",
+                            string.Join(", ", duplicated))
+                        : L.F("The second weapon set carries {0} twice. Identical sigils do not stack.",
+                            string.Join(", ", duplicated)));
         }
 
         // --- gear level -----------------------------------------------------
@@ -146,44 +155,95 @@ public sealed class BuildChecker
             .Where(item => item.Level > 0 && item.Level < character.Level - 10)
             .ToList();
 
-        Check(outdated.Count == 0, "Gear behind your level",
-            $"{outdated.Count} pieces are more than 10 levels below {character.Level}.");
+        Check(outdated.Count == 0, L.T("Gear behind your level"),
+            L.F("{0} pieces are more than 10 levels below {1}.", outdated.Count, character.Level));
 
         // --- specializations ------------------------------------------------
 
         var chosen = specializations.Count(s => s.Id is not null);
         var expectedLines = character.Level >= MaxLevel ? 3 : Math.Min(3, character.Level / 21 + 1);
-        Check(chosen >= expectedLines, "Specialization line unused",
-            $"{chosen} of {expectedLines} lines chosen at level {character.Level}.");
+        Check(chosen >= expectedLines, L.T("Specialization line unused"),
+            L.F("{0} of {1} lines chosen at level {2}.", chosen, expectedLines, character.Level));
 
         var incompleteTraits = specializations
             .Where(s => s.Id is not null)
             .Count(s => (s.Traits ?? []).Count(t => t is not null) < 3);
-        Check(incompleteTraits == 0, "Traits not fully picked",
-            $"{incompleteTraits} chosen line(s) have fewer than three traits.");
+        Check(incompleteTraits == 0, L.T("Traits not fully picked"),
+            L.F("{0} chosen line(s) have fewer than three traits.", incompleteTraits));
 
         // --- skills ---------------------------------------------------------
         // A revenant's bar comes from its legend, so empty slots there mean nothing.
 
         if (!revenant)
         {
-            Check(bar?.Heal is not null, "No healing skill", "The heal slot is empty.");
+            Check(bar?.Heal is not null, L.T("No healing skill"), L.T("The heal slot is empty."));
 
             var utilities = (bar?.Utilities ?? []).Count(u => u is not null);
-            Check(utilities >= 3, "Utility slot empty", $"{utilities} of 3 utility skills slotted.");
+            Check(utilities >= 3, L.T("Utility slot empty"), L.F("{0} of 3 utility skills slotted.", utilities));
 
             Check(bar?.Elite is not null || character.Level < MaxLevel,
-                "No elite skill", "The elite slot is empty.");
+                L.T("No elite skill"), L.T("The elite slot is empty."));
         }
 
         return new BuildCheck(
             $"{passed} / {total}",
             findings,
-            findings.Count == 0 ? "Nothing missing. Every slot filled and every line spent." : null,
-            "Checks completeness only. Nothing in the API ranks builds, so this never judges your choices.");
+            findings.Count == 0 ? L.T("Nothing missing. Every slot filled and every line spent.") : null,
+            L.T("Checks completeness only. Nothing in the API ranks builds, so this never judges your choices."));
     }
 
     /// <summary>The upgrade of a given kind on a piece, if any.</summary>
+    /// <summary>
+    /// An API slot id as a finding names it. English keeps the id itself ("Helm", "Ring1"), as it
+    /// always has; another language gets the slot's name.
+    /// </summary>
+    private static string SlotWord(string slot) => slot switch
+    {
+        "Helm" => L.T("Helm"),
+        "Shoulders" => L.T("Shoulders"),
+        "Coat" => L.T("Coat"),
+        "Gloves" => L.T("Gloves"),
+        "Leggings" => L.T("Leggings"),
+        "Boots" => L.T("Boots"),
+        "Backpack" => L.T("Backpack"),
+        "Amulet" => L.T("Amulet"),
+        "Ring1" => L.T("Ring1"),
+        "Ring2" => L.T("Ring2"),
+        "Accessory1" => L.T("Accessory1"),
+        "Accessory2" => L.T("Accessory2"),
+        "WeaponA1" => L.T("WeaponA1"),
+        "WeaponA2" => L.T("WeaponA2"),
+        "WeaponB1" => L.T("WeaponB1"),
+        "WeaponB2" => L.T("WeaponB2"),
+        _ => slot
+    };
+
+    /// <summary>A weapon type id from the API, as the game names it in the phone's language.</summary>
+    private static string WeaponTypeName(string type) => type switch
+    {
+        "Axe" => L.T("Axe"),
+        "Dagger" => L.T("Dagger"),
+        "Mace" => L.T("Mace"),
+        "Pistol" => L.T("Pistol"),
+        "Scepter" => L.T("Scepter"),
+        "Sword" => L.T("Sword"),
+        "Focus" => L.T("Focus"),
+        "Shield" => L.T("Shield"),
+        "Torch" => L.T("Torch"),
+        "Warhorn" => L.T("Warhorn"),
+        "Greatsword" => L.T("Greatsword"),
+        "Hammer" => L.T("Hammer"),
+        "Longbow" => L.T("Longbow"),
+        "Rifle" => L.T("Rifle"),
+        "Shortbow" => L.T("Shortbow"),
+        "Staff" => L.T("Staff"),
+        "Spear" => L.T("Spear"),
+        "Trident" => L.T("Trident"),
+        "Harpoon Gun" => L.T("Harpoon Gun"),
+        "Speargun" => L.T("Speargun"),
+        _ => type
+    };
+
     private static WeaponItem? UpgradeOfType(
         EquipmentPiece piece, IReadOnlyDictionary<int, WeaponItem> details, string kind) =>
         (piece.Upgrades ?? [])

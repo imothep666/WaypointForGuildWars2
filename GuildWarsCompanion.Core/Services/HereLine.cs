@@ -67,34 +67,40 @@ public static class HereLine
     {
         var parts = new List<string>();
 
-        if (facts.ChestLooted == false) parts.Add("map chest waiting");
+        if (facts.ChestLooted == false) parts.Add(L.T("map chest waiting"));
 
         if (facts is { HeroPoints: > 0, HeroPointsLeft: > 0 } && facts.HeroPointsLeft is { } left)
-            parts.Add($"{left} of {facts.HeroPoints} hero points left");
+            parts.Add(L.F("{0} of {1} hero points left", left, facts.HeroPoints));
 
         if (facts.Meta is { } meta)
         {
-            parts.Add(meta.IsOn ? $"{meta.Name} on now" : $"{meta.Name} {When(meta.Wait)}");
+            parts.Add(meta.IsOn ? L.F("{0} on now", meta.Name) : $"{meta.Name} {When(meta.Wait)}");
 
             if (meta is { IsOn: true, Then: var (then, wait) }) parts.Add($"{then} {When(wait)}");
         }
 
         foreach (var (name, wait) in facts.Bosses) parts.Add($"{name} {When(wait)}");
 
-        if (parts.Count > 0) return $"Here: {string.Join(" · ", parts)}";
+        if (parts.Count > 0) return Prefix + string.Join(" · ", parts);
 
         // Only a claim when something was read and found done. Nothing read is no line at all.
         var anythingRead = facts.ChestLooted is true || facts is { HeroPoints: > 0, HeroPointsLeft: 0 };
 
-        return anythingRead ? "Here: nothing left" : null;
+        return anythingRead ? Prefix + L.T("nothing left") : null;
     }
+
+    /// <summary>
+    /// "Here: " in the phone's language. Its own key rather than part of a sentence, because the
+    /// Here widget takes it off again to list the facts one a line; see <see cref="HereWidget.Facts"/>.
+    /// </summary>
+    public static string Prefix => L.T("Here:") + " ";
 
     private static string When(TimeSpan wait) =>
         wait <= TimeSpan.Zero
-            ? "up now"
+            ? L.T("up now")
             : wait.TotalMinutes < 1
-                ? "in under a minute"
+                ? L.T("in under a minute")
                 : wait.TotalMinutes < 60
-                    ? $"in {wait.TotalMinutes:0} min"
-                    : $"in {(int)wait.TotalHours}h {wait.Minutes:00}m";
+                    ? L.F("in {0:0} min", wait.TotalMinutes)
+                    : L.F("in {0}h {1:00}m", (int)wait.TotalHours, wait.Minutes);
 }

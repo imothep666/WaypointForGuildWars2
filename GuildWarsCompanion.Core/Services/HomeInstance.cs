@@ -45,7 +45,7 @@ public static class HomeInstance
     /// food you leave out — so the hint is the whole answer rather than a clue to it.
     /// </summary>
     public static string CatLure(string? hint) =>
-        string.IsNullOrWhiteSpace(hint) ? "Unknown" : Ids.ToDisplayName(hint);
+        string.IsNullOrWhiteSpace(hint) ? L.T("Unknown") : Ids.ToDisplayName(hint);
 
     /// <summary>
     /// Everything in the catalogue, what is missing first, each side keeping the order the
@@ -77,12 +77,12 @@ public static class HomeInstance
     {
         if (total <= 0) return string.Empty;
 
-        if (unlocked is not { } have) return $"{total:N0} {what} in the game";
+        if (unlocked is not { } have) return L.F("{0:N0} {1} in the game", total, what);
 
         var missing = Math.Max(0, total - have);
 
         return missing == 0
-            ? $"All {total:N0} {what}"
-            : $"{have:N0} of {total:N0} {what} · {missing:N0} still to unlock";
+            ? L.F("All {0:N0} {1}", total, what)
+            : L.F("{0:N0} of {1:N0} {2} · {3:N0} still to unlock", have, total, what, missing);
     }
 }

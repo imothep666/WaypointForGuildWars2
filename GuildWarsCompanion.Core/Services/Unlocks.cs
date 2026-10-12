@@ -53,8 +53,9 @@ public sealed record UnlockEntry(
 /// </param>
 public sealed record UnlockGroup(string Rarity, IReadOnlyList<UnlockEntry> Entries)
 {
-    /// <summary>"EXCLUSIVE", as a heading is written on this screen.</summary>
-    public string Heading => Rarity.ToUpperInvariant();
+    /// <summary>"EXCLUSIVE", as a heading is written on this screen, in the phone's language.
+    /// <see cref="Rarity"/> stays the API's English word, which the sorting and the tint read.</summary>
+    public string Heading => Unlocks.RarityName(Rarity).ToUpperInvariant();
 
     public string Line => $"{Entries.Count:N0}";
 }
@@ -63,7 +64,7 @@ public sealed record UnlockGroup(string Rarity, IReadOnlyList<UnlockEntry> Entri
 public sealed record UnlockTally(UnlockCategory Category, int Owned, int Total)
 {
     /// <summary>"412 of 682", grouped, because four figures without a separator is a smear.</summary>
-    public string Line => $"{Owned:N0} of {Total:N0}";
+    public string Line => L.F("{0:N0} of {1:N0}", Owned, Total);
 
     /// <summary>
     /// For a progress bar, in 0..1.
@@ -91,18 +92,18 @@ public static class Unlocks
     /// </summary>
     public static IReadOnlyList<UnlockCategory> All { get; } =
     [
-        new(UnlockKind.Dye, "Dyes", "account/dyes", "colors"),
-        new(UnlockKind.Skin, "Skins", "account/skins", "skins", Browsable: false),
-        new(UnlockKind.Mini, "Minis", "account/minis", "minis"),
-        new(UnlockKind.Outfit, "Outfits", "account/outfits", "outfits"),
-        new(UnlockKind.MountSkin, "Mount skins", "account/mounts/skins", "mounts/skins"),
-        new(UnlockKind.Glider, "Gliders", "account/gliders", "gliders"),
-        new(UnlockKind.Title, "Titles", "account/titles", "titles"),
-        new(UnlockKind.Mailcarrier, "Mailcarriers", "account/mailcarriers", "mailcarriers"),
-        new(UnlockKind.Novelty, "Novelties", "account/novelties", "novelties"),
-        new(UnlockKind.Finisher, "Finishers", "account/finishers", "finishers"),
-        new(UnlockKind.Jadebot, "Jade bot skins", "account/jadebots", "jadebots"),
-        new(UnlockKind.Skiff, "Skiff skins", "account/skiffs", "skiffs")
+        new(UnlockKind.Dye, L.T("Dyes"), "account/dyes", "colors"),
+        new(UnlockKind.Skin, L.T("Skins"), "account/skins", "skins", Browsable: false),
+        new(UnlockKind.Mini, L.T("Minis"), "account/minis", "minis"),
+        new(UnlockKind.Outfit, L.T("Outfits"), "account/outfits", "outfits"),
+        new(UnlockKind.MountSkin, L.T("Mount skins"), "account/mounts/skins", "mounts/skins"),
+        new(UnlockKind.Glider, L.T("Gliders"), "account/gliders", "gliders"),
+        new(UnlockKind.Title, L.T("Titles"), "account/titles", "titles"),
+        new(UnlockKind.Mailcarrier, L.T("Mailcarriers"), "account/mailcarriers", "mailcarriers"),
+        new(UnlockKind.Novelty, L.T("Novelties"), "account/novelties", "novelties"),
+        new(UnlockKind.Finisher, L.T("Finishers"), "account/finishers", "finishers"),
+        new(UnlockKind.Jadebot, L.T("Jade bot skins"), "account/jadebots", "jadebots"),
+        new(UnlockKind.Skiff, L.T("Skiff skins"), "account/skiffs", "skiffs")
     ];
 
     /// <summary>
@@ -178,6 +179,19 @@ public static class Unlocks
         _ => 0
     };
 
+    /// <summary>A rarity, or <see cref="Locked"/> or <see cref="Other"/>, for a heading.</summary>
+    public static string RarityName(string rarity) => rarity switch
+    {
+        "Exclusive" => L.T("Exclusive"),
+        "Rare" => L.T("Rare"),
+        "Uncommon" => L.T("Uncommon"),
+        "Common" => L.T("Common"),
+        "Starter" => L.T("Starter"),
+        Locked => L.T("Locked"),
+        Other => L.T("Other"),
+        _ => rarity
+    };
+
     /// <summary>
     /// A dye's rarity, which is the third of its three categories.
     ///
@@ -198,7 +212,7 @@ public static class Unlocks
     /// means the number and the list below it can never disagree.
     /// </summary>
     public static string Counted(IReadOnlyCollection<UnlockEntry> entries) =>
-        $"{entries.Count(entry => entry.Owned):N0} of {entries.Count:N0} unlocked";
+        L.F("{0:N0} of {1:N0} unlocked", entries.Count(entry => entry.Owned), entries.Count);
 
     /// <summary>
     /// "#8A2F2F" from three channels, or null when there are none.

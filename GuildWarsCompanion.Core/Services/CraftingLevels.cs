@@ -58,7 +58,25 @@ public static class CraftingLevels
     /// </summary>
     public static string Describe(int rating) => ToNextTier(rating) switch
     {
-        null => $"{rating} — at the cap",
-        var toGo => $"{rating} · {toGo} to the next tier"
+        null => L.F("{0} — at the cap", rating),
+        var toGo => L.F("{0} · {1} to the next tier", rating, toGo)
+    };
+
+    /// <summary>
+    /// A discipline id from the API, as the game names it in the phone's language. For display
+    /// only: the id itself is what the recipe catalogue is searched by.
+    /// </summary>
+    public static string DisciplineName(string id) => id switch
+    {
+        "Armorsmith" => L.T("Armorsmith"),
+        "Artificer" => L.T("Artificer"),
+        "Chef" => L.T("Chef"),
+        "Huntsman" => L.T("Huntsman"),
+        "Jeweler" => L.T("Jeweler"),
+        "Leatherworker" => L.T("Leatherworker"),
+        "Scribe" => L.T("Scribe"),
+        "Tailor" => L.T("Tailor"),
+        "Weaponsmith" => L.T("Weaponsmith"),
+        _ => id
     };
 }

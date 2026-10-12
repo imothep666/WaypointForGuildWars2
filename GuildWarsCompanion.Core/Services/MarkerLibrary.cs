@@ -201,7 +201,7 @@ public static class MarkerLibrary
     }
 
     private static string Describe(TargetKind kind) =>
-        kind == TargetKind.JumpingPuzzle ? "Jumping puzzle" : "Chest";
+        kind == TargetKind.JumpingPuzzle ? L.T("Jumping puzzle") : L.T("Chest");
 
     /// <summary>A name with nothing in it that would break the line it is written on.</summary>
     private static string Clean(string? name) =>

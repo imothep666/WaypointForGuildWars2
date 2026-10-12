@@ -98,7 +98,8 @@ public sealed partial class CharacterViewModel(
     /// </summary>
     public ObservableCollection<PageTab> Tabs { get; } =
     [
-        new("Overview", 0), new("Build", 1), new("Gear", 2), new("Check", 3), new("Story", 4)
+        new(L.T("Overview"), 0), new(L.T("Build"), 1), new(L.T("Gear"), 2), new(L.T("Check"), 3),
+        new(L.T("Story"), 4)
     ];
 
     public ObservableCollection<BackstoryRow> Backstory { get; } = [];
@@ -117,7 +118,7 @@ public sealed partial class CharacterViewModel(
     [ObservableProperty] private string? _storyNote;
     [ObservableProperty] private bool _storyLoaded;
 
-    protected override string DefaultEmptyMessage => "Nothing equipped.";
+    protected override string DefaultEmptyMessage => L.T("Nothing equipped.");
 
     public void ApplyQuery(IDictionary<string, object> query)
     {
@@ -142,9 +143,9 @@ public sealed partial class CharacterViewModel(
         await navigator.AlertAsync(
             tile.Name,
             string.IsNullOrWhiteSpace(tile.Description)
-                ? "The API returns no description for this skill."
+                ? L.T("The API returns no description for this skill.")
                 : tile.Description,
-            "Close");
+            L.T("Close"));
     }
 
     /// <summary>
@@ -160,8 +161,8 @@ public sealed partial class CharacterViewModel(
             tile.Name,
             tile.HasDescription
                 ? tile.Description!
-                : "The API returns no description for this trait.",
-            "Close");
+                : L.T("The API returns no description for this trait."),
+            L.T("Close"));
     }
 
     /// <summary>Switches which of the five views is on screen.</summary>
@@ -197,7 +198,7 @@ public sealed partial class CharacterViewModel(
             // everything else: the load runs detached from the tap that started it, so an
             // unexpected fault would otherwise vanish with the discarded task and leave the
             // tab blank with no explanation.
-            StoryNote = $"Could not read this character's story — {ex.GetType().Name}.";
+            StoryNote = L.F("Could not read this character's story — {0}.", ex.GetType().Name);
         }
     });
 
@@ -207,7 +208,7 @@ public sealed partial class CharacterViewModel(
     {
         if (step is null || !step.HasAccount) return;
 
-        await navigator.AlertAsync(step.Name, step.Account, "Close");
+        await navigator.AlertAsync(step.Name, step.Account, L.T("Close"));
     }
 
     /// <summary>The longer version of a backstory answer, for the same reason skills have one.</summary>
@@ -219,7 +220,7 @@ public sealed partial class CharacterViewModel(
         await navigator.AlertAsync(
             answer.Title,
             string.IsNullOrWhiteSpace(answer.Description) ? answer.Journal : answer.Description,
-            "Close");
+            L.T("Close"));
     }
 
     [RelayCommand]
@@ -241,7 +242,7 @@ public sealed partial class CharacterViewModel(
         var detail = await characters.GetCharacterAsync(CharacterName, _loadout, ct);
         if (detail is null)
         {
-            Notice = "That character is no longer on the account.";
+            Notice = L.T("That character is no longer on the account.");
             return;
         }
 

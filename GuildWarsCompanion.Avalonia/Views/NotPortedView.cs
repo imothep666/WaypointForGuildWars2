@@ -12,7 +12,7 @@ public sealed class NotPortedView : PageView
     {
         Content = new TextBlock
         {
-            Text = $"\"{name}\" is not in the Avalonia app yet. The Android app has it.",
+            Text = L.F("\"{0}\" is not in the Avalonia app yet. The Android app has it.", name),
             Classes = { "caption" },
             HorizontalAlignment = HorizontalAlignment.Center,
             Margin = new Avalonia.Thickness(24, 40)

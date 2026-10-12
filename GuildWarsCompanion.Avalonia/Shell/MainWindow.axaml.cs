@@ -77,9 +77,9 @@ public partial class MainWindow : Window
         // the middle mark leaves fullscreen, the way restore leaves maximised.
         var label = state switch
         {
-            WindowState.Maximized => "Restore",
-            WindowState.FullScreen => "Leave fullscreen",
-            _ => "Maximise"
+            WindowState.Maximized => L.T("Restore"),
+            WindowState.FullScreen => L.T("Leave fullscreen"),
+            _ => L.T("Maximise")
         };
         MaximiseMark.Data = state is WindowState.Maximized or WindowState.FullScreen ? RestoreGlyph : MaximiseGlyph;
         ToolTip.SetTip(MaximiseButton, label);

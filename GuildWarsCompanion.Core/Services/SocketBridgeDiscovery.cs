@@ -38,7 +38,7 @@ public sealed class SocketBridgeDiscovery : IBridgeDiscovery
 
         if (Lan() is not { } lan)
         {
-            Problem = "This device is on no network with a gateway, so there is nowhere to look.";
+            Problem = L.T("This device is on no network with a gateway, so there is nowhere to look.");
             return [];
         }
 
@@ -69,7 +69,7 @@ public sealed class SocketBridgeDiscovery : IBridgeDiscovery
 
             if (failures.Count == targets.Count)
             {
-                Problem = $"The probe could not be sent — {string.Join("; ", failures)}";
+                Problem = L.F("The probe could not be sent — {0}", string.Join("; ", failures));
                 return [];
             }
 
@@ -100,13 +100,13 @@ public sealed class SocketBridgeDiscovery : IBridgeDiscovery
         {
             // "Could not look" and "nothing found" are different problems, and only one of them
             // is about the network.
-            Problem = $"Could not open a socket to look with — {ex.Message}";
+            Problem = L.F("Could not open a socket to look with — {0}", ex.Message);
             return [];
         }
 
         if (found.Count == 0)
-            Problem = $"Nothing answered on {Network ?? "this network"} " +
-                      $"(tried {string.Join(", ", targets)}). Is the bridge running?";
+            Problem = L.F("Nothing answered on {0} (tried {1}). Is the bridge running?",
+                          Network ?? L.T("this network"), string.Join(", ", targets));
 
         return found.Values.ToList();
     }

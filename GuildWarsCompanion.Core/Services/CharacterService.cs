@@ -83,13 +83,14 @@ public sealed record SpecializationPanel(
 }
 
 /// <summary>One row of five skill tiles, named.</summary>
-public sealed record SkillRow(string Label, IReadOnlyList<SkillTile> Tiles, string? Note)
-{
-    /// <summary>The hint belongs on one row only, not repeated under every weapon set.</summary>
-    public bool IsUtilityRow => Label == "Utility";
-}
+/// <param name="IsUtilityRow">The hint belongs on one row only, not repeated under every weapon
+/// set. Said outright rather than read off the label, which is in the phone's language.</param>
+public sealed record SkillRow(
+    string Label, IReadOnlyList<SkillTile> Tiles, string? Note, bool IsUtilityRow = false);
 
 /// <summary>A character's PvE build: both halves of the bar, plus the trait lines.</summary>
+/// <param name="EliteName">The elite specialization's English name, for the wiki painting
+/// behind the page; see <see cref="CharacterService"/>'s EliteArtNameAsync.</param>
 public sealed record BuildView(
     IReadOnlyList<SkillRow> Rows,
     IReadOnlyList<SpecializationRow> Specializations,
@@ -182,7 +183,7 @@ public sealed record LoadoutOption(int Tab, string Label, bool IsShown, bool IsW
     /// looking at a tab you are not wearing is the whole point of having them.</summary>
     public Color EdgeColor => IsShown ? Theme.Brass : Theme.Banked;
 
-    public string Caption => IsWorn ? "in use" : string.Empty;
+    public string Caption => IsWorn ? L.T("in use") : string.Empty;
 
     public bool HasCaption => IsWorn;
 }
@@ -208,30 +209,31 @@ public sealed class CharacterService(
 
     private static readonly Dictionary<string, string> SlotNames = new()
     {
-        ["Helm"] = "Head",
-        ["Shoulders"] = "Shoulders",
-        ["Coat"] = "Chest",
-        ["Gloves"] = "Hands",
-        ["Leggings"] = "Legs",
-        ["Boots"] = "Feet",
-        ["WeaponA1"] = "Main hand",
-        ["WeaponA2"] = "Off hand",
-        ["WeaponB1"] = "Main hand (swap)",
-        ["WeaponB2"] = "Off hand (swap)",
-        ["Backpack"] = "Back",
-        ["Amulet"] = "Amulet",
-        ["Ring1"] = "Ring 1",
-        ["Ring2"] = "Ring 2",
-        ["Accessory1"] = "Accessory 1",
-        ["Accessory2"] = "Accessory 2",
-        ["HelmAquatic"] = "Breathing apparatus",
-        ["WeaponAquaticA"] = "Aquatic weapon",
-        ["WeaponAquaticB"] = "Aquatic weapon (swap)",
-        ["Sickle"] = "Harvesting sickle",
-        ["Axe"] = "Logging axe",
-        ["Pick"] = "Mining pick",
-        ["FishingRod"] = "Fishing rod",
-        ["FishingLure"] = "Fishing lure"
+        ["Helm"] = L.T("Head"),
+        ["Shoulders"] = L.T("Shoulders"),
+        // In context: elsewhere in the app "Chest" is a treasure chest.
+        ["Coat"] = L.TIn("slot", "Chest"),
+        ["Gloves"] = L.T("Hands"),
+        ["Leggings"] = L.T("Legs"),
+        ["Boots"] = L.T("Feet"),
+        ["WeaponA1"] = L.T("Main hand"),
+        ["WeaponA2"] = L.T("Off hand"),
+        ["WeaponB1"] = L.T("Main hand (swap)"),
+        ["WeaponB2"] = L.T("Off hand (swap)"),
+        ["Backpack"] = L.T("Back"),
+        ["Amulet"] = L.T("Amulet"),
+        ["Ring1"] = L.T("Ring 1"),
+        ["Ring2"] = L.T("Ring 2"),
+        ["Accessory1"] = L.T("Accessory 1"),
+        ["Accessory2"] = L.T("Accessory 2"),
+        ["HelmAquatic"] = L.T("Breathing apparatus"),
+        ["WeaponAquaticA"] = L.T("Aquatic weapon"),
+        ["WeaponAquaticB"] = L.T("Aquatic weapon (swap)"),
+        ["Sickle"] = L.T("Harvesting sickle"),
+        ["Axe"] = L.T("Logging axe"),
+        ["Pick"] = L.T("Mining pick"),
+        ["FishingRod"] = L.T("Fishing rod"),
+        ["FishingLure"] = L.T("Fishing lure")
     };
 
     /// <summary>The roster from the last fetch, so the detail page needs no second request.</summary>
@@ -376,7 +378,7 @@ public sealed class CharacterService(
             .ThenBy(e => e.Slot)
             .Select(e => new EquipmentRow(
                 SlotNames.GetValueOrDefault(e.Slot!, e.Slot!),
-                items.GetValueOrDefault(e.Id)?.Name ?? $"Item {e.Id}",
+                items.GetValueOrDefault(e.Id)?.Name ?? L.F("Item {0}", e.Id),
                 items.GetValueOrDefault(e.Id)?.Rarity,
                 items.GetValueOrDefault(e.Id)?.Icon,
                 e.Id))
@@ -430,7 +432,7 @@ public sealed class CharacterService(
             character.Created.ToString("d MMM yyyy"),
             await ReadHeroChallengesAsync(character.Name, ct),
             character.Level >= MaxLevel && mastery is not null
-                ? "Mastery points are account-wide, not per character."
+                ? L.T("Mastery points are account-wide, not per character.")
                 : null,
             equipment,
             Loadouts.EmptyNotice(equipment.Count, options.Count),
@@ -488,7 +490,7 @@ public sealed class CharacterService(
         EquipmentTab? tab, CancellationToken ct)
     {
         if (!Loadouts.HasPvpGear(tab?.Pvp))
-            return ([], "No PvP gear set on this template.");
+            return ([], L.T("No PvP gear set on this template."));
 
         var pvp = tab!.Pvp!;
         var rows = new List<EquipmentRow>();
@@ -499,11 +501,11 @@ public sealed class CharacterService(
             {
                 var amulet = (await client.GetAmuletsAsync([amuletId], ct)).FirstOrDefault();
                 rows.Add(new EquipmentRow(
-                    "Amulet", amulet?.Name ?? $"Amulet {amuletId}", null, amulet?.Icon));
+                    L.T("Amulet"), amulet?.Name ?? L.F("Amulet {0}", amuletId), null, amulet?.Icon));
             }
             catch (Gw2ApiException)
             {
-                rows.Add(new EquipmentRow("Amulet", $"Amulet {amuletId}", null, null));
+                rows.Add(new EquipmentRow(L.T("Amulet"), L.F("Amulet {0}", amuletId), null, null));
             }
         }
 
@@ -520,13 +522,13 @@ public sealed class CharacterService(
         EquipmentRow Row(string slot, int id)
         {
             var item = items.GetValueOrDefault(id);
-            return new EquipmentRow(slot, item?.Name ?? $"Item {id}", item?.Rarity, item?.Icon, id);
+            return new EquipmentRow(slot, item?.Name ?? L.F("Item {0}", id), item?.Rarity, item?.Icon, id);
         }
 
-        if (pvp.Rune is { } runeId) rows.Add(Row("Rune", runeId));
+        if (pvp.Rune is { } runeId) rows.Add(Row(L.T("Rune"), runeId));
 
         var sigils = (pvp.Sigils ?? []).Where(sigil => sigil is not null).Select(s => s!.Value);
-        rows.AddRange(sigils.Select((id, index) => Row($"Sigil {index + 1}", id)));
+        rows.AddRange(sigils.Select((id, index) => Row(L.F("Sigil {0}", index + 1), id)));
 
         return (rows, null);
     }
@@ -609,11 +611,12 @@ public sealed class CharacterService(
             .ToList();
 
         rows.Add(new SkillRow(
-            "Utility",
+            L.T("Utility"),
             utilityIds
                 .Select((id, i) => Tile(i == 0 ? "Heal" : i == 4 ? "Elite" : $"Utility {i}", id, skills))
                 .ToList(),
-            legend is not null && bar?.Heal is null ? "From the equipped legend." : null));
+            legend is not null && bar?.Heal is null ? L.T("From the equipped legend.") : null,
+            IsUtilityRow: true));
 
         var (lines, grid) = await SpecializationsAsync(choices, character.Name, ct);
 
@@ -621,9 +624,34 @@ public sealed class CharacterService(
             rows,
             lines,
             grid,
-            lines.FirstOrDefault(l => l.IsElite)?.Name,
+            await EliteArtNameAsync(grid.FirstOrDefault(panel => panel.IsElite), ct),
             lines.Count == 0 ? await DiagnoseAsync(ct) : null,
             string.IsNullOrWhiteSpace(build?.Name) ? null : build.Name);
+    }
+
+    /// <summary>English names of elite specializations already asked for, by id.</summary>
+    private readonly Dictionary<int, string?> _eliteArtNames = [];
+
+    /// <summary>
+    /// The elite specialization as the wiki names it, for the painting behind the page. The
+    /// name the page shows is the API's, in the phone's language; the wiki's files are English.
+    /// Null when there is no elite, or no connection to ask with; the page then shows the
+    /// profession's painting instead, as it does for a core build.
+    /// </summary>
+    private async Task<string?> EliteArtNameAsync(SpecializationPanel? elite, CancellationToken ct)
+    {
+        if (elite is null) return null;
+        if (client.Language == Gw2Language.English) return elite.Name;
+        if (_eliteArtNames.TryGetValue(elite.Id, out var known)) return known;
+
+        try
+        {
+            return _eliteArtNames[elite.Id] = await client.GetEnglishSpecializationNameAsync(elite.Id, ct);
+        }
+        catch (Gw2ApiException)
+        {
+            return null;
+        }
     }
 
     /// <summary>
@@ -704,7 +732,7 @@ public sealed class CharacterService(
 
         return new TraitTile(
             id,
-            trait?.Name ?? $"Trait {id}",
+            trait?.Name ?? L.F("Trait {0}", id),
             trait?.Icon,
             Prose.Clean(trait?.Description),
             chosen.Contains(id),
@@ -726,8 +754,8 @@ public sealed class CharacterService(
 
         var pairs = new[]
         {
-            (Label: "Weapon", Main: worn.GetValueOrDefault("WeaponA1"), Off: worn.GetValueOrDefault("WeaponA2")),
-            (Label: "Weapon swap", Main: worn.GetValueOrDefault("WeaponB1"), Off: worn.GetValueOrDefault("WeaponB2"))
+            (Label: L.T("Weapon"), Main: worn.GetValueOrDefault("WeaponA1"), Off: worn.GetValueOrDefault("WeaponA2")),
+            (Label: L.T("Weapon swap"), Main: worn.GetValueOrDefault("WeaponB1"), Off: worn.GetValueOrDefault("WeaponB2"))
         }.Where(p => p.Main != 0 || p.Off != 0).ToList();
 
         if (pairs.Count == 0) return [];
@@ -786,7 +814,7 @@ public sealed class CharacterService(
                 ids.Add(candidates.Count > 0 ? candidates[0].Id : null);
             }
 
-            var note = attunement is not null ? $"{attunement} attunement" : null;
+            var note = attunement is not null ? L.F("{0} attunement", AttunementName(attunement)) : null;
             if (ids.Any(id => id is not null))
                 sets.Add(new WeaponSet(pair.Label, ids, note));
         }
@@ -807,7 +835,7 @@ public sealed class CharacterService(
             var first = document.RootElement[0];
 
             if (!first.TryGetProperty("build_tabs", out var tabs) || tabs.GetArrayLength() == 0)
-                return "No build tabs returned. The API key needs the 'builds' permission.";
+                return L.T("No build tabs returned. The API key needs the 'builds' permission.");
 
 #if DEBUG
             var tabKeys = string.Join(", ", tabs[0].EnumerateObject().Select(x => x.Name));
@@ -817,12 +845,12 @@ public sealed class CharacterService(
 
             return $"Unexpected build format. tab: {tabKeys} | build: {buildKeys}";
 #else
-            return "The build came back in a format this version does not understand.";
+            return L.T("The build came back in a format this version does not understand.");
 #endif
         }
         catch (Exception ex)
         {
-            return "Could not read the build: " + ex.GetType().Name;
+            return L.F("Could not read the build: {0}", ex.GetType().Name);
         }
     }
 
@@ -871,8 +899,8 @@ public sealed class CharacterService(
         var others = statIds.Count - majority.Count();
 
         return others == 0
-            ? $"All {majority.Count()} stat-bearing pieces are {majority.Key}."
-            : $"{majority.Count()} of {statIds.Count} pieces are {majority.Key}; {others} differ.";
+            ? L.F("All {0} stat-bearing pieces are {1}.", majority.Count(), majority.Key)
+            : L.F("{0} of {1} pieces are {2}; {3} differ.", majority.Count(), statIds.Count, majority.Key, others);
     }
 
     /// <summary>
@@ -902,7 +930,7 @@ public sealed class CharacterService(
     private static SkillTile Tile(string slot, int? id, Dictionary<int, Skill> skills)
     {
         var skill = id is { } value ? skills.GetValueOrDefault(value) : null;
-        return new SkillTile(slot, skill?.Name ?? "empty", skill?.Icon, Prose.Clean(skill?.Description));
+        return new SkillTile(slot, skill?.Name ?? L.T("empty"), skill?.Icon, Prose.Clean(skill?.Description));
     }
 
     /// <summary>
@@ -910,16 +938,70 @@ public sealed class CharacterService(
     /// mastery points take its place — with the caveat that they are account-wide, which the
     /// detail screen spells out.
     /// </summary>
+    /// <remarks>
+    /// Gender, race and profession are the API's English ids, so they are named here in the
+    /// phone's language. Each shape is one sentence rather than a "who" glued to a level,
+    /// because German puts the profession first and the rest after it.
+    /// </remarks>
     private static string Describe(Character c, int? masteryPoints)
     {
-        var who = string.IsNullOrEmpty(c.Gender)
-            ? $"{c.Race} {c.Profession}"
-            : $"{c.Gender} {c.Race} {c.Profession}";
+        var race = RaceName(c.Race);
+        var profession = ProfessionName(c.Profession);
+        var mastery = c.Level >= MaxLevel && masteryPoints is not null;
 
-        return c.Level >= MaxLevel && masteryPoints is not null
-            ? $"{who} · {masteryPoints:N0} mastery points"
-            : $"Level {c.Level} {who}";
+        if (string.IsNullOrEmpty(c.Gender))
+            return mastery
+                ? L.F("{0} {1} · {2:N0} mastery points", race, profession, masteryPoints)
+                : L.F("Level {0} {1} {2}", c.Level, race, profession);
+
+        var gender = GenderName(c.Gender);
+
+        return mastery
+            ? L.F("{0} {1} {2} · {3:N0} mastery points", gender, race, profession, masteryPoints)
+            : L.F("Level {0} {1} {2} {3}", c.Level, gender, race, profession);
     }
+
+    /// <summary>A profession id from the API, as the game names it in the phone's language.</summary>
+    public static string ProfessionName(string id) => id switch
+    {
+        "Guardian" => L.T("Guardian"),
+        "Warrior" => L.T("Warrior"),
+        "Engineer" => L.T("Engineer"),
+        "Ranger" => L.T("Ranger"),
+        "Thief" => L.T("Thief"),
+        "Elementalist" => L.T("Elementalist"),
+        "Mesmer" => L.T("Mesmer"),
+        "Necromancer" => L.T("Necromancer"),
+        "Revenant" => L.T("Revenant"),
+        _ => id
+    };
+
+    private static string RaceName(string id) => id switch
+    {
+        "Asura" => L.T("Asura"),
+        "Charr" => L.T("Charr"),
+        "Human" => L.T("Human"),
+        "Norn" => L.T("Norn"),
+        "Sylvari" => L.T("Sylvari"),
+        _ => id
+    };
+
+    private static string GenderName(string id) => id switch
+    {
+        "Male" => L.T("Male"),
+        "Female" => L.T("Female"),
+        _ => id
+    };
+
+    /// <summary>An elementalist attunement id, named for the line under the weapon skills.</summary>
+    private static string AttunementName(string id) => id switch
+    {
+        "Fire" => L.T("Fire"),
+        "Water" => L.T("Water"),
+        "Air" => L.T("Air"),
+        "Earth" => L.T("Earth"),
+        _ => id
+    };
 
     private const int MaxLevel = 80;
 
@@ -965,8 +1047,8 @@ public sealed class CharacterService(
     {
         var hours = seconds / 3600d;
         return hours >= 1000
-            ? $"{hours / 24:N0} d"
-            : $"{hours:N0} h";
+            ? L.F("{0:N0} d", hours / 24)
+            : L.F("{0:N0} h", hours);
     }
 
 }

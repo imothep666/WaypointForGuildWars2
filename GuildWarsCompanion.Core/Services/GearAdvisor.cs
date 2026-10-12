@@ -61,7 +61,7 @@ public sealed class GearAdvisor(Gw2Client client)
             if (shortfall > 0)
                 wanted.Add((
                     majorityRune.Key,
-                    details.GetValueOrDefault(majorityRune.Key)?.Name ?? $"item {majorityRune.Key}",
+                    details.GetValueOrDefault(majorityRune.Key)?.Name ?? L.F("item {0}", majorityRune.Key),
                     shortfall));
         }
 
@@ -93,17 +93,17 @@ public sealed class GearAdvisor(Gw2Client client)
             if (shortfall > 0)
                 wanted.Add((
                     majoritySigil.Key,
-                    details.GetValueOrDefault(majoritySigil.Key)?.Name ?? $"item {majoritySigil.Key}",
+                    details.GetValueOrDefault(majoritySigil.Key)?.Name ?? L.F("item {0}", majoritySigil.Key),
                     shortfall));
         }
 
-        const string caveat =
+        var caveat = L.T(
             "Only what your own gear already determines. Nothing here suggests which rune or " +
-            "sigil a build should run — the API has no view on that.";
+            "sigil a build should run — the API has no view on that.");
 
         if (wanted.Count == 0)
             return new ShoppingList([], null,
-                "Nothing to complete from what you are already wearing.", caveat);
+                L.T("Nothing to complete from what you are already wearing."), caveat);
 
         var prices = (await client.GetPricesAsync(wanted.Select(w => w.ItemId), ct))
             .ToDictionary(p => p.Id);
@@ -117,7 +117,7 @@ public sealed class GearAdvisor(Gw2Client client)
             var ask = prices.GetValueOrDefault(itemId)?.Sells?.UnitPrice;
             if (ask is null or 0)
             {
-                rows.Add(new ShoppingRow(name, $"×{quantity}", "not traded", string.Empty));
+                rows.Add(new ShoppingRow(name, $"×{quantity}", L.T("not traded"), string.Empty));
                 continue;
             }
 

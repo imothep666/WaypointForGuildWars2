@@ -34,17 +34,20 @@ public sealed record TodayRow(
     /// leaves a shorter list and no way to tell anything is missing.
     /// </summary>
     public string? Caption => Unread
-        ? "Could not be read just now — pull down to try again."
+        ? L.T("Could not be read just now — pull down to try again.")
         : IsStale
-            ? "Last cycle — the vault only updates once you log into the game."
+            ? L.T("Last cycle — the vault only updates once you log into the game.")
             : Remaining;
 }
 
 /// <summary>Daily and weekly, kept apart: they expire on different clocks.</summary>
-public sealed class TodaySection(string name, string summary, IEnumerable<TodayRow> rows)
+/// <param name="key">What code knows the section by, since <paramref name="name"/> is in the
+/// phone's language; the name itself when not given.</param>
+public sealed class TodaySection(string name, string summary, IEnumerable<TodayRow> rows, string? key = null)
     : List<TodayRow>(rows)
 {
     public string Name { get; } = name;
+    public string Key { get; } = key ?? name;
     public string Summary { get; } = summary;
 }
 
@@ -66,12 +69,12 @@ public static class TodaySummary
         var outstanding = readable.Count(r => !r.IsComplete);
 
         var summary = readable.Count == 0
-            ? "Nothing could be read"
+            ? L.T("Nothing could be read")
             : outstanding == 0
-                ? "All clear"
-                : $"{outstanding} of {readable.Count} unfinished";
+                ? L.T("All clear")
+                : L.F("{0} of {1} unfinished", outstanding, readable.Count);
 
-        return unread == 0 ? summary : $"{summary} · {unread} unread";
+        return unread == 0 ? summary : L.F("{0} · {1} unread", summary, unread);
     }
 
     /// <summary>Rows worth showing: anything with a target, plus anything that failed to load.</summary>

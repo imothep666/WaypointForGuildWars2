@@ -25,7 +25,7 @@ namespace GuildWarsCompanion.ViewModels;
 public sealed partial class MapViewModel(
     GameStream stream, CompassTargets targets, Gw2Client api, Gw2Cache cache, Gw2Tiles tiles,
     MapIcons icons, Objective objective, Journal journal, MarkerStore markers, TrailShare trails,
-    IRouteChoiceStore choices,
+    IRouteChoiceStore choices, MapCatalogue catalogue,
     INavigator navigator, IMainThread mainThread) : BaseViewModel, IMapScene
 {
     /// <summary>
@@ -332,9 +332,9 @@ public sealed partial class MapViewModel(
         double x, double y, double screenWidth, double screenHeight) =>
         QuarterTurn.FromScreen(Quarter, x, y, screenWidth, screenHeight);
 
-    [ObservableProperty] private string _mapLine = "Waiting for the bridge…";
+    [ObservableProperty] private string _mapLine = L.T("Waiting for the bridge…");
 
-    [ObservableProperty] private string _objectiveLine = "No objective chosen";
+    [ObservableProperty] private string _objectiveLine = L.T("No objective chosen");
 
     /// <summary>
     /// How far the objective is and which way, in the words a map wants.
@@ -374,8 +374,10 @@ public sealed partial class MapViewModel(
     /// <summary>True while a map is being shown because somebody picked it.</summary>
     [ObservableProperty] private bool _isPinned;
 
-    /// <summary>The name of the map on screen, picked or stood in, once it has loaded; its
-    /// loading screen goes in the band above it. Null before any map has.</summary>
+    /// <summary>The English name of the map on screen, picked or stood in, once it has loaded;
+    /// its loading screen goes in the band above it, and the wiki files those under English
+    /// names whatever language the phone is in. Null before any map has, or when the English
+    /// name cannot be had.</summary>
     [ObservableProperty] private string? _shownMap;
 
     /// <summary>
@@ -424,7 +426,7 @@ public sealed partial class MapViewModel(
         IsPinned = false;
         _following = true;
 
-        if (!IsLive) MapLine = "Waiting for the bridge…";
+        if (!IsLive) MapLine = L.T("Waiting for the bridge…");
 
         Changed?.Invoke();
     }
@@ -819,6 +821,15 @@ public sealed partial class MapViewModel(
         }
     });
 
+    /// <summary>The name the map's loading screen is filed under, unless another map has been
+    /// opened while it was being found.</summary>
+    private async Task NameForArtAsync(MapInfo map)
+    {
+        var english = await catalogue.EnglishNameAsync(map);
+
+        if (_map == map) ShownMap = english;
+    }
+
     /// <summary>Everything one map needs, in the order it can be asked for.</summary>
     private async Task OpenAsync(int mapId, CancellationToken ct)
     {
@@ -827,7 +838,10 @@ public sealed partial class MapViewModel(
         var map = await targets.InfoAsync(mapId, ct);
 
         _map = map;
-        ShownMap = map.Name;
+
+        // Not awaited: on a phone in another language the first map can cost a request for every
+        // map's English name, and the map itself should not wait on its painting.
+        _ = NameForArtAsync(map);
 
         ContinentId = map.ContinentId;
         Floor = map.DefaultFloor;
@@ -864,8 +878,8 @@ public sealed partial class MapViewModel(
         catch (Gw2ApiException ex)
             when (ex.Kind is Gw2ErrorKind.Network or Gw2ErrorKind.ServiceUnavailable)
         {
-            Notice = $"Nothing stored for {map.Name} yet, and no connection to fetch it. " +
-                     "Maps opened once with a connection stay available offline.";
+            Notice = L.F("Nothing stored for {0} yet, and no connection to fetch it. " +
+                         "Maps opened once with a connection stay available offline.", map.Name);
         }
 
         // Whatever the downloaded packs have for this map. Local work on files already read —
@@ -988,7 +1002,7 @@ public sealed partial class MapViewModel(
 
     private void NameObjective()
     {
-        ObjectiveLine = objective.Chosen is { } chosen ? chosen.Name : "No objective chosen";
+        ObjectiveLine = objective.Chosen is { } chosen ? chosen.Name : L.T("No objective chosen");
 
         OnPropertyChanged(nameof(HasObjective));
 
@@ -1054,7 +1068,7 @@ public sealed partial class MapViewModel(
         // measuring to it from somewhere it is not.
         if (chosen.MapId != _loadedMap)
         {
-            Set($"on {chosen.MapName}", _hopLine);
+            Set(L.FIn("map", "on {0}", chosen.MapName), _hopLine);
 
             return;
         }
@@ -1079,16 +1093,16 @@ public sealed partial class MapViewModel(
 
             var height = TrailGuide.Height(leg.Climb);
             var trail = leg.IsOnTrail
-                ? $"{leg.Along:0} along the trail"
-                : $"{leg.OffTrail:0} to the trail, then {leg.Along:0} along it";
+                ? L.F("{0:0} along the trail", leg.Along)
+                : L.F("{0:0} to the trail, then {1:0} along it", leg.OffTrail, leg.Along);
 
             Set(height.Length > 0 ? $"{trail} · {height}" : trail,
-                port.Length > 0 ? port : $"following {guide.Route.Name}");
+                port.Length > 0 ? port : L.F("following {0}", guide.Route.Name));
 
             return;
         }
 
-        Set($"{away:0} away · {way}", _hop?.BeatsWalking(away) == true ? _hopLine : string.Empty);
+        Set(L.F("{0:0} away · {1}", away, way), _hop?.BeatsWalking(away) == true ? _hopLine : string.Empty);
     }
 
     private void Set(string detail, string route)
@@ -1099,5 +1113,5 @@ public sealed partial class MapViewModel(
     }
 
     protected override string DefaultEmptyMessage =>
-        "No game to follow. Tap CHOOSE MAP to look at any map by name.";
+        L.T("No game to follow. Tap CHOOSE MAP to look at any map by name.");
 }

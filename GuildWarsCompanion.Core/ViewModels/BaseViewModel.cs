@@ -32,9 +32,9 @@ public abstract partial class BaseViewModel : ObservableObject
     /// the data, that reason IS the empty state rather than a second line above it. While the
     /// data is on its way it says so, rather than inviting a pull that is already happening.
     /// </summary>
-    public string EmptyMessage => Notice ?? (IsBusy ? "Loading…" : DefaultEmptyMessage);
+    public string EmptyMessage => Notice ?? (IsBusy ? L.T("Loading…") : DefaultEmptyMessage);
 
-    protected virtual string DefaultEmptyMessage => "Pull down to refresh.";
+    protected virtual string DefaultEmptyMessage => L.T("Pull down to refresh.");
 
     /// <summary>
     /// Runs one unit of work, cancelling whatever the screen was doing before. Errors land
@@ -96,12 +96,12 @@ public abstract partial class BaseViewModel : ObservableObject
     /// </summary>
     protected static string Describe(Gw2ApiException ex) => ex.Kind switch
     {
-        Gw2ErrorKind.Network => "No connection to the Guild Wars 2 API. Pull to retry.",
-        Gw2ErrorKind.InvalidKey => "Your API key was rejected. Add a new one under Settings.",
-        Gw2ErrorKind.MissingScope => "Your API key is missing a permission this screen needs.",
-        Gw2ErrorKind.RateLimited => "Too many requests. Wait a moment before refreshing again.",
+        Gw2ErrorKind.Network => L.T("No connection to the Guild Wars 2 API. Pull to retry."),
+        Gw2ErrorKind.InvalidKey => L.T("Your API key was rejected. Add a new one under Settings."),
+        Gw2ErrorKind.MissingScope => L.T("Your API key is missing a permission this screen needs."),
+        Gw2ErrorKind.RateLimited => L.T("Too many requests. Wait a moment before refreshing again."),
         Gw2ErrorKind.BadRequest => ex.Message,
-        Gw2ErrorKind.ServiceUnavailable => "ArenaNet's API is down right now — usually brief, often during a patch.",
+        Gw2ErrorKind.ServiceUnavailable => L.T("ArenaNet's API is down right now — usually brief, often during a patch."),
         _ => ex.Message
     };
 }

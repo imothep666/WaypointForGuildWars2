@@ -42,6 +42,9 @@ public sealed class StorageService(Gw2Client client, ItemLookup items, OfflineRe
 {
     private List<Holding>? _holdings;
     private Dictionary<int, Item> _items = [];
+
+    /// <summary>The same items' English names, so a name typed from a guide finds them too.</summary>
+    private Dictionary<int, string> _english = [];
     private Dictionary<int, long> _unitValue = [];
     private List<string> _unavailable = [];
 
@@ -65,6 +68,7 @@ public sealed class StorageService(Gw2Client client, ItemLookup items, OfflineRe
 
         var ids = _holdings.Select(h => h.ItemId).Distinct().ToList();
         _items = await items.ResolveAsync(ids, ct);
+        _english = await items.EnglishNamesAsync(ids, ct);
         _unitValue = await ValueAsync(ids, ct);
         _priced = _unitValue.Count > 0;
     }
@@ -95,7 +99,7 @@ public sealed class StorageService(Gw2Client client, ItemLookup items, OfflineRe
         var holdings = new List<Holding>();
         var unavailable = new List<string>();
 
-        await ReadAsync("material storage", unavailable, async () =>
+        await ReadAsync(L.TIn("unreadable", "material storage"), unavailable, async () =>
         {
             foreach (var material in (await offline.ReadAsync(
                          "account/materials", Gw2JsonContext.Default.ListAccountMaterial,
@@ -103,7 +107,7 @@ public sealed class StorageService(Gw2Client client, ItemLookup items, OfflineRe
                 holdings.Add(new Holding(StoragePlace.Materials, string.Empty, material.Id, material.Count));
         });
 
-        await ReadAsync("the bank", unavailable, async () =>
+        await ReadAsync(L.T("the bank"), unavailable, async () =>
         {
             foreach (var slot in (await offline.ReadAsync(
                          "account/bank", Gw2JsonContext.Default.ListStorageSlot,
@@ -112,7 +116,7 @@ public sealed class StorageService(Gw2Client client, ItemLookup items, OfflineRe
                     holdings.Add(new Holding(StoragePlace.Bank, string.Empty, slot.Id, slot.Count));
         });
 
-        await ReadAsync("shared slots", unavailable, async () =>
+        await ReadAsync(L.TIn("unreadable", "shared slots"), unavailable, async () =>
         {
             foreach (var slot in (await offline.ReadAsync(
                          "account/inventory", Gw2JsonContext.Default.ListStorageSlot,
@@ -121,7 +125,7 @@ public sealed class StorageService(Gw2Client client, ItemLookup items, OfflineRe
                     holdings.Add(new Holding(StoragePlace.Shared, string.Empty, slot.Id, slot.Count));
         });
 
-        await ReadAsync("your characters", unavailable, async () =>
+        await ReadAsync(L.T("your characters"), unavailable, async () =>
         {
             foreach (var character in (await offline.ReadAsync(
                          "characters", Gw2JsonContext.Default.ListCharacter,
@@ -187,7 +191,7 @@ public sealed class StorageService(Gw2Client client, ItemLookup items, OfflineRe
     /// Items you own whose name contains <paramref name="term"/>, best match first.
     ///
     /// Matched against the resolved names of things actually held, so "none" means none —
-    /// not "none that the app has seen before".
+    /// not "none that the app has seen before" — and against their English names as well.
     /// </summary>
     public IReadOnlyList<FoundItem> Find(string term, int limit = 40)
     {
@@ -195,14 +199,17 @@ public sealed class StorageService(Gw2Client client, ItemLookup items, OfflineRe
 
         var needle = term.Trim();
 
+        bool Has(string? name) => name?.Contains(needle, StringComparison.OrdinalIgnoreCase) == true;
+        bool Starts(string? name) => name?.StartsWith(needle, StringComparison.OrdinalIgnoreCase) == true;
+
         return _holdings
             .GroupBy(h => h.ItemId)
-            .Select(group => (group, name: _items.GetValueOrDefault(group.Key)?.Name))
-            .Where(x => x.name is not null &&
-                        x.name.Contains(needle, StringComparison.OrdinalIgnoreCase))
+            .Select(group => (group, name: _items.GetValueOrDefault(group.Key)?.Name,
+                english: _english.GetValueOrDefault(group.Key)))
+            .Where(x => x.name is not null && (Has(x.name) || Has(x.english)))
             // A name that starts with the term is the likelier target than one that merely
             // contains it, and a shorter name is likelier than a longer one.
-            .OrderBy(x => x.name!.StartsWith(needle, StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+            .OrderBy(x => Starts(x.name) || Starts(x.english) ? 0 : 1)
             .ThenBy(x => x.name!.Length)
             .ThenBy(x => x.name, StringComparer.OrdinalIgnoreCase)
             .Take(limit)
@@ -218,7 +225,7 @@ public sealed class StorageService(Gw2Client client, ItemLookup items, OfflineRe
 
         return new FoundItem(
             itemId,
-            item?.Name ?? $"Item {itemId}",
+            item?.Name ?? L.F("Item {0}", itemId),
             item?.Icon,
             item?.Rarity,
             total,
@@ -253,7 +260,7 @@ public sealed class StorageService(Gw2Client client, ItemLookup items, OfflineRe
 
                 return (group.Key.Place, Total: new PlaceTotal(
                     StorageTally.PlaceHeading(group.Key.Place, group.Key.Where),
-                    $"{count:N0} {(count == 1 ? "item" : "items")}",
+                    count == 1 ? L.F("{0:N0} item", count) : L.F("{0:N0} items", count),
                     value > 0 ? Coin.Format(value) : string.Empty,
                     value));
             })
@@ -268,15 +275,15 @@ public sealed class StorageService(Gw2Client client, ItemLookup items, OfflineRe
             return new StorageOverview(
                 places,
                 string.Empty,
-                "Values need a connection — this is what you are holding, not what it is worth.",
+                L.T("Values need a connection — this is what you are holding, not what it is worth."),
                 places.Count > 0);
 
-        var note = "Sell-order value of everything tradable, after the 15% trading post fee.";
+        var note = L.T("Sell-order value of everything tradable, after the 15% trading post fee.");
         if (untradable > 0)
-            note += $" {untradable:N0} stacks are account-bound and have no market value.";
+            note += " " + L.F("{0:N0} stacks are account-bound and have no market value.", untradable);
         if (_unavailable.Count > 0)
-            note += $" Could not read {string.Join(", ", _unavailable)} — your API key is " +
-                    "missing a permission.";
+            note += " " + L.F("Could not read {0} — your API key is missing a permission.",
+                string.Join(", ", _unavailable));
 
         return new StorageOverview(
             places, Coin.Format(grand), note, places.Count > 0, grand, Priced: true);

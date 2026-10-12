@@ -17,7 +17,7 @@ public static class Stale
     /// days do not.
     /// </summary>
     public static string Describe(string what, DateTimeOffset fetchedAt, DateTimeOffset now) =>
-        $"No connection — showing {what} from {Age(fetchedAt, now)}.";
+        L.F("No connection — showing {0} from {1}.", what, Age(fetchedAt, now));
 
     /// <summary>
     /// How long ago, in words. Clock skew and a snapshot written a moment ago both land on
@@ -29,12 +29,12 @@ public static class Stale
 
         return elapsed.TotalMinutes switch
         {
-            < 2 => "just now",
-            < 60 => $"{(int)elapsed.TotalMinutes} minutes ago",
-            < 120 => "an hour ago",
-            < 1440 => $"{(int)elapsed.TotalHours} hours ago",
-            < 2880 => "yesterday",
-            _ => $"{(int)elapsed.TotalDays} days ago"
+            < 2 => L.T("just now"),
+            < 60 => L.F("{0} minutes ago", (int)elapsed.TotalMinutes),
+            < 120 => L.T("an hour ago"),
+            < 1440 => L.F("{0} hours ago", (int)elapsed.TotalHours),
+            < 2880 => L.T("yesterday"),
+            _ => L.F("{0} days ago", (int)elapsed.TotalDays)
         };
     }
 }

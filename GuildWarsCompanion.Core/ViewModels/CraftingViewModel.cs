@@ -33,7 +33,7 @@ public sealed partial class CraftingViewModel(CraftingService crafting, ApiKeySe
     /// </summary>
     public bool CanReadStorage => MakeableSummary is null && !IsReadingStorage;
 
-    protected override string DefaultEmptyMessage => "Pull down to read your disciplines.";
+    protected override string DefaultEmptyMessage => L.T("Pull down to read your disciplines.");
 
     [RelayCommand]
     public Task RefreshAsync() => RunAsync(async ct =>
@@ -42,13 +42,13 @@ public sealed partial class CraftingViewModel(CraftingService crafting, ApiKeySe
 
         if (!session.IsAuthenticated)
         {
-            Notice = "Add your API key under Settings to see your crafting.";
+            Notice = L.T("Add your API key under Settings to see your crafting.");
             return;
         }
 
         if (!session.HasPermission(Gw2Permissions.Characters))
         {
-            Notice = "This key has no 'characters' permission. Create a new key that includes it.";
+            Notice = L.T("This key has no 'characters' permission. Create a new key that includes it.");
             return;
         }
 

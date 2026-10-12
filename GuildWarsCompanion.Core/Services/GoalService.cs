@@ -102,7 +102,7 @@ public sealed class GoalService(GoalStore store, Gw2Cache cache, StorageService 
 
         if (count.IsReady)
         {
-            parts.Add("Everything is in hand");
+            parts.Add(L.T("Everything is in hand"));
         }
         else
         {
@@ -110,19 +110,19 @@ public sealed class GoalService(GoalStore store, Gw2Cache cache, StorageService 
             var names = await items.ResolveAsync(shown.Select(need => need.ItemId).ToList(), ct);
 
             var named = string.Join(", ", shown.Select(need =>
-                $"{need.Count:N0} {names.GetValueOrDefault(need.ItemId)?.Name ?? $"item {need.ItemId}"}"));
+                $"{need.Count:N0} {names.GetValueOrDefault(need.ItemId)?.Name ?? L.F("item {0}", need.ItemId)}"));
 
             parts.Add(count.Short.Count > shown.Count
-                ? $"Short {named} and {count.Short.Count - shown.Count} more"
-                : $"Short {named}");
+                ? L.F("Short {0} and {1} more", named, count.Short.Count - shown.Count)
+                : L.F("Short {0}", named));
 
             parts.Add(await PriceAsync(count.Short, ct));
         }
 
         // What the count could not see, said rather than left to look complete.
-        if (!catalogue) parts.Add("download the item catalogue to count its recipe");
-        if (count.Truncated) parts.Add("stopped six levels down");
-        if (unreadable.Count > 0) parts.Add($"not counted: {string.Join(", ", unreadable)}");
+        if (!catalogue) parts.Add(L.T("download the item catalogue to count its recipe"));
+        if (count.Truncated) parts.Add(L.T("stopped six levels down"));
+        if (unreadable.Count > 0) parts.Add(L.F("not counted: {0}", string.Join(", ", unreadable)));
 
         return string.Join(" · ", parts);
     }
@@ -144,7 +144,7 @@ public sealed class GoalService(GoalStore store, Gw2Cache cache, StorageService 
         }
         catch (Gw2ApiException ex) when (ex.Kind is Gw2ErrorKind.Network or Gw2ErrorKind.ServiceUnavailable)
         {
-            return "prices need a connection";
+            return L.T("prices need a connection");
         }
         catch (Gw2ApiException)
         {

@@ -32,15 +32,17 @@ public static class GemExchange
     /// "7g 79s 70c buys 18 gems" — the trade as the exchange priced it.
     /// </summary>
     public static string Buys(long copper, int gems) =>
-        $"{Coin.Format(copper)} buys {gems:N0} gem{(gems == 1 ? string.Empty : "s")}";
+        gems == 1
+            ? L.F("{0} buys {1:N0} gem", Coin.Format(copper), gems)
+            : L.F("{0} buys {1:N0} gems", Coin.Format(copper), gems);
 
     /// <summary>
     /// What those same gems fetch on the way back, and what fraction of the original that is.
     /// </summary>
     public static string SellsBack(int gems, long copper, string? roundTrip) =>
         roundTrip is null
-            ? $"{gems:N0} gems sell for {Coin.Format(copper)}"
-            : $"{gems:N0} gems sell back for {Coin.Format(copper)} — {roundTrip} of what went in";
+            ? L.F("{0:N0} gems sell for {1}", gems, Coin.Format(copper))
+            : L.F("{0:N0} gems sell back for {1} — {2} of what went in", gems, Coin.Format(copper), roundTrip);
 
     /// <summary>
     /// Whether a quote is an answer at all. A trade too small to make comes back as a message
@@ -55,6 +57,6 @@ public static class GemExchange
     /// </summary>
     public static string TooSmall(string? text) =>
         string.IsNullOrWhiteSpace(text)
-            ? "Not enough coin to convert."
-            : char.ToUpperInvariant(text[0]) + text[1..] + " to convert.";
+            ? L.T("Not enough coin to convert.")
+            : L.F("{0} to convert.", char.ToUpperInvariant(text[0]) + text[1..]);
 }

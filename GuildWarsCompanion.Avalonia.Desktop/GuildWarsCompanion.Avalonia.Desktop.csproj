@@ -47,4 +47,8 @@
         <PackageReference Include="Velopack" Version="1.2.161" />
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- L.T and L.F, the app's own words in the phone's language; everywhere, like string. -->
+        <Using Include="GuildWarsCompanion.Localization" />
+    </ItemGroup>
 </Project>

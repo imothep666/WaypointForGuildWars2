@@ -14,7 +14,7 @@
                 <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
 
                 <!-- Where each discipline stands. Tap one to move the advice to it. -->
-                <TextBlock Text="DISCIPLINES" Classes="heading" />
+                <TextBlock Text="{ui:T 'DISCIPLINES'}" Classes="heading" />
 
                 <ItemsControl ItemsSource="{Binding Disciplines}">
                     <ItemsControl.ItemTemplate>
@@ -22,7 +22,7 @@
                             <Button Classes="row" Click="OnDisciplineClicked" Margin="0,0,0,8">
                                 <Grid ColumnDefinitions="4,*,Auto" RowDefinitions="Auto,Auto,*" MinHeight="66">
                                     <Border Grid.RowSpan="3" Background="{StaticResource BrassDimBrush}" />
-                                    <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="16,10,8,0" />
+                                    <TextBlock Grid.Column="1" Text="{Binding Title}" Margin="16,10,8,0" />
                                     <TextBlock Grid.Column="2" Text="{Binding Character}" Classes="caption small"
                                                Margin="0,10,0,0" />
                                     <ProgressBar Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
@@ -40,7 +40,7 @@
                 <Border Classes="rule" Margin="0,6,0,0" />
 
                 <!-- The advice: what to make next, cheapest first. -->
-                <TextBlock Text="WHAT TO MAKE NEXT" Classes="heading small" Margin="0,4,0,0" />
+                <TextBlock Text="{ui:T 'WHAT TO MAKE NEXT'}" Classes="heading small" Margin="0,4,0,0" />
                 <TextBlock Text="{Binding SuggestionHeading}" Classes="figure" FontSize="14"
                            Foreground="{StaticResource BrassBrush}" TextWrapping="Wrap" />
 
@@ -74,9 +74,9 @@
                      already on the phone — the recipe catalogue and the storage scan —
                      so this is a join rather than a fetch. -->
                 <Border Classes="rule" Margin="0,14,0,0" />
-                <TextBlock Text="FROM WHAT YOU HAVE" Classes="heading" Margin="0,6,0,0" />
+                <TextBlock Text="{ui:T 'FROM WHAT YOU HAVE'}" Classes="heading" Margin="0,6,0,0" />
 
-                <Button Content="CHECK MY MATERIALS" Command="{Binding ReadStorageCommand}"
+                <Button Content="{ui:T 'CHECK MY MATERIALS'}" Command="{Binding ReadStorageCommand}"
                         IsVisible="{Binding CanReadStorage}" Classes="quiet" HorizontalAlignment="Left" />
 
                 <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsReadingStorage}" />

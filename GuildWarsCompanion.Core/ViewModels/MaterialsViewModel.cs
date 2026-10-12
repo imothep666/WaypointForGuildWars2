@@ -16,7 +16,7 @@ public sealed partial class MaterialsViewModel(AccountDataService data, ApiKeySe
 
     public ObservableCollection<MaterialSection> Sections { get; } = [];
 
-    protected override string DefaultEmptyMessage => "Pull down to load your material storage.";
+    protected override string DefaultEmptyMessage => L.T("Pull down to load your material storage.");
 
     /// <summary>Opens one stack's item. Every list in the app hands off to the same screen.</summary>
     [RelayCommand]
@@ -36,13 +36,13 @@ public sealed partial class MaterialsViewModel(AccountDataService data, ApiKeySe
 
         if (!session.IsAuthenticated)
         {
-            Notice = "Add your API key under Settings to see material storage.";
+            Notice = L.T("Add your API key under Settings to see material storage.");
             return;
         }
 
         if (!session.HasPermission(Gw2Permissions.Inventories))
         {
-            Notice = "This key has no 'inventories' permission. Create a new key that includes it.";
+            Notice = L.T("This key has no 'inventories' permission. Create a new key that includes it.");
             return;
         }
 
@@ -62,6 +62,6 @@ public sealed partial class MaterialsViewModel(AccountDataService data, ApiKeySe
             Sections.Add(section);
 
         if (fetched.FetchedAt is { } taken)
-            Notice = Stale.Describe("your storage", taken, DateTimeOffset.UtcNow);
+            Notice = Stale.Describe(L.T("your storage"), taken, DateTimeOffset.UtcNow);
     });
 }

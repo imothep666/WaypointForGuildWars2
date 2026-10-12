@@ -71,4 +71,8 @@
         <PackageReference Include="Xamarin.AndroidX.Work.Runtime" Version="2.11.2.1" />
     </ItemGroup>
 
+    <ItemGroup>
+        <!-- L.T and L.F, the app's own words in the phone's language; everywhere, like string. -->
+        <Using Include="GuildWarsCompanion.Localization" />
+    </ItemGroup>
 </Project>

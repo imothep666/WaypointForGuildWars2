@@ -48,7 +48,7 @@ public sealed class MetaSource(AppEnvironment environment)
         catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException)
         {
             // A page edited into something else entirely. Say so; do not invent a timetable.
-            Problem = "The Guild Wars 2 Wiki's event timer data could not be read.";
+            Problem = L.T("The Guild Wars 2 Wiki's event timer data could not be read.");
             _maps = [];
         }
 
@@ -75,7 +75,7 @@ public sealed class MetaSource(AppEnvironment environment)
             if (ct.IsCancellationRequested) throw;
 
             if (!File.Exists(FilePath))
-                Problem = "The meta timetable comes from the Guild Wars 2 Wiki and could not be fetched.";
+                Problem = L.T("The meta timetable comes from the Guild Wars 2 Wiki and could not be fetched.");
         }
     }
 

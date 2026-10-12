@@ -30,13 +30,13 @@ public static class Gw2Scopes
     /// </summary>
     public static IReadOnlyList<Gw2Scope> Used { get; } =
     [
-        new(Gw2Permissions.Account, "Account, and the name shown above"),
-        new(Gw2Permissions.Inventories, "Materials and bank"),
-        new(Gw2Permissions.Characters, "Characters, Crafting, and the compass's finished hero points"),
-        new(Gw2Permissions.TradingPost, "Trading Post orders and deliveries"),
-        new(Gw2Permissions.Wallet, "Wallet"),
-        new(Gw2Permissions.Unlocks, "Home instance, dyes and skins"),
-        new(Gw2Permissions.Progression, "Today, Achievements, Masteries, world bosses, and the compass's finished hero points")
+        new(Gw2Permissions.Account, L.T("Account, and the name shown above")),
+        new(Gw2Permissions.Inventories, L.T("Materials and bank")),
+        new(Gw2Permissions.Characters, L.T("Characters, Crafting, and the compass's finished hero points")),
+        new(Gw2Permissions.TradingPost, L.T("Trading Post orders and deliveries")),
+        new(Gw2Permissions.Wallet, L.T("Wallet")),
+        new(Gw2Permissions.Unlocks, L.T("Home instance, dyes and skins")),
+        new(Gw2Permissions.Progression, L.T("Today, Achievements, Masteries, world bosses, and the compass's finished hero points"))
     ];
 
     /// <summary>
@@ -87,9 +87,9 @@ public static class Gw2Scopes
             .ToList();
 
         return missing.Count == 0
-            ? "Your key has everything the app asks for."
-            : $"Your key is missing {Join(missing)}. Tick it on account.arena.net, make a new " +
-              "key, and scan it again — a key's permissions cannot be changed after it is made.";
+            ? L.T("Your key has everything the app asks for.")
+            : L.F("Your key is missing {0}. Tick it on account.arena.net, make a new key, and " +
+                  "scan it again — a key's permissions cannot be changed after it is made.", Join(missing));
     }
 
     /// <summary>"wallet", "wallet and unlocks", "wallet, unlocks and progression".</summary>
@@ -97,7 +97,7 @@ public static class Gw2Scopes
         names.Count switch
         {
             1 => names[0],
-            2 => $"{names[0]} and {names[1]}",
-            _ => $"{string.Join(", ", names.Take(names.Count - 1))} and {names[^1]}"
+            2 => L.F("{0} and {1}", names[0], names[1]),
+            _ => L.F("{0} and {1}", string.Join(", ", names.Take(names.Count - 1)), names[^1])
         };
 }

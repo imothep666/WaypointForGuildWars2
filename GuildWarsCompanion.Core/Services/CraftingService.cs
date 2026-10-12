@@ -4,8 +4,12 @@ using GuildWarsCompanion.Gw2;
 namespace GuildWarsCompanion.Services;
 
 /// <summary>One discipline on one character.</summary>
+/// <param name="Name">The API's discipline id, which is also what the recipe catalogue is
+/// asked by; <see cref="Title"/> is what the screen shows.</param>
 public sealed record DisciplineRow(string Name, string Character, int Rating, string RatingText)
 {
+    public string Title => CraftingLevels.DisciplineName(Name);
+
     public double Fraction => Math.Clamp((double)Rating / CraftingLevels.Max, 0, 1);
 
     public bool IsCapped => Rating >= CraftingLevels.Max;
@@ -78,7 +82,7 @@ public sealed class CraftingService(
             .ToList();
 
         if (disciplines.Count == 0)
-            return new CraftingView([], [], null, NoDisciplines);
+            return new CraftingView([], [], null, L.T(NoDisciplines));
 
         // Nothing chosen yet: lead with whatever is furthest from its cap, since that is where
         // advice is worth anything.
@@ -93,7 +97,7 @@ public sealed class CraftingService(
         return new CraftingView(
             disciplines,
             suggestions,
-            $"{chosen.Name} · {chosen.RatingText}",
+            $"{chosen.Title} · {chosen.RatingText}",
             note);
     }
 
@@ -107,7 +111,7 @@ public sealed class CraftingService(
     public async Task<MakeableView> GetMakeableAsync(CancellationToken ct = default)
     {
         if (await cache.CountRecipesAsync(ct) == 0)
-            return new MakeableView(string.Empty, [], NoCatalogue);
+            return new MakeableView(string.Empty, [], L.T(NoCatalogue));
 
         if (!storage.HasSnapshot)
             await storage.RefreshAsync(ct);
@@ -123,7 +127,7 @@ public sealed class CraftingService(
             .ToList();
 
         if (disciplines.Count == 0)
-            return new MakeableView(string.Empty, [], NoDisciplines);
+            return new MakeableView(string.Empty, [], L.T(NoDisciplines));
 
         // Recipes learned from an item as well as the auto-learned ones: the account endpoint
         // reports exactly the half the catalogue cannot infer from a rating.
@@ -145,19 +149,19 @@ public sealed class CraftingService(
 
                 return new MakeableItemRow(
                     plan.OutputItemId,
-                    item?.Name ?? $"Item {plan.OutputItemId}",
+                    item?.Name ?? L.F("Item {0}", plan.OutputItemId),
                     item?.Icon,
                     item?.Rarity,
                     Makeable.Describe(plan));
             })
             .ToList();
 
-        var note = "Every ingredient already in your bags, bank or material storage — nothing " +
-                   "to buy. Made by the character with the lowest rating that still qualifies, " +
-                   "since crafting below your rating earns nothing.";
+        var note = L.T("Every ingredient already in your bags, bank or material storage — nothing " +
+                       "to buy. Made by the character with the lowest rating that still qualifies, " +
+                       "since crafting below your rating earns nothing.");
 
         if (plans.Count > shown.Count)
-            note += $" Showing the {MakeableCeiling} with the most materials, of {plans.Count:N0}.";
+            note += " " + L.F("Showing the {0} with the most materials, of {1:N0}.", MakeableCeiling, plans.Count);
 
         return new MakeableView(Makeable.Summarise(plans.Count), shown, note);
     }
@@ -186,7 +190,7 @@ public sealed class CraftingService(
         DisciplineRow chosen, CancellationToken ct)
     {
         if (chosen.IsCapped)
-            return ([], $"{chosen.Name} is at {CraftingLevels.Max}. Nothing left to learn.");
+            return ([], L.F("{0} is at {1}. Nothing left to learn.", chosen.Title, CraftingLevels.Max));
 
         // The recipes come from the local catalogue, not from the account.
         //
@@ -196,7 +200,7 @@ public sealed class CraftingService(
         // The catalogue has them all, and auto-learned means every account has them at rating.
         var stored = await cache.CountRecipesAsync(ct);
         if (stored == 0)
-            return ([], NoCatalogue);
+            return ([], L.T(NoCatalogue));
 
         // Widest span any recipe type uses, so nothing in range is missed before the exact
         // grey-recipe rule is applied below.
@@ -206,9 +210,9 @@ public sealed class CraftingService(
             .ToList();
 
         if (candidates.Count == 0)
-            return ([], $"Nothing in the catalogue still grants {chosen.Name} experience at " +
-                        $"{chosen.Rating}. Recipes bought from a trainer are not auto-learned, " +
-                        "so the API cannot see those until you use them.");
+            return ([], L.F("Nothing in the catalogue still grants {0} experience at {1}. " +
+                            "Recipes bought from a trainer are not auto-learned, so the API cannot " +
+                            "see those until you use them.", chosen.Title, chosen.Rating));
 
         var priced = await PriceAsync(candidates, ct);
 
@@ -223,9 +227,9 @@ public sealed class CraftingService(
             .Select(x => Show(x.Recipe, x.Cost, x.Names))
             .ToList();
 
-        return (rows, "Cheapest first, at what sellers are asking. Only auto-learned recipes " +
-                      "that still grant experience at your rating — anything further above it " +
-                      "has gone grey and teaches nothing.");
+        return (rows, L.T("Cheapest first, at what sellers are asking. Only auto-learned recipes " +
+                          "that still grant experience at your rating — anything further above it " +
+                          "has gone grey and teaches nothing."));
     }
 
     /// <summary>
@@ -287,16 +291,16 @@ public sealed class CraftingService(
 
         return new LevellingRow(
             recipe.OutputItemId,
-            names.GetValueOrDefault(recipe.OutputItemId)?.Name ?? $"Item {recipe.OutputItemId}",
+            names.GetValueOrDefault(recipe.OutputItemId)?.Name ?? L.F("Item {0}", recipe.OutputItemId),
             Coin.Format(cost),
             batches switch
             {
-                null => "materials not counted",
-                0 => "none from stock",
-                1 => "1 from stock",
-                var many => $"{many:N0} from stock"
+                null => L.T("materials not counted"),
+                0 => L.T("none from stock"),
+                1 => L.T("1 from stock"),
+                var many => L.F("{0:N0} from stock", many)
             },
-            recipe.MinRating > 0 ? $"needs {recipe.MinRating}" : "no requirement");
+            recipe.MinRating > 0 ? L.F("needs {0}", recipe.MinRating) : L.T("no requirement"));
     }
 
     private const string NoCatalogue =

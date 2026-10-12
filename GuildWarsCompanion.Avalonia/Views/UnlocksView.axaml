@@ -2,6 +2,7 @@
                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
                 xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
                 x:Class="GuildWarsCompanion.Ava.Views.UnlocksView"
                 x:DataType="vm:UnlocksViewModel">
 
@@ -50,7 +51,7 @@
                     </ItemsControl>
 
                     <TextBlock Margin="20,16,20,32" Classes="caption"
-                               Text="Unlocks are account-wide, so these are the same on every character. Tap a category to see which ones you have." />
+                               Text="{ui:T 'Unlocks are account-wide, so these are the same on every character. Tap a category to see which ones you have.'}" />
                 </StackPanel>
             </ScrollViewer>
         </RefreshContainer>

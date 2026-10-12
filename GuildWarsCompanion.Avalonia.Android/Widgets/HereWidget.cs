@@ -10,7 +10,7 @@ namespace GuildWarsCompanion.Platforms.Android.Widgets;
 /// The Here home screen widget: the map being played and what is left on it. See
 /// <see cref="BossWidget"/>; it shares their poll, which also asks the PC who is playing where.
 /// </summary>
-[BroadcastReceiver(Label = "Here", Exported = true)]
+[BroadcastReceiver(Label = "@string/widget_here", Exported = true)]
 [IntentFilter([AppWidgetManager.ActionAppwidgetUpdate])]
 [MetaData("android.appwidget.provider", Resource = "@xml/widget_here_info")]
 public sealed class HereWidget : AppWidgetProvider

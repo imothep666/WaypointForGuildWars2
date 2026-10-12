@@ -24,7 +24,7 @@ public sealed partial class EventsViewModel(
     /// <summary>Where the meta times come from, or why there are none.</summary>
     [ObservableProperty] private string? _metaNote;
 
-    protected override string DefaultEmptyMessage => "Pull down to load the timetable.";
+    protected override string DefaultEmptyMessage => L.T("Pull down to load the timetable.");
 
     [RelayCommand]
     public Task RefreshAsync() => RunAsync(async ct =>
@@ -40,7 +40,7 @@ public sealed partial class EventsViewModel(
         // is simply unfiltered, which is also fine.
         ForCharacter = view.For is null
             ? null
-            : $"Levels shown against {view.For.Name}, level {view.For.Level}.";
+            : L.F("Levels shown against {0}, level {1}.", view.For.Name, view.For.Level);
 
         foreach (var row in view.Bosses)
             Bosses.Add(row);
@@ -48,8 +48,8 @@ public sealed partial class EventsViewModel(
         await LoadMetasAsync(ct);
 
         Footnote = session.HasPermission(Gw2Permissions.Progression)
-            ? "Times are local. Drakkar and the Mists and Monsters titans count for the daily but are not on this timetable."
-            : "Times are local. Add a key with the 'progression' permission to see which bosses you have already killed today.";
+            ? L.T("Times are local. Drakkar and the Mists and Monsters titans count for the daily but are not on this timetable.")
+            : L.T("Times are local. Add a key with the 'progression' permission to see which bosses you have already killed today.");
     });
 
     /// <summary>
@@ -89,9 +89,9 @@ public sealed partial class EventsViewModel(
         MetaNote = metas.Problem ??
                    (Metas.Count == 0
                        ? null
-                       : "Map meta times from the Guild Wars 2 Wiki's event timer. Tap a map to choose " +
-                         "which of its events to be reminded of; reminders come with the others, when " +
-                         "they are switched on in Settings.");
+                       : L.T("Map meta times from the Guild Wars 2 Wiki's event timer. Tap a map to choose " +
+                             "which of its events to be reminded of; reminders come with the others, when " +
+                             "they are switched on in Settings."));
     }
 
     /// <summary>Advances the countdowns without touching the network.</summary>

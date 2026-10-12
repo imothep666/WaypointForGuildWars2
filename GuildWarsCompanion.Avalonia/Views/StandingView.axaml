@@ -16,7 +16,7 @@
             <ScrollViewer>
                 <StackPanel Margin="20,16,20,32" Spacing="14">
                     <!-- What the account is, rather than what it owns. -->
-                    <TextBlock Text="STANDING" Classes="heading" />
+                    <TextBlock Text="{ui:T 'STANDING'}" Classes="heading" />
                     <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
                     <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
 
@@ -41,7 +41,7 @@
                     <!-- What the account owns. The access list has arrived with every
                          account read since the app was written and was thrown away. -->
                     <Border Classes="rule" Margin="0,8,0,0" />
-                    <TextBlock Text="OWNED" Classes="heading" />
+                    <TextBlock Text="{ui:T 'OWNED'}" Classes="heading" />
                     <TextBlock Text="{Binding Owned}" Classes="caption" />
 
                     <ItemsControl ItemsSource="{Binding Expansions}" IsVisible="{Binding HasExpansions}">
@@ -69,14 +69,14 @@
 
                     <!-- Whose artwork this is. The app draws its own silhouettes; these are
                          the game's, and the credit belongs on the screen showing them. -->
-                    <TextBlock Text="Expansion emblems are ArenaNet's, from the Guild Wars 2 Wiki."
+                    <TextBlock Text="{ui:T 'Expansion emblems are ArenaNet\'s, from the Guild Wars 2 Wiki.'}"
                                Classes="caption small" Margin="0,4,0,0" />
 
                     <!-- The home instance. Small catalogues, self-describing ids and no
                          name lookup anywhere: the cheapest checklist in the app. -->
                     <StackPanel IsVisible="{Binding HasHome}" Spacing="10" Margin="0,8,0,0">
                         <Border Classes="rule" />
-                        <TextBlock Text="HOME INSTANCE" Classes="heading" />
+                        <TextBlock Text="{ui:T 'HOME INSTANCE'}" Classes="heading" />
                         <TextBlock Text="{Binding NodeSummary}" Classes="caption" />
                         <ItemsControl ItemsSource="{Binding Nodes}">
                             <ItemsControl.ItemTemplate>

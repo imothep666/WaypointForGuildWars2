@@ -72,12 +72,12 @@ public sealed class LedgerService(Gw2Client client, LedgerStore store, ApiKeySes
         var duration = SessionRecap.Duration(played.PlayedSeconds);
 
         return new SessionText(
-            played.IsOngoing ? $"This session · {duration} so far" : $"Last session · {duration}",
+            played.IsOngoing ? L.F("This session · {0} so far", duration) : L.F("Last session · {0}", duration),
             // When the last poll still saw playtime rising: the session ended after it, before the next.
             played.IsOngoing
-                ? "playing now"
-                : $"last seen playing {played.LastSeen.At.ToLocalTime():ddd HH:mm}",
+                ? L.T("playing now")
+                : L.F("last seen playing {0:ddd HH:mm}", played.LastSeen.At.ToLocalTime()),
             played.Characters.Select(SessionRecap.Line).ToList(),
-            SessionRecap.Wallet(played.WalletChange, id => names.GetValueOrDefault(id, $"currency {id}")));
+            SessionRecap.Wallet(played.WalletChange, id => names.GetValueOrDefault(id, L.F("currency {0}", id))));
     }
 }

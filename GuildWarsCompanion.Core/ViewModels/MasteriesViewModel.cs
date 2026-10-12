@@ -19,7 +19,7 @@ public sealed partial class MasteriesViewModel(MasteryService masteries, ApiKeyS
 
     public ObservableCollection<MasteryRow> Tracks { get; } = [];
 
-    protected override string DefaultEmptyMessage => "Pull down to read your mastery tracks.";
+    protected override string DefaultEmptyMessage => L.T("Pull down to read your mastery tracks.");
 
     [RelayCommand]
     public Task RefreshAsync() => RunAsync(async ct =>
@@ -31,7 +31,7 @@ public sealed partial class MasteriesViewModel(MasteryService masteries, ApiKeyS
 
         if (!session.IsAuthenticated)
         {
-            Notice = "Add your API key under Settings to see your masteries.";
+            Notice = L.T("Add your API key under Settings to see your masteries.");
             return;
         }
 

@@ -82,13 +82,13 @@ public sealed class ImageQrScanner(Shells shells, INavigator navigator) : IQrSca
 
         if (payload is null)
         {
-            await navigator.AlertAsync("No code found", "That picture holds no code this app can read.", "Close");
+            await navigator.AlertAsync(L.T("No code found"), L.T("That picture holds no code this app can read."), L.T("Close"));
             return null;
         }
 
         if (!request.Accept(payload))
         {
-            await navigator.AlertAsync("Not the right code", request.Rejected, "Close");
+            await navigator.AlertAsync(L.T("Not the right code"), request.Rejected, L.T("Close"));
             return null;
         }
 

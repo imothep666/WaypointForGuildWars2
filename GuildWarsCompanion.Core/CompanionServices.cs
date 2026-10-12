@@ -28,8 +28,11 @@ public static class CompanionServices
         // API key, and the cache is a single SQLite file in app-private storage.
         services.AddSingleton(Gw2Client.CreateHttpClient());
         services.AddSingleton<Gw2Client>();
+        // In the client's language, so what the cache keeps and what the client fetches agree.
         services.AddSingleton(provider =>
-            new Gw2Cache(Path.Combine(Environment(provider).DataDirectory, "gw2cache.db3")));
+            new Gw2Cache(
+                Path.Combine(Environment(provider).DataDirectory, "gw2cache.db3"),
+                provider.GetRequiredService<Gw2Client>().Language));
         services.AddSingleton(provider =>
             new AlertStore(Path.Combine(Environment(provider).DataDirectory, "alerts.db3")));
         services.AddSingleton(provider =>
@@ -89,6 +92,7 @@ public static class CompanionServices
         // The compass stream's own way onto the right network. Separate from IBridgeTransport
         // because SignalR cannot be handed a Java.Net.HttpURLConnection; see IStreamBinding.
         services.TryAddSingleton<IStreamBinding, DefaultStreamBinding>();
+        services.AddSingleton<LocalMapNames>();
         services.AddSingleton<GameStream>();
         services.AddSingleton<UnlockService>();
         services.AddSingleton<CompassTargets>();

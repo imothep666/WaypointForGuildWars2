@@ -1,0 +1,3125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    German for the app's own words. Each name is the English text exactly as the code
+    passes it to L.T or L.F, placeholders included; the value is what a German phone shows.
+    Game terms follow the German client: see the wiki-de names, not a dictionary.
+  -->
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="&quot;{0}&quot; is not in the Avalonia app yet. The Android app has it." xml:space="preserve">
+    <value>„{0}“ gibt es in der Avalonia-App noch nicht. Die Android-App hat es.</value>
+  </data>
+  <data name="+{0} AP" xml:space="preserve">
+    <value>+{0} EP</value>
+  </data>
+  <data name="1 expansion" xml:space="preserve">
+    <value>1 Erweiterung</value>
+  </data>
+  <data name="1 from stock" xml:space="preserve">
+    <value>1 aus dem Vorrat</value>
+  </data>
+  <data name="1 map" xml:space="preserve">
+    <value>1 Karte</value>
+  </data>
+  <data name="1 map." xml:space="preserve">
+    <value>1 Karte.</value>
+  </data>
+  <data name="1 mastery point waiting to be spent." xml:space="preserve">
+    <value>1 Beherrschungspunkt wartet darauf, ausgegeben zu werden.</value>
+  </data>
+  <data name="1 on this map" xml:space="preserve">
+    <value>1 auf dieser Karte</value>
+  </data>
+  <data name="1 point" xml:space="preserve">
+    <value>1 Punkt</value>
+  </data>
+  <data name="1 reward" xml:space="preserve">
+    <value>1 Belohnung</value>
+  </data>
+  <data name="1 step" xml:space="preserve">
+    <value>1 Schritt</value>
+  </data>
+  <data name="1 time-gated craft not done" xml:space="preserve">
+    <value>1 zeitbegrenzte Herstellung offen</value>
+  </data>
+  <data name="1 to go" xml:space="preserve">
+    <value>noch 1</value>
+  </data>
+  <data name="1 Wizard's Vault daily left" xml:space="preserve">
+    <value>1 tägliches Gewölbe-Ziel offen</value>
+  </data>
+  <data name="&lt; 1 min" xml:space="preserve">
+    <value>&lt; 1 Min.</value>
+  </data>
+  <data name="about {0} to buy" xml:space="preserve">
+    <value>etwa {0} zum Kaufen</value>
+  </data>
+  <data name="Accessory" xml:space="preserve">
+    <value>Accessoire</value>
+  </data>
+  <data name="Accessory 1" xml:space="preserve">
+    <value>Accessoire 1</value>
+  </data>
+  <data name="Accessory 2" xml:space="preserve">
+    <value>Accessoire 2</value>
+  </data>
+  <data name="Accessory1" xml:space="preserve">
+    <value>Accessoire 1</value>
+  </data>
+  <data name="Accessory2" xml:space="preserve">
+    <value>Accessoire 2</value>
+  </data>
+  <data name="Account" xml:space="preserve">
+    <value>Account</value>
+  </data>
+  <data name="Account bound" xml:space="preserve">
+    <value>Accountgebunden</value>
+  </data>
+  <data name="Account bound on use" xml:space="preserve">
+    <value>Bei Benutzung accountgebunden</value>
+  </data>
+  <data name="Account reminders" xml:space="preserve">
+    <value>Konto-Erinnerungen</value>
+  </data>
+  <data name="Account, and the name shown above" xml:space="preserve">
+    <value>Account und der oben angezeigte Name</value>
+  </data>
+  <data name="Account-wide, so these apply to every character. Magic find is the base figure luck alone buys — achievement points, food, boosters and guild bonuses stack on top. The API carries no conversion for it, so the app ships the wiki's table." xml:space="preserve">
+    <value>Accountweit, gilt also für jeden Charakter. Magiefund ist der Grundwert, den Glück allein bringt – Erfolgspunkte, Essen, Booster und Gildenboni kommen obendrauf. Die API liefert dafür keine Umrechnung, also bringt die App die Tabelle aus dem Wiki mit.</value>
+  </data>
+  <data name="Account: (key has no 'account' permission)" xml:space="preserve">
+    <value>Account: (Schlüssel hat keine Berechtigung „account“)</value>
+  </data>
+  <data name="Account: {0}" xml:space="preserve">
+    <value>Account: {0}</value>
+  </data>
+  <data name="Achievement {0}" xml:space="preserve">
+    <value>Erfolg {0}</value>
+  </data>
+  <data name="Achievements" xml:space="preserve">
+    <value>Erfolge</value>
+  </data>
+  <data name="ADD" xml:space="preserve">
+    <value>HINZUFÜGEN</value>
+  </data>
+  <data name="ADD A WATCH" xml:space="preserve">
+    <value>BEOBACHTUNG HINZUFÜGEN</value>
+  </data>
+  <data name="ADD PACK" xml:space="preserve">
+    <value>PAKET HINZUFÜGEN</value>
+  </data>
+  <data name="ADD UP" xml:space="preserve">
+    <value>BERECHNEN</value>
+  </data>
+  <data name="Add your API key under Settings to see material storage." xml:space="preserve">
+    <value>Füge deinen API-Schlüssel in den Einstellungen hinzu, um das Materialienlager zu sehen.</value>
+  </data>
+  <data name="Add your API key under Settings to see the trading post." xml:space="preserve">
+    <value>Füge deinen API-Schlüssel in den Einstellungen hinzu, um den Handelsposten zu sehen.</value>
+  </data>
+  <data name="Add your API key under Settings to see the Wizard's Vault." xml:space="preserve">
+    <value>Füge deinen API-Schlüssel in den Einstellungen hinzu, um das Gewölbe des Zauberers zu sehen.</value>
+  </data>
+  <data name="Add your API key under Settings to see what is left today." xml:space="preserve">
+    <value>Füge deinen API-Schlüssel in den Einstellungen hinzu, um zu sehen, was heute noch offen ist.</value>
+  </data>
+  <data name="Add your API key under Settings to see which emotes you have unlocked." xml:space="preserve">
+    <value>Füge unter Einstellungen deinen API-Schlüssel hinzu, um zu sehen, welche Emotes du freigeschaltet hast.</value>
+  </data>
+  <data name="Add your API key under Settings to see your account." xml:space="preserve">
+    <value>Füge unter Einstellungen deinen API-Schlüssel hinzu, um deinen Account zu sehen.</value>
+  </data>
+  <data name="Add your API key under Settings to see your achievements." xml:space="preserve">
+    <value>Füge unter Einstellungen deinen API-Schlüssel hinzu, um deine Erfolge zu sehen.</value>
+  </data>
+  <data name="Add your API key under Settings to see your characters." xml:space="preserve">
+    <value>Füge unter Einstellungen deinen API-Schlüssel hinzu, um deine Charaktere zu sehen.</value>
+  </data>
+  <data name="Add your API key under Settings to see your crafting." xml:space="preserve">
+    <value>Füge unter Einstellungen deinen API-Schlüssel hinzu, um dein Handwerk zu sehen.</value>
+  </data>
+  <data name="Add your API key under Settings to see your masteries." xml:space="preserve">
+    <value>Füge unter Einstellungen deinen API-Schlüssel hinzu, um deine Beherrschungen zu sehen.</value>
+  </data>
+  <data name="Add your API key under Settings to see your unlocks." xml:space="preserve">
+    <value>Füge unter Einstellungen deinen API-Schlüssel hinzu, um deine Freischaltungen zu sehen.</value>
+  </data>
+  <data name="Add your API key under Settings to see your wallet." xml:space="preserve">
+    <value>Füge deinen API-Schlüssel in den Einstellungen hinzu, um deine Geldbörse zu sehen.</value>
+  </data>
+  <data name="ADDED" xml:space="preserve">
+    <value>HINZUGEFÜGT</value>
+  </data>
+  <data name="Added {0:N0} entries. Search covers the whole market, and the crafting guide has every recipe." xml:space="preserve">
+    <value>{0:N0} Einträge hinzugefügt. Die Suche deckt den ganzen Markt ab, und der Handwerksratgeber kennt jedes Rezept.</value>
+  </data>
+  <data name="After the 15% trading post fee." xml:space="preserve">
+    <value>Nach 15% Handelspostengebühr.</value>
+  </data>
+  <data name="After the 15% trading post fee. {0} account-bound materials have no market value." xml:space="preserve">
+    <value>Nach 15% Handelspostengebühr. {0} accountgebundene Materialien haben keinen Marktwert.</value>
+  </data>
+  <data name="Air" xml:space="preserve">
+    <value>Luft</value>
+  </data>
+  <data name="All clear" xml:space="preserve">
+    <value>Alles erledigt</value>
+  </data>
+  <data name="All day at weekends" xml:space="preserve">
+    <value>Am Wochenende ganztägig</value>
+  </data>
+  <data name="ALL THE WAY DOWN" xml:space="preserve">
+    <value>DIE GANZE KETTE</value>
+  </data>
+  <data name="All {0:N0} {1}" xml:space="preserve">
+    <value>Alle {0:N0} {1}</value>
+  </data>
+  <data name="All {0} stat-bearing pieces are {1}." xml:space="preserve">
+    <value>Alle {0} Teile mit Werten sind {1}.</value>
+  </data>
+  <data name="Already up to date." xml:space="preserve">
+    <value>Bereits aktuell.</value>
+  </data>
+  <data name="Also on the key, unused by the app: {0}." xml:space="preserve">
+    <value>Außerdem auf dem Schlüssel, von der App nicht genutzt: {0}.</value>
+  </data>
+  <data name="Amulet" xml:space="preserve">
+    <value>Amulett</value>
+  </data>
+  <data name="Amulet {0}" xml:space="preserve">
+    <value>Amulett {0}</value>
+  </data>
+  <data name="an hour ago" xml:space="preserve">
+    <value>vor einer Stunde</value>
+  </data>
+  <data name="An unofficial fan app, not made, endorsed, sponsored or approved by ArenaNet or NCSOFT." xml:space="preserve">
+    <value>Eine inoffizielle Fan-App, nicht von ArenaNet oder NCSOFT erstellt, unterstützt, gesponsert oder genehmigt.</value>
+  </data>
+  <data name="Android needs notification permission. Grant it in system settings, then try again." xml:space="preserve">
+    <value>Android braucht die Berechtigung für Benachrichtigungen. Erteile sie in den Systemeinstellungen und versuch es dann erneut.</value>
+  </data>
+  <data name="API KEY" xml:space="preserve">
+    <value>API-SCHLÜSSEL</value>
+  </data>
+  <data name="API key is missing, malformed or revoked." xml:space="preserve">
+    <value>API-Schlüssel fehlt, ist fehlerhaft oder wurde widerrufen.</value>
+  </data>
+  <data name="API key lacks the permission this endpoint needs." xml:space="preserve">
+    <value>Dem API-Schlüssel fehlt die Berechtigung, die dieser Endpunkt braucht.</value>
+  </data>
+  <data name="Aquatic weapon" xml:space="preserve">
+    <value>Wasserwaffe</value>
+  </data>
+  <data name="Aquatic weapon (swap)" xml:space="preserve">
+    <value>Wasserwaffe (Zweitwaffe)</value>
+  </data>
+  <data name="ArenaNet's API is down right now — usually brief, often during a patch." xml:space="preserve">
+    <value>Die API von ArenaNet ist gerade nicht erreichbar – meist nur kurz, oft während eines Patches.</value>
+  </data>
+  <data name="Armor" xml:space="preserve">
+    <value>Rüstung</value>
+  </data>
+  <data name="Armorsmith" xml:space="preserve">
+    <value>Rüstungsschmied</value>
+  </data>
+  <data name="Armour incomplete" xml:space="preserve">
+    <value>Rüstung unvollständig</value>
+  </data>
+  <data name="Artificer" xml:space="preserve">
+    <value>Konstrukteur</value>
+  </data>
+  <data name="Ascended" xml:space="preserve">
+    <value>Aufgestiegen</value>
+  </data>
+  <data name="ASK" xml:space="preserve">
+    <value>ABFRAGEN</value>
+  </data>
+  <data name="Astral Acclaim" xml:space="preserve">
+    <value>Astraler Ruhm</value>
+  </data>
+  <data name="Asura" xml:space="preserve">
+    <value>Asura</value>
+  </data>
+  <data name="at most {0} of {1} left" xml:space="preserve">
+    <value>höchstens {0} von {1} übrig</value>
+  </data>
+  <data name="At the maximum." xml:space="preserve">
+    <value>Am Maximum.</value>
+  </data>
+  <data name="Axe" xml:space="preserve">
+    <value>Axt</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Rücken</value>
+  </data>
+  <data name="back to the trail, {0}" xml:space="preserve">
+    <value>zurück zum Pfad, {0}</value>
+  </data>
+  <data name="Backpack" xml:space="preserve">
+    <value>Rücken</value>
+  </data>
+  <data name="BACKSTORY" xml:space="preserve">
+    <value>BIOGRAFIE</value>
+  </data>
+  <data name="bad request" xml:space="preserve">
+    <value>ungültige Anfrage</value>
+  </data>
+  <data name="Bag" xml:space="preserve">
+    <value>Tasche</value>
+  </data>
+  <data name="bags, bank and material storage" xml:space="preserve">
+    <value>Taschen, Bank und Materialienlager</value>
+  </data>
+  <data name="Bank" xml:space="preserve">
+    <value>Bank</value>
+  </data>
+  <data name="Basic" xml:space="preserve">
+    <value>Einfach</value>
+  </data>
+  <data name="bear left" xml:space="preserve">
+    <value>leicht links</value>
+  </data>
+  <data name="bear right" xml:space="preserve">
+    <value>leicht rechts</value>
+  </data>
+  <data name="best ask" xml:space="preserve">
+    <value>niedrigstes Angebot</value>
+  </data>
+  <data name="best offer" xml:space="preserve">
+    <value>höchstes Gebot</value>
+  </data>
+  <data name="BLISH HUD'S LIST" xml:space="preserve">
+    <value>LISTE VON BLISH HUD</value>
+  </data>
+  <data name="Boots" xml:space="preserve">
+    <value>Stiefel</value>
+  </data>
+  <data name="BORN" xml:space="preserve">
+    <value>ERSCHAFFEN</value>
+  </data>
+  <data name="Bought" xml:space="preserve">
+    <value>Gekauft</value>
+  </data>
+  <data name="bought out" xml:space="preserve">
+    <value>ausverkauft</value>
+  </data>
+  <data name="Breathing apparatus" xml:space="preserve">
+    <value>Atemgerät</value>
+  </data>
+  <data name="Bridge" xml:space="preserve">
+    <value>Bridge</value>
+  </data>
+  <data name="BROWSE PACKS" xml:space="preserve">
+    <value>PAKETE DURCHSUCHEN</value>
+  </data>
+  <data name="Build" xml:space="preserve">
+    <value>Build</value>
+  </data>
+  <data name="BUILD CHECK" xml:space="preserve">
+    <value>BUILD-CHECK</value>
+  </data>
+  <data name="Buy order" xml:space="preserve">
+    <value>Kaufauftrag</value>
+  </data>
+  <data name="Buy orders" xml:space="preserve">
+    <value>Kaufaufträge</value>
+  </data>
+  <data name="Buy price at or above {0}" xml:space="preserve">
+    <value>Kaufpreis bei oder über {0}</value>
+  </data>
+  <data name="Buy price at or below {0}" xml:space="preserve">
+    <value>Kaufpreis bei oder unter {0}</value>
+  </data>
+  <data name="Buying" xml:space="preserve">
+    <value>Einkauf</value>
+  </data>
+  <data name="Buying the rest costs about {0}." xml:space="preserve">
+    <value>Den Rest zu kaufen kostet etwa {0}.</value>
+  </data>
+  <data name="BY HAND" xml:space="preserve">
+    <value>VON HAND</value>
+  </data>
+  <data name="Cannot be salvaged" xml:space="preserve">
+    <value>Nicht wiederverwertbar</value>
+  </data>
+  <data name="Cannot be sold" xml:space="preserve">
+    <value>Nicht verkaufbar</value>
+  </data>
+  <data name="cannot be sold to a vendor" xml:space="preserve">
+    <value>nicht an Händler verkaufbar</value>
+  </data>
+  <data name="Category {0}" xml:space="preserve">
+    <value>Kategorie {0}</value>
+  </data>
+  <data name="cats" xml:space="preserve">
+    <value>Katzen</value>
+  </data>
+  <data name="Central Tyria" xml:space="preserve">
+    <value>Zentraltyria</value>
+  </data>
+  <data name="CHARACTER" xml:space="preserve">
+    <value>CHARAKTER</value>
+  </data>
+  <data name="Characters" xml:space="preserve">
+    <value>Charaktere</value>
+  </data>
+  <data name="Characters, Crafting, and the compass's finished hero points" xml:space="preserve">
+    <value>Charaktere, Handwerk und die abgeschlossenen Heldenpunkte im Kompass</value>
+  </data>
+  <data name="Charr" xml:space="preserve">
+    <value>Charr</value>
+  </data>
+  <data name="Cheaper to buy: {0} against {1} to make." xml:space="preserve">
+    <value>Kaufen ist günstiger: {0} statt {1} beim Herstellen.</value>
+  </data>
+  <data name="Cheaper to make: {0} against {1} to buy, saving {2} each." xml:space="preserve">
+    <value>Herstellen ist günstiger: {0} statt {1} beim Kauf, du sparst {2} pro Stück.</value>
+  </data>
+  <data name="Cheapest first, at what sellers are asking. Only auto-learned recipes that still grant experience at your rating — anything further above it has gone grey and teaches nothing." xml:space="preserve">
+    <value>Günstigstes zuerst, zu den Preisen der Verkäufer. Nur automatisch gelernte Rezepte, die auf deiner Stufe noch Erfahrung geben – alles weiter darunter ist grau und bringt nichts mehr.</value>
+  </data>
+  <data name="Check" xml:space="preserve">
+    <value>Prüfung</value>
+  </data>
+  <data name="CHECK MY MATERIALS" xml:space="preserve">
+    <value>MATERIALIEN PRÜFEN</value>
+  </data>
+  <data name="CHECK NOW" xml:space="preserve">
+    <value>JETZT PRÜFEN</value>
+  </data>
+  <data name="Checked with the background poll, so it works even with no API key — market prices are public. You are told once when a price arrives, and again if it comes back." xml:space="preserve">
+    <value>Wird mit der Hintergrundabfrage geprüft und funktioniert daher auch ohne API-Schlüssel — Marktpreise sind öffentlich. Du wirst einmal benachrichtigt, wenn ein Preis erreicht ist, und erneut, wenn er wiederkommt.</value>
+  </data>
+  <data name="Checked. Nothing waiting that you have not already seen." xml:space="preserve">
+    <value>Geprüft. Nichts wartet, was du nicht schon gesehen hast.</value>
+  </data>
+  <data name="Checked. One reminder sent." xml:space="preserve">
+    <value>Geprüft. Eine Erinnerung gesendet.</value>
+  </data>
+  <data name="Checked. {0} held back: it is outside your notification hours. {1}" xml:space="preserve">
+    <value>Geprüft. {0} zurückgehalten: Es ist außerhalb deiner Benachrichtigungszeiten. {1}</value>
+  </data>
+  <data name="Checked. {0} reminders sent." xml:space="preserve">
+    <value>Geprüft. {0} Erinnerungen gesendet.</value>
+  </data>
+  <data name="Checked. {0} sent, {1} held back: {2} is in the game, which shows trading post and vault news itself." xml:space="preserve">
+    <value>Geprüft. {0} gesendet, {1} zurückgehalten: {2} ist im Spiel, und das zeigt Neuigkeiten von Handelsposten und Gewölbe selbst an.</value>
+  </data>
+  <data name="Checking…" xml:space="preserve">
+    <value>Wird geprüft…</value>
+  </data>
+  <data name="Checks completeness only. Nothing in the API ranks builds, so this never judges your choices." xml:space="preserve">
+    <value>Prüft nur die Vollständigkeit. Die API bewertet keine Builds, also urteilt dies nie über deine Wahl.</value>
+  </data>
+  <data name="Chef" xml:space="preserve">
+    <value>Chefkoch</value>
+  </data>
+  <data name="Chest" xml:space="preserve">
+    <value>Truhe</value>
+  </data>
+  <data name="Chests" xml:space="preserve">
+    <value>Truhen</value>
+  </data>
+  <data name="Chests and jumping puzzles are not events and no endpoint publishes them, so the only source is a community marker pack. Choose one under BROWSE PACKS, or paste the address of a .taco, and the app fetches it, keeps the chests and jumping puzzles, and throws the rest away — the pack itself is not kept and nothing is shipped inside the app. Boss arenas need none of this; they come from ArenaNet's own data." xml:space="preserve">
+    <value>Truhen und Sprungrätsel sind keine Events, und kein Endpunkt veröffentlicht sie, deshalb ist die einzige Quelle ein Marker-Paket aus der Community. Wähle eines unter PAKETE DURCHSUCHEN oder füge die Adresse einer .taco ein, dann lädt die App es, behält die Truhen und Sprungrätsel und verwirft den Rest – das Paket selbst wird nicht behalten, und nichts davon steckt in der App. Boss-Arenen brauchen nichts davon; sie kommen aus ArenaNets eigenen Daten.</value>
+  </data>
+  <data name="chests, jumping, Tekkit…" xml:space="preserve">
+    <value>Truhen, Sprungrätsel, Tekkit…</value>
+  </data>
+  <data name="CHOOSE A MAP" xml:space="preserve">
+    <value>KARTE WÄHLEN</value>
+  </data>
+  <data name="Choose a picture of the QR code holding your API key" xml:space="preserve">
+    <value>Wähle ein Bild des QR-Codes mit deinem API-Schlüssel</value>
+  </data>
+  <data name="Choose a picture of the QR code in the bridge window" xml:space="preserve">
+    <value>Wähle ein Bild des QR-Codes im Bridge-Fenster</value>
+  </data>
+  <data name="CHOOSE AN OBJECTIVE" xml:space="preserve">
+    <value>ZIEL WÄHLEN</value>
+  </data>
+  <data name="CHOOSE MAP" xml:space="preserve">
+    <value>KARTE WÄHLEN</value>
+  </data>
+  <data name="claimed" xml:space="preserve">
+    <value>abgeholt</value>
+  </data>
+  <data name="CLEAR OBJECTIVE" xml:space="preserve">
+    <value>ZIEL ENTFERNEN</value>
+  </data>
+  <data name="CLEAR TRAIL" xml:space="preserve">
+    <value>PFAD ENTFERNEN</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Schließen</value>
+  </data>
+  <data name="CLOSEST TO FINISHING" xml:space="preserve">
+    <value>KURZ VOR DEM ZIEL</value>
+  </data>
+  <data name="Coat" xml:space="preserve">
+    <value>Brustschutz</value>
+  </data>
+  <data name="Coin" xml:space="preserve">
+    <value>Münzen</value>
+  </data>
+  <data name="coin the trading post is holding" xml:space="preserve">
+    <value>Gold, das der Handelsposten hält</value>
+  </data>
+  <data name="COLLECTION" xml:space="preserve">
+    <value>SAMMLUNG</value>
+  </data>
+  <data name="Common" xml:space="preserve">
+    <value>Gewöhnlich</value>
+  </data>
+  <data name="Compass" xml:space="preserve">
+    <value>Kompass</value>
+  </data>
+  <data name="Component" xml:space="preserve">
+    <value>Komponente</value>
+  </data>
+  <data name="CONNECT" xml:space="preserve">
+    <value>VERBINDEN</value>
+  </data>
+  <data name="Connect an API key first." xml:space="preserve">
+    <value>Verbinde zuerst einen API-Schlüssel.</value>
+  </data>
+  <data name="CONNECTED" xml:space="preserve">
+    <value>VERBUNDEN</value>
+  </data>
+  <data name="Consumable" xml:space="preserve">
+    <value>Verbrauchsgegenstand</value>
+  </data>
+  <data name="Container" xml:space="preserve">
+    <value>Behälter</value>
+  </data>
+  <data name="Copied {0}" xml:space="preserve">
+    <value>{0} kopiert</value>
+  </data>
+  <data name="COPY CHAT LINK" xml:space="preserve">
+    <value>CHATLINK KOPIEREN</value>
+  </data>
+  <data name="could not be read" xml:space="preserve">
+    <value>konnte nicht gelesen werden</value>
+  </data>
+  <data name="Could not be read just now — pull down to try again." xml:space="preserve">
+    <value>Gerade nicht lesbar — zum erneuten Versuch nach unten ziehen.</value>
+  </data>
+  <data name="Could not check for an update ({0}). It tries again later." xml:space="preserve">
+    <value>Suche nach Updates fehlgeschlagen ({0}). Später folgt ein neuer Versuch.</value>
+  </data>
+  <data name="Could not open a browser on this device." xml:space="preserve">
+    <value>Auf diesem Gerät ließ sich kein Browser öffnen.</value>
+  </data>
+  <data name="Could not open a socket to look with — {0}" xml:space="preserve">
+    <value>Konnte keinen Socket für die Suche öffnen — {0}</value>
+  </data>
+  <data name="Could not open a Wi-Fi connection." xml:space="preserve">
+    <value>Konnte keine WLAN-Verbindung öffnen.</value>
+  </data>
+  <data name="Could not open a Wi-Fi socket to look with — {0}" xml:space="preserve">
+    <value>Konnte keinen WLAN-Socket für die Suche öffnen — {0}</value>
+  </data>
+  <data name="Could not open the wiki: {0}" xml:space="preserve">
+    <value>Das Wiki konnte nicht geöffnet werden: {0}</value>
+  </data>
+  <data name="Could not reach the Guild Wars 2 API." xml:space="preserve">
+    <value>Die Guild Wars 2-API ist nicht erreichbar.</value>
+  </data>
+  <data name="Could not read the build: {0}" xml:space="preserve">
+    <value>Der Build konnte nicht gelesen werden: {0}</value>
+  </data>
+  <data name="Could not read this character's story — {0}." xml:space="preserve">
+    <value>Die Geschichte dieses Charakters konnte nicht gelesen werden – {0}.</value>
+  </data>
+  <data name="Could not read this item just now." xml:space="preserve">
+    <value>Dieser Gegenstand ließ sich gerade nicht lesen.</value>
+  </data>
+  <data name="Could not read what you are holding." xml:space="preserve">
+    <value>Konnte nicht lesen, was du besitzt.</value>
+  </data>
+  <data name="Could not read {0} — your API key is missing a permission." xml:space="preserve">
+    <value>Nicht lesbar: {0} — deinem API-Schlüssel fehlt eine Berechtigung.</value>
+  </data>
+  <data name="Could not read {0}, so this is short by whatever is in there." xml:space="preserve">
+    <value>Nicht lesbar: {0} — was dort liegt, fehlt in der Summe.</value>
+  </data>
+  <data name="count only — fourteen thousand names is a download of its own" xml:space="preserve">
+    <value>nur gezählt – vierzehntausend Namen wären ein eigener Download</value>
+  </data>
+  <data name="Counted from everywhere you keep things." xml:space="preserve">
+    <value>Gezählt über alle Orte, an denen du Dinge aufbewahrst.</value>
+  </data>
+  <data name="Counted from material storage." xml:space="preserve">
+    <value>Gezählt aus dem Materialienlager.</value>
+  </data>
+  <data name="Crafting" xml:space="preserve">
+    <value>Handwerk</value>
+  </data>
+  <data name="Crafting Material" xml:space="preserve">
+    <value>Handwerksmaterial</value>
+  </data>
+  <data name="Create a key at account.arena.net under Applications. Tick every permission listed under PERMISSIONS below to use every screen - a key's permissions cannot be changed once it is made, so a missing one means a new key. Paste it below, or scan a QR code holding it. The key is kept on this device only." xml:space="preserve">
+    <value>Erstelle einen Schlüssel auf account.arena.net unter „Anwendungen“. Hake jede Berechtigung an, die unten unter BERECHTIGUNGEN steht, um jede Seite nutzen zu können – die Berechtigungen eines Schlüssels lassen sich nach dem Erstellen nicht ändern, eine fehlende bedeutet also einen neuen Schlüssel. Füge ihn unten ein oder scanne einen QR-Code, der ihn enthält. Der Schlüssel bleibt nur auf diesem Gerät.</value>
+  </data>
+  <data name="currency {0}" xml:space="preserve">
+    <value>Währung {0}</value>
+  </data>
+  <data name="Dagger" xml:space="preserve">
+    <value>Dolch</value>
+  </data>
+  <data name="Daily" xml:space="preserve">
+    <value>Täglich</value>
+  </data>
+  <data name="Daily meta reward ready" xml:space="preserve">
+    <value>Tägliche Meta-Belohnung bereit</value>
+  </data>
+  <data name="Daily objective complete" xml:space="preserve">
+    <value>Tägliches Ziel erledigt</value>
+  </data>
+  <data name="Daily reset in {0} min" xml:space="preserve">
+    <value>Täglicher Reset in {0} Min.</value>
+  </data>
+  <data name="Data" xml:space="preserve">
+    <value>Daten</value>
+  </data>
+  <data name="DEATHS" xml:space="preserve">
+    <value>TODE</value>
+  </data>
+  <data name="Delivery box" xml:space="preserve">
+    <value>Abholung</value>
+  </data>
+  <data name="Desktop" xml:space="preserve">
+    <value>Desktop</value>
+  </data>
+  <data name="DIAGNOSTIC LOG" xml:space="preserve">
+    <value>DIAGNOSEPROTOKOLL</value>
+  </data>
+  <data name="DISCIPLINES" xml:space="preserve">
+    <value>DISZIPLINEN</value>
+  </data>
+  <data name="done in game on {0}" xml:space="preserve">
+    <value>im Spiel ausgeführt auf {0}</value>
+  </data>
+  <data name="DOWNLOAD ALL ITEMS" xml:space="preserve">
+    <value>ALLE GEGENSTÄNDE LADEN</value>
+  </data>
+  <data name="Download stopped." xml:space="preserve">
+    <value>Download gestoppt.</value>
+  </data>
+  <data name="download the item catalogue to count its recipe" xml:space="preserve">
+    <value>lade den Gegenstandskatalog, um das Rezept mitzuzählen</value>
+  </data>
+  <data name="Downloading {0}…" xml:space="preserve">
+    <value>Lade {0} herunter…</value>
+  </data>
+  <data name="Downloading {0}… {1}%" xml:space="preserve">
+    <value>Lade {0} herunter… {1}%</value>
+  </data>
+  <data name="Downloading…" xml:space="preserve">
+    <value>Wird heruntergeladen…</value>
+  </data>
+  <data name="Dungeon paths" xml:space="preserve">
+    <value>Verlies-Pfade</value>
+  </data>
+  <data name="Duplicate sigil wasted" xml:space="preserve">
+    <value>Doppeltes Sigill verschenkt</value>
+  </data>
+  <data name="Dye" xml:space="preserve">
+    <value>Farbstoff</value>
+  </data>
+  <data name="Dyes" xml:space="preserve">
+    <value>Farbstoffe</value>
+  </data>
+  <data name="E" xml:space="preserve">
+    <value>O</value>
+  </data>
+  <data name="Earth" xml:space="preserve">
+    <value>Erde</value>
+  </data>
+  <data name="east" xml:space="preserve">
+    <value>Osten</value>
+  </data>
+  <data name="Elementalist" xml:space="preserve">
+    <value>Elementarmagier</value>
+  </data>
+  <data name="Elsewhere" xml:space="preserve">
+    <value>Anderswo</value>
+  </data>
+  <data name="Emotes" xml:space="preserve">
+    <value>Emotes</value>
+  </data>
+  <data name="empty" xml:space="preserve">
+    <value>leer</value>
+  </data>
+  <data name="Empty response from /{0}." xml:space="preserve">
+    <value>Leere Antwort von /{0}.</value>
+  </data>
+  <data name="Empty sigil slots on: {0}." xml:space="preserve">
+    <value>Leere Sigillplätze an: {0}.</value>
+  </data>
+  <data name="Engineer" xml:space="preserve">
+    <value>Ingenieur</value>
+  </data>
+  <data name="Enter a price like 1g 20s, 45s, or a number of copper." xml:space="preserve">
+    <value>Gib einen Preis wie 1g 20s, 45s oder eine Zahl in Kupfer ein.</value>
+  </data>
+  <data name="Enter both the address and the code from the bridge window." xml:space="preserve">
+    <value>Gib die Adresse und den Code aus dem Bridge-Fenster ein.</value>
+  </data>
+  <data name="EQUIPMENT" xml:space="preserve">
+    <value>AUSRÜSTUNG</value>
+  </data>
+  <data name="equipped on {0}" xml:space="preserve">
+    <value>angelegt bei {0}</value>
+  </data>
+  <data name="ESTIMATED VALUE" xml:space="preserve">
+    <value>GESCHÄTZTER WERT</value>
+  </data>
+  <data name="Every character, the bank and storage, at today's prices" xml:space="preserve">
+    <value>Alle Charaktere, Bank und Lager zu heutigen Preisen</value>
+  </data>
+  <data name="Every ingredient already in your bags, bank or material storage — nothing to buy. Made by the character with the lowest rating that still qualifies, since crafting below your rating earns nothing." xml:space="preserve">
+    <value>Jede Zutat liegt schon in deinen Taschen, der Bank oder dem Materialienlager – nichts zu kaufen. Hergestellt vom Charakter mit der niedrigsten Stufe, die noch reicht, denn Herstellen unter deiner Stufe bringt nichts.</value>
+  </data>
+  <data name="Everything for {0} is in hand." xml:space="preserve">
+    <value>Alles für {0} ist beisammen.</value>
+  </data>
+  <data name="Everything is in hand" xml:space="preserve">
+    <value>Alles beisammen</value>
+  </data>
+  <data name="Everything there is to collect. What you already have could not be read just now, so nothing here is marked." xml:space="preserve">
+    <value>Alles, was es zu sammeln gibt. Was du schon hast, konnte gerade nicht gelesen werden, also ist hier nichts markiert.</value>
+  </data>
+  <data name="Everything there is to collect. Which of it you already have needs an API key with the 'progression' and 'unlocks' permissions." xml:space="preserve">
+    <value>Alles, was es zu sammeln gibt. Was du davon schon hast, braucht einen API-Schlüssel mit den Berechtigungen „progression“ und „unlocks“.</value>
+  </data>
+  <data name="Everything tradable at what buyers are offering now, after the 15% fee. Account-bound items, karma and gems are not counted." xml:space="preserve">
+    <value>Alles Handelbare zu dem, was Käufer jetzt bieten, nach 15% Gebühr. Accountgebundene Gegenstände, Karma und Edelsteine zählen nicht mit.</value>
+  </data>
+  <data name="Everything tradable, sold now" xml:space="preserve">
+    <value>Alles Handelbare, jetzt verkauft</value>
+  </data>
+  <data name="Exclusive" xml:space="preserve">
+    <value>Exklusiv</value>
+  </data>
+  <data name="Exotic" xml:space="preserve">
+    <value>Exotisch</value>
+  </data>
+  <data name="Expansion emblems are ArenaNet's, from the Guild Wars 2 Wiki." xml:space="preserve">
+    <value>Die Embleme der Erweiterungen gehören ArenaNet und stammen aus dem Guild Wars 2 Wiki.</value>
+  </data>
+  <data name="Featured" xml:space="preserve">
+    <value>Empfohlen</value>
+  </data>
+  <data name="Feet" xml:space="preserve">
+    <value>Füße</value>
+  </data>
+  <data name="Female" xml:space="preserve">
+    <value>weiblich</value>
+  </data>
+  <data name="Fetched {0:N0} of {1:N0} new items and recipes." xml:space="preserve">
+    <value>{0:N0} von {1:N0} neuen Gegenständen und Rezepten geladen.</value>
+  </data>
+  <data name="Fills the screen and remembers this choice for the next launch. F11 switches it from any page." xml:space="preserve">
+    <value>Füllt den Bildschirm und merkt sich die Wahl für den nächsten Start. F11 schaltet auf jeder Seite um.</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="Find" xml:space="preserve">
+    <value>Suchen</value>
+  </data>
+  <data name="Find an item first." xml:space="preserve">
+    <value>Such zuerst einen Gegenstand.</value>
+  </data>
+  <data name="FIND MY PCS" xml:space="preserve">
+    <value>MEINE PCS SUCHEN</value>
+  </data>
+  <data name="Fine" xml:space="preserve">
+    <value>Edel</value>
+  </data>
+  <data name="Finishers" xml:space="preserve">
+    <value>Todesstöße</value>
+  </data>
+  <data name="Finishing up…" xml:space="preserve">
+    <value>Wird abgeschlossen…</value>
+  </data>
+  <data name="Fire" xml:space="preserve">
+    <value>Feuer</value>
+  </data>
+  <data name="Fishing lure" xml:space="preserve">
+    <value>Köder</value>
+  </data>
+  <data name="Fishing rod" xml:space="preserve">
+    <value>Angelrute</value>
+  </data>
+  <data name="Focus" xml:space="preserve">
+    <value>Fokus</value>
+  </data>
+  <data name="FOLLOW CHARACTER" xml:space="preserve">
+    <value>CHARAKTER FOLGEN</value>
+  </data>
+  <data name="following {0}" xml:space="preserve">
+    <value>folge {0}</value>
+  </data>
+  <data name="following {0} · {1}" xml:space="preserve">
+    <value>folge {0} · {1}</value>
+  </data>
+  <data name="Food" xml:space="preserve">
+    <value>Nahrung</value>
+  </data>
+  <data name="FOR GUILD WARS 2" xml:space="preserve">
+    <value>FÜR GUILD WARS 2</value>
+  </data>
+  <data name="Foraging" xml:space="preserve">
+    <value>Ernten</value>
+  </data>
+  <data name="FORGET" xml:space="preserve">
+    <value>VERGESSEN</value>
+  </data>
+  <data name="Forgotten. Emotes now only reach this phone's clipboard." xml:space="preserve">
+    <value>Vergessen. Emotes landen jetzt nur noch in der Zwischenablage dieses Handys.</value>
+  </data>
+  <data name="Found {0} but {1}." xml:space="preserve">
+    <value>{0} gefunden, aber {1}.</value>
+  </data>
+  <data name="Fractal level" xml:space="preserve">
+    <value>Fraktalstufe</value>
+  </data>
+  <data name="Free account · {0}" xml:space="preserve">
+    <value>Kostenloser Account · {0}</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>Von</value>
+  </data>
+  <data name="From the equipped legend." xml:space="preserve">
+    <value>Aus der ausgerüsteten Legende.</value>
+  </data>
+  <data name="FROM WHAT YOU HAVE" xml:space="preserve">
+    <value>AUS DEINEN VORRÄTEN</value>
+  </data>
+  <data name="Fullscreen" xml:space="preserve">
+    <value>Vollbild</value>
+  </data>
+  <data name="Gathering" xml:space="preserve">
+    <value>Sammelwerkzeug</value>
+  </data>
+  <data name="Gear" xml:space="preserve">
+    <value>Ausrüstung</value>
+  </data>
+  <data name="Gear behind your level" xml:space="preserve">
+    <value>Ausrüstung unter deiner Stufe</value>
+  </data>
+  <data name="Gem" xml:space="preserve">
+    <value>Juwel</value>
+  </data>
+  <data name="Gems" xml:space="preserve">
+    <value>Edelsteine</value>
+  </data>
+  <data name="Gizmo" xml:space="preserve">
+    <value>Spielerei</value>
+  </data>
+  <data name="Gliders" xml:space="preserve">
+    <value>Gleitschirme</value>
+  </data>
+  <data name="Gloves" xml:space="preserve">
+    <value>Handschuhe</value>
+  </data>
+  <data name="Goal ready" xml:space="preserve">
+    <value>Ziel bereit</value>
+  </data>
+  <data name="Goals" xml:space="preserve">
+    <value>Ziele</value>
+  </data>
+  <data name="GRANTED" xml:space="preserve">
+    <value>ERTEILT</value>
+  </data>
+  <data name="Greatsword" xml:space="preserve">
+    <value>Großschwert</value>
+  </data>
+  <data name="Guardian" xml:space="preserve">
+    <value>Wächter</value>
+  </data>
+  <data name="Guild Wars 2 Companion log" xml:space="preserve">
+    <value>Guild Wars 2 Companion-Protokoll</value>
+  </data>
+  <data name="Guild Wars 2 has no Android client, so the phone's clipboard is nowhere near the game. Run the bridge app on the PC you play on and scan the QR code it shows — tapping an emote here then puts it on that PC's clipboard, ready for Ctrl+V in the chat box. Pair as many PCs as you like; whichever one is awake on your network gets the paste, and the one running the game wins if several are. Addresses are found, not typed." xml:space="preserve">
+    <value>Guild Wars 2 hat keinen Android-Client, die Zwischenablage des Handys ist also weit weg vom Spiel. Starte die Bridge-App auf dem PC, auf dem du spielst, und scanne den QR-Code, den sie zeigt – tippst du dann hier auf ein Emote, landet es in der Zwischenablage dieses PCs, bereit für Strg+V im Chatfenster. Koppel so viele PCs, wie du willst; der, der in deinem Netzwerk wach ist, bekommt den Text, und sind es mehrere, gewinnt der mit dem laufenden Spiel. Adressen werden gefunden, nicht eingetippt.</value>
+  </data>
+  <data name="Guild Wars 2 has no push service, so the app checks your account every 30 minutes in the background and tells you when a Wizard's Vault reward is waiting, a trade has closed, a watched price has arrived, a world boss you still need today is about to appear, the daily reset is an hour away with Wizard's Vault dailies or time-gated crafts still open, or a map meta you chose on the timetable is about to start." xml:space="preserve">
+    <value>Guild Wars 2 hat keinen Push-Dienst, deshalb prüft die App deinen Account alle 30 Minuten im Hintergrund und sagt dir Bescheid, wenn eine Belohnung im Gewölbe des Zauberers wartet, ein Handel abgeschlossen ist, ein beobachteter Preis erreicht ist, ein Weltenboss, den du heute noch brauchst, gleich erscheint, der tägliche Reset in einer Stunde ansteht und noch Tagesaufgaben im Gewölbe des Zauberers oder zeitgebundene Handwerksaufgaben offen sind, oder ein Meta-Event, das du im Zeitplan gewählt hast, gleich beginnt.</value>
+  </data>
+  <data name="Guild Wars 2 is not running — this is what it left behind when it closed." xml:space="preserve">
+    <value>Guild Wars 2 läuft nicht – das hat es beim Beenden hinterlassen.</value>
+  </data>
+  <data name="Guild Wars 2 publishes only 14 of its 43 unlockable emotes, so the account endpoint can answer for those and no others. The rest — every gem-store emote tome — are listed without a verdict rather than guessed at; type /emotelist in game for the account's own list. Emotes cannot be used underwater, and appending @ aims one at your target." xml:space="preserve">
+    <value>Guild Wars 2 veröffentlicht nur 14 seiner 43 freischaltbaren Emotes, also kann der Account-Endpunkt nur für diese antworten. Die übrigen – jeder Emote-Foliant aus dem Edelsteinshop – stehen ohne Urteil in der Liste, statt geraten zu werden; tippe im Spiel /emotelist für die eigene Liste des Accounts. Emotes gehen nicht unter Wasser, und ein angehängtes @ richtet eins auf dein Ziel.</value>
+  </data>
+  <data name="Hammer" xml:space="preserve">
+    <value>Hammer</value>
+  </data>
+  <data name="Hands" xml:space="preserve">
+    <value>Hände</value>
+  </data>
+  <data name="hard left" xml:space="preserve">
+    <value>scharf links</value>
+  </data>
+  <data name="hard right" xml:space="preserve">
+    <value>scharf rechts</value>
+  </data>
+  <data name="Harpoon" xml:space="preserve">
+    <value>Speer</value>
+  </data>
+  <data name="Harpoon Gun" xml:space="preserve">
+    <value>Harpunenschleuder</value>
+  </data>
+  <data name="Harvesting sickle" xml:space="preserve">
+    <value>Erntesichel</value>
+  </data>
+  <data name="have it" xml:space="preserve">
+    <value>vorhanden</value>
+  </data>
+  <data name="Head" xml:space="preserve">
+    <value>Kopf</value>
+  </data>
+  <data name="Heart" xml:space="preserve">
+    <value>Herz-Aufgabe</value>
+  </data>
+  <data name="Hearts" xml:space="preserve">
+    <value>Herz-Aufgaben</value>
+  </data>
+  <data name="Helm" xml:space="preserve">
+    <value>Helm</value>
+  </data>
+  <data name="Helm Aquatic" xml:space="preserve">
+    <value>Atemgerät</value>
+  </data>
+  <data name="Here:" xml:space="preserve">
+    <value>Hier:</value>
+  </data>
+  <data name="HERO CHALLENGES" xml:space="preserve">
+    <value>HELDENHERAUSFORDERUNGEN</value>
+  </data>
+  <data name="Hero point" xml:space="preserve">
+    <value>Heldenpunkt</value>
+  </data>
+  <data name="Hero points" xml:space="preserve">
+    <value>Heldenpunkte</value>
+  </data>
+  <data name="HIDDEN" xml:space="preserve">
+    <value>AUSGEBLENDET</value>
+  </data>
+  <data name="HIDE" xml:space="preserve">
+    <value>AUSBLENDEN</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>Verlauf</value>
+  </data>
+  <data name="HOME INSTANCE" xml:space="preserve">
+    <value>HEIMATORT</value>
+  </data>
+  <data name="Home instance, dyes and skins" xml:space="preserve">
+    <value>Heimatort, Farbstoffe und Skins</value>
+  </data>
+  <data name="Human" xml:space="preserve">
+    <value>Mensch</value>
+  </data>
+  <data name="Huntsman" xml:space="preserve">
+    <value>Waidmann</value>
+  </data>
+  <data name="Icebrood Saga" xml:space="preserve">
+    <value>Die Eisbrut-Saga</value>
+  </data>
+  <data name="If listed" xml:space="preserve">
+    <value>Wenn angeboten</value>
+  </data>
+  <data name="If the camera or the QR code will not cooperate. A PC paired this way is asked about once if its address changes, because a short code cannot prove which machine it is." xml:space="preserve">
+    <value>Falls die Kamera oder der QR-Code nicht mitspielt. Bei einem so gekoppelten PC wird einmal nachgefragt, wenn sich seine Adresse ändert, weil ein kurzer Code nicht beweisen kann, welcher Rechner es ist.</value>
+  </data>
+  <data name="in material storage" xml:space="preserve">
+    <value>im Materialienlager</value>
+  </data>
+  <data name="in shared slots" xml:space="preserve">
+    <value>in gemeinsamen Inventarplätzen</value>
+  </data>
+  <data name="in the bank" xml:space="preserve">
+    <value>in der Bank</value>
+  </data>
+  <data name="in the wallet" xml:space="preserve">
+    <value>in der Geldbörse</value>
+  </data>
+  <data name="in under a minute" xml:space="preserve">
+    <value>in unter einer Minute</value>
+  </data>
+  <data name="in use" xml:space="preserve">
+    <value>aktiv</value>
+  </data>
+  <data name="in {0:0} min" xml:space="preserve">
+    <value>in {0:0} Min.</value>
+  </data>
+  <data name="in {0}" xml:space="preserve">
+    <value>in {0}</value>
+  </data>
+  <data name="in {0}h {1:00}m" xml:space="preserve">
+    <value>in {0} Std. {1:00} Min.</value>
+  </data>
+  <data name="included with Path of Fire" xml:space="preserve">
+    <value>in Path of Fire enthalten</value>
+  </data>
+  <data name="Inscription" xml:space="preserve">
+    <value>Inschrift</value>
+  </data>
+  <data name="Insignia" xml:space="preserve">
+    <value>Insignie</value>
+  </data>
+  <data name="Intermediate Item" xml:space="preserve">
+    <value>Zwischenprodukt</value>
+  </data>
+  <data name="Item" xml:space="preserve">
+    <value>Gegenstand</value>
+  </data>
+  <data name="ITEM CATALOGUE" xml:space="preserve">
+    <value>GEGENSTANDSKATALOG</value>
+  </data>
+  <data name="Item name" xml:space="preserve">
+    <value>Gegenstandsname</value>
+  </data>
+  <data name="Item {0}" xml:space="preserve">
+    <value>Gegenstand {0}</value>
+  </data>
+  <data name="Items" xml:space="preserve">
+    <value>Gegenstände</value>
+  </data>
+  <data name="its old address" xml:space="preserve">
+    <value>seiner alten Adresse</value>
+  </data>
+  <data name="Jade bot skins" xml:space="preserve">
+    <value>Jadebot-Skins</value>
+  </data>
+  <data name="Jade Tech Module" xml:space="preserve">
+    <value>Jadetech-Modul</value>
+  </data>
+  <data name="Jeweler" xml:space="preserve">
+    <value>Juwelier</value>
+  </data>
+  <data name="Jumping puzzle" xml:space="preserve">
+    <value>Sprungrätsel</value>
+  </data>
+  <data name="Jumping puzzles" xml:space="preserve">
+    <value>Sprungrätsel</value>
+  </data>
+  <data name="Junk" xml:space="preserve">
+    <value>Schrott</value>
+  </data>
+  <data name="just now" xml:space="preserve">
+    <value>gerade eben</value>
+  </data>
+  <data name="Keep" xml:space="preserve">
+    <value>Behalten</value>
+  </data>
+  <data name="Key" xml:space="preserve">
+    <value>Schlüssel</value>
+  </data>
+  <data name="Key accepted. Pull to refresh on the other screens." xml:space="preserve">
+    <value>Schlüssel akzeptiert. Zieh auf den anderen Seiten zum Aktualisieren nach unten.</value>
+  </data>
+  <data name="Key removed from this device." xml:space="preserve">
+    <value>Schlüssel von diesem Gerät entfernt.</value>
+  </data>
+  <data name="Key: {0}" xml:space="preserve">
+    <value>Schlüssel: {0}</value>
+  </data>
+  <data name="KINDS" xml:space="preserve">
+    <value>ARTEN</value>
+  </data>
+  <data name="Landmark" xml:space="preserve">
+    <value>Sehenswürdigkeit</value>
+  </data>
+  <data name="Landmarks" xml:space="preserve">
+    <value>Sehenswürdigkeiten</value>
+  </data>
+  <data name="Last cycle — the vault only updates once you log into the game." xml:space="preserve">
+    <value>Letzter Zyklus — das Gewölbe aktualisiert sich erst, wenn du dich im Spiel anmeldest.</value>
+  </data>
+  <data name="last played {0}d ago" xml:space="preserve">
+    <value>zuletzt vor {0} T. gespielt</value>
+  </data>
+  <data name="last played {0}h ago" xml:space="preserve">
+    <value>zuletzt vor {0} Std. gespielt</value>
+  </data>
+  <data name="last seen at {0}" xml:space="preserve">
+    <value>zuletzt gesehen unter {0}</value>
+  </data>
+  <data name="last seen playing {0:ddd HH:mm}" xml:space="preserve">
+    <value>zuletzt gespielt {0:ddd HH:mm}</value>
+  </data>
+  <data name="Last session · {0}" xml:space="preserve">
+    <value>Letzte Sitzung · {0}</value>
+  </data>
+  <data name="Leatherworker" xml:space="preserve">
+    <value>Lederer</value>
+  </data>
+  <data name="Leave fullscreen" xml:space="preserve">
+    <value>Vollbild beenden</value>
+  </data>
+  <data name="leave this out to lure it" xml:space="preserve">
+    <value>leg das aus, um sie anzulocken</value>
+  </data>
+  <data name="Legacy vault" xml:space="preserve">
+    <value>Vermächtnis-Gewölbe</value>
+  </data>
+  <data name="Legendary" xml:space="preserve">
+    <value>Legendär</value>
+  </data>
+  <data name="Leggings" xml:space="preserve">
+    <value>Beinschutz</value>
+  </data>
+  <data name="Legs" xml:space="preserve">
+    <value>Beine</value>
+  </data>
+  <data name="level {0}" xml:space="preserve">
+    <value>Stufe {0}</value>
+  </data>
+  <data name="Level {0} {1} {2}" xml:space="preserve">
+    <value>Stufe {0} {2} ({1})</value>
+  </data>
+  <data name="Level {0} {1} {2} {3}" xml:space="preserve">
+    <value>Stufe {0} {3} ({2}, {1})</value>
+  </data>
+  <data name="Levels shown against {0}, level {1}." xml:space="preserve">
+    <value>Stufen im Vergleich zu {0}, Stufe {1}.</value>
+  </data>
+  <data name="limit {0}" xml:space="preserve">
+    <value>Limit {0}</value>
+  </data>
+  <data name="LIST" xml:space="preserve">
+    <value>LISTE</value>
+  </data>
+  <data name="Listed" xml:space="preserve">
+    <value>Angeboten</value>
+  </data>
+  <data name="Loading…" xml:space="preserve">
+    <value>Wird geladen…</value>
+  </data>
+  <data name="LOADOUT" xml:space="preserve">
+    <value>AUSSTATTUNG</value>
+  </data>
+  <data name="Locked" xml:space="preserve">
+    <value>gesperrt</value>
+  </data>
+  <data name="Logging" xml:space="preserve">
+    <value>Holzfällen</value>
+  </data>
+  <data name="Logging axe" xml:space="preserve">
+    <value>Holzfälleraxt</value>
+  </data>
+  <data name="Long Bow" xml:space="preserve">
+    <value>Langbogen</value>
+  </data>
+  <data name="Longbow" xml:space="preserve">
+    <value>Langbogen</value>
+  </data>
+  <data name="Looking for an update…" xml:space="preserve">
+    <value>Suche nach einem Update…</value>
+  </data>
+  <data name="Looking for Guild Wars 2…" xml:space="preserve">
+    <value>Suche nach Guild Wars 2 …</value>
+  </data>
+  <data name="Looking for your PCs…" xml:space="preserve">
+    <value>Suche nach deinen PCs…</value>
+  </data>
+  <data name="Loops" xml:space="preserve">
+    <value>Endlos</value>
+  </data>
+  <data name="Mace" xml:space="preserve">
+    <value>Streitkolben</value>
+  </data>
+  <data name="Magic find from luck" xml:space="preserve">
+    <value>Magiefund durch Glück</value>
+  </data>
+  <data name="Mailcarriers" xml:space="preserve">
+    <value>Postboten</value>
+  </data>
+  <data name="Main hand" xml:space="preserve">
+    <value>Haupthand</value>
+  </data>
+  <data name="Main hand (swap)" xml:space="preserve">
+    <value>Haupthand (Zweitwaffe)</value>
+  </data>
+  <data name="Making one costs the same as buying it." xml:space="preserve">
+    <value>Herstellen kostet genauso viel wie Kaufen.</value>
+  </data>
+  <data name="Making one to sell breaks even after the trading post's cut." xml:space="preserve">
+    <value>Eins herzustellen und zu verkaufen geht nach der Gebühr des Handelspostens plusminus null auf.</value>
+  </data>
+  <data name="Making one to sell loses {0} after the trading post's cut." xml:space="preserve">
+    <value>Eins herzustellen und zu verkaufen kostet dich {0} nach der Gebühr des Handelspostens.</value>
+  </data>
+  <data name="Making one to sell nets {0} after the trading post's cut." xml:space="preserve">
+    <value>Eins herzustellen und zu verkaufen bringt {0} nach der Gebühr des Handelspostens.</value>
+  </data>
+  <data name="Male" xml:space="preserve">
+    <value>männlich</value>
+  </data>
+  <data name="Map" xml:space="preserve">
+    <value>Karte</value>
+  </data>
+  <data name="Map bonus chests" xml:space="preserve">
+    <value>Karten-Bonustruhen</value>
+  </data>
+  <data name="map chest waiting" xml:space="preserve">
+    <value>Kartentruhe wartet</value>
+  </data>
+  <data name="Map meta times from the Guild Wars 2 Wiki's event timer. Tap a map to choose which of its events to be reminded of; reminders come with the others, when they are switched on in Settings." xml:space="preserve">
+    <value>Meta-Zeiten aus dem Event-Timer des Guild Wars 2 Wiki. Tippe auf eine Karte, um zu wählen, an welche ihrer Events du erinnert wirst; die Erinnerungen kommen mit den anderen, wenn sie in den Einstellungen eingeschaltet sind.</value>
+  </data>
+  <data name="MAP METAS" xml:space="preserve">
+    <value>KARTEN-METAS</value>
+  </data>
+  <data name="Map name" xml:space="preserve">
+    <value>Kartenname</value>
+  </data>
+  <data name="map|on {0}" xml:space="preserve">
+    <value>in {0}</value>
+  </data>
+  <data name="MARKER PACK" xml:space="preserve">
+    <value>MARKER-PAKET</value>
+  </data>
+  <data name="MARKER PACKS" xml:space="preserve">
+    <value>MARKER-PAKETE</value>
+  </data>
+  <data name="Masteries" xml:space="preserve">
+    <value>Beherrschungen</value>
+  </data>
+  <data name="Masterwork" xml:space="preserve">
+    <value>Meisterwerk</value>
+  </data>
+  <data name="Mastery points" xml:space="preserve">
+    <value>Beherrschungspunkte</value>
+  </data>
+  <data name="Mastery points are account-wide, not per character." xml:space="preserve">
+    <value>Beherrschungspunkte gelten für den ganzen Account, nicht pro Charakter.</value>
+  </data>
+  <data name="Mastery progress needs an API key with the 'progression' permission." xml:space="preserve">
+    <value>Der Beherrschungsfortschritt braucht einen API-Schlüssel mit der Berechtigung „progression“.</value>
+  </data>
+  <data name="Material storage" xml:space="preserve">
+    <value>Materialienlager</value>
+  </data>
+  <data name="Materials" xml:space="preserve">
+    <value>Materialien</value>
+  </data>
+  <data name="Materials and bank" xml:space="preserve">
+    <value>Materialien und Bank</value>
+  </data>
+  <data name="materials not counted" xml:space="preserve">
+    <value>Materialien nicht gezählt</value>
+  </data>
+  <data name="Maximise" xml:space="preserve">
+    <value>Maximieren</value>
+  </data>
+  <data name="Mesmer" xml:space="preserve">
+    <value>Mesmer</value>
+  </data>
+  <data name="meta {0}/{1}" xml:space="preserve">
+    <value>Meta {0}/{1}</value>
+  </data>
+  <data name="Mini Pet" xml:space="preserve">
+    <value>Miniatur</value>
+  </data>
+  <data name="Miniature" xml:space="preserve">
+    <value>Miniatur</value>
+  </data>
+  <data name="Minimise" xml:space="preserve">
+    <value>Minimieren</value>
+  </data>
+  <data name="Mining" xml:space="preserve">
+    <value>Bergbau</value>
+  </data>
+  <data name="Mining pick" xml:space="preserve">
+    <value>Spitzhacke</value>
+  </data>
+  <data name="Minis" xml:space="preserve">
+    <value>Miniaturen</value>
+  </data>
+  <data name="MISSING" xml:space="preserve">
+    <value>FEHLT</value>
+  </data>
+  <data name="Missing first. Nodes are bought from vendors and karma merchants; cats are lured with the food listed, one at a time." xml:space="preserve">
+    <value>Fehlendes zuerst. Ressourcenknoten kaufst du bei Händlern und Karma-Händlern; Katzen lockst du mit dem genannten Essen an, eine nach der anderen.</value>
+  </data>
+  <data name="More" xml:space="preserve">
+    <value>Mehr</value>
+  </data>
+  <data name="Mount skins" xml:space="preserve">
+    <value>Reittier-Skins</value>
+  </data>
+  <data name="MumbleLink is not readable." xml:space="preserve">
+    <value>MumbleLink ist nicht lesbar.</value>
+  </data>
+  <data name="MumbleLink is there and empty — Guild Wars 2 is not running, or has not reached a character yet. The mapping is this bridge's own; the game fills it in within seconds of starting." xml:space="preserve">
+    <value>MumbleLink ist da, aber leer – Guild Wars 2 läuft nicht oder hat noch keinen Charakter geladen. Die Zuordnung gehört der Bridge; das Spiel füllt sie wenige Sekunden nach dem Start.</value>
+  </data>
+  <data name="N" xml:space="preserve">
+    <value>N</value>
+  </data>
+  <data name="Name the price you are waiting for." xml:space="preserve">
+    <value>Nenne den Preis, auf den du wartest.</value>
+  </data>
+  <data name="Necromancer" xml:space="preserve">
+    <value>Nekromant</value>
+  </data>
+  <data name="needs level {0}" xml:space="preserve">
+    <value>braucht Stufe {0}</value>
+  </data>
+  <data name="needs {0}" xml:space="preserve">
+    <value>braucht {0}</value>
+  </data>
+  <data name="Net worth" xml:space="preserve">
+    <value>Gesamtwert</value>
+  </data>
+  <data name="No build tabs returned. The API key needs the 'builds' permission." xml:space="preserve">
+    <value>Keine Build-Vorlagen erhalten. Der API-Schlüssel braucht die Berechtigung „builds“.</value>
+  </data>
+  <data name="No code found" xml:space="preserve">
+    <value>Kein Code gefunden</value>
+  </data>
+  <data name="No connection to the Guild Wars 2 API. Pull to retry." xml:space="preserve">
+    <value>Keine Verbindung zur Guild Wars 2-API. Zum Wiederholen nach unten ziehen.</value>
+  </data>
+  <data name="No connection — showing {0} from {1}." xml:space="preserve">
+    <value>Keine Verbindung – zeige {0} (Stand: {1}).</value>
+  </data>
+  <data name="No connection, and no map list stored yet. Open this once with a connection and it works offline from then on." xml:space="preserve">
+    <value>Keine Verbindung und noch keine Kartenliste gespeichert. Öffne dies einmal mit Verbindung, danach funktioniert es auch offline.</value>
+  </data>
+  <data name="No crafting disciplines found. The API reports these per character, so a character has to have taken one up." xml:space="preserve">
+    <value>Keine Handwerksdisziplinen gefunden. Die API meldet sie pro Charakter, also muss ein Charakter eine erlernt haben.</value>
+  </data>
+  <data name="No elite skill" xml:space="preserve">
+    <value>Keine Elite-Fertigkeit</value>
+  </data>
+  <data name="No emote goes by that name." xml:space="preserve">
+    <value>Kein Emote heißt so.</value>
+  </data>
+  <data name="No equipment returned. The API key needs the 'builds' permission to read it." xml:space="preserve">
+    <value>Keine Ausrüstung erhalten. Der API-Schlüssel braucht die Berechtigung „builds“, um sie zu lesen.</value>
+  </data>
+  <data name="No expansions" xml:space="preserve">
+    <value>Keine Erweiterungen</value>
+  </data>
+  <data name="No game to follow. Tap CHOOSE MAP to look at any map by name." xml:space="preserve">
+    <value>Kein Spiel zum Folgen. Tippe auf KARTE WÄHLEN, um jede Karte nach Namen anzusehen.</value>
+  </data>
+  <data name="no heading from the PC" xml:space="preserve">
+    <value>keine Blickrichtung vom PC</value>
+  </data>
+  <data name="No healing skill" xml:space="preserve">
+    <value>Keine Heilfertigkeit</value>
+  </data>
+  <data name="No items waiting — only coins." xml:space="preserve">
+    <value>Keine Gegenstände zum Abholen — nur Münzen.</value>
+  </data>
+  <data name="No main-hand weapon" xml:space="preserve">
+    <value>Keine Haupthandwaffe</value>
+  </data>
+  <data name="No map by that name." xml:space="preserve">
+    <value>Keine Karte mit diesem Namen.</value>
+  </data>
+  <data name="no market" xml:space="preserve">
+    <value>kein Markt</value>
+  </data>
+  <data name="No market price to hand." xml:space="preserve">
+    <value>Gerade kein Marktpreis zur Hand.</value>
+  </data>
+  <data name="No mastery points waiting to be spent." xml:space="preserve">
+    <value>Keine Beherrschungspunkte warten darauf, ausgegeben zu werden.</value>
+  </data>
+  <data name="No match among the {0:N0} items the app has seen. Download the full item list under Settings to search the whole market." xml:space="preserve">
+    <value>Kein Treffer unter den {0:N0} Gegenständen, die die App kennt. Lade die vollständige Gegenstandsliste in den Einstellungen, um den ganzen Markt zu durchsuchen.</value>
+  </data>
+  <data name="No objective chosen" xml:space="preserve">
+    <value>Kein Ziel gewählt</value>
+  </data>
+  <data name="No open orders. Pull down to refresh." xml:space="preserve">
+    <value>Keine offenen Aufträge. Zum Aktualisieren nach unten ziehen.</value>
+  </data>
+  <data name="No pack matches that." xml:space="preserve">
+    <value>Kein Paket passt dazu.</value>
+  </data>
+  <data name="No packs to check." xml:space="preserve">
+    <value>Keine Pakete zu prüfen.</value>
+  </data>
+  <data name="No paired PC answered." xml:space="preserve">
+    <value>Kein gekoppelter PC hat geantwortet.</value>
+  </data>
+  <data name="No paired PC answered. Is the bridge running, and is this phone on the same network?" xml:space="preserve">
+    <value>Kein gekoppelter PC hat geantwortet. Läuft die Bridge, und ist dieses Handy im selben Netzwerk?</value>
+  </data>
+  <data name="no PC answered" xml:space="preserve">
+    <value>kein PC hat geantwortet</value>
+  </data>
+  <data name="No PC paired yet. Scan the QR code in the bridge window." xml:space="preserve">
+    <value>Noch kein PC gekoppelt. Scanne den QR-Code im Bridge-Fenster.</value>
+  </data>
+  <data name="no PC set up" xml:space="preserve">
+    <value>kein PC eingerichtet</value>
+  </data>
+  <data name="No PvP gear set on this template." xml:space="preserve">
+    <value>Auf dieser Vorlage ist keine PvP-Ausrüstung festgelegt.</value>
+  </data>
+  <data name="No recipe makes this, and it is not traded. The wiki says where it comes from." xml:space="preserve">
+    <value>Kein Rezept stellt das her, und es wird nicht gehandelt. Das Wiki sagt, woher es kommt.</value>
+  </data>
+  <data name="No recipe makes this. Buy it above, or gather it — the wiki says where." xml:space="preserve">
+    <value>Kein Rezept stellt das her. Kauf es oben oder sammle es — das Wiki sagt, wo.</value>
+  </data>
+  <data name="No recipes downloaded yet. The API cannot say which recipes you know — it reports only the ones learned from an item — so the guide reads the full recipe list instead. Download it under Settings." xml:space="preserve">
+    <value>Noch keine Rezepte heruntergeladen. Die API kann nicht sagen, welche Rezepte du kennst – sie meldet nur die aus Gegenständen gelernten –, also liest der Ratgeber stattdessen die vollständige Rezeptliste. Lade sie unter Einstellungen herunter.</value>
+  </data>
+  <data name="no requirement" xml:space="preserve">
+    <value>keine Voraussetzung</value>
+  </data>
+  <data name="No trades in the last 90 days." xml:space="preserve">
+    <value>Keine Geschäfte in den letzten 90 Tagen.</value>
+  </data>
+  <data name="No upgrade slot" xml:space="preserve">
+    <value>Kein Aufwertungsplatz</value>
+  </data>
+  <data name="No watches yet. Find an item below and name the price you are waiting for." xml:space="preserve">
+    <value>Noch keine Beobachtungen. Such unten einen Gegenstand und nenne den Preis, auf den du wartest.</value>
+  </data>
+  <data name="Nobody is selling. Buyers offer {0}." xml:space="preserve">
+    <value>Niemand verkauft. Käufer bieten {0}.</value>
+  </data>
+  <data name="nodes" xml:space="preserve">
+    <value>Ressourcenknoten</value>
+  </data>
+  <data name="None anywhere the app can see." xml:space="preserve">
+    <value>Nirgends, soweit die App sehen kann.</value>
+  </data>
+  <data name="none from stock" xml:space="preserve">
+    <value>keins aus dem Vorrat</value>
+  </data>
+  <data name="none on this map" xml:space="preserve">
+    <value>keine auf dieser Karte</value>
+  </data>
+  <data name="none — tap to see what it takes" xml:space="preserve">
+    <value>keine — tippen, um zu sehen, was es braucht</value>
+  </data>
+  <data name="Norn" xml:space="preserve">
+    <value>Norn</value>
+  </data>
+  <data name="north" xml:space="preserve">
+    <value>Norden</value>
+  </data>
+  <data name="north-east" xml:space="preserve">
+    <value>Nordosten</value>
+  </data>
+  <data name="north-west" xml:space="preserve">
+    <value>Nordwesten</value>
+  </data>
+  <data name="not counted" xml:space="preserve">
+    <value>nicht gezählt</value>
+  </data>
+  <data name="not counted: {0}" xml:space="preserve">
+    <value>nicht gezählt: {0}</value>
+  </data>
+  <data name="Not enough coin to convert." xml:space="preserve">
+    <value>Nicht genug Gold zum Umtauschen.</value>
+  </data>
+  <data name="not found yet — it will be, once it is running" xml:space="preserve">
+    <value>noch nicht gefunden — das passiert, sobald er läuft</value>
+  </data>
+  <data name="Not in the game" xml:space="preserve">
+    <value>Nicht im Spiel</value>
+  </data>
+  <data name="NOT IN YOUR STORAGE" xml:space="preserve">
+    <value>NICHT IN DEINEM LAGER</value>
+  </data>
+  <data name="Not the right code" xml:space="preserve">
+    <value>Nicht der richtige Code</value>
+  </data>
+  <data name="not tracked" xml:space="preserve">
+    <value>nicht erfasst</value>
+  </data>
+  <data name="not traded" xml:space="preserve">
+    <value>nicht handelbar</value>
+  </data>
+  <data name="Not traded on the trading post." xml:space="preserve">
+    <value>Wird nicht im Handelsposten gehandelt.</value>
+  </data>
+  <data name="Nothing added up — the key may be missing a permission." xml:space="preserve">
+    <value>Nichts zusammengekommen — dem Schlüssel fehlt vielleicht eine Berechtigung.</value>
+  </data>
+  <data name="Nothing answered on {0} (tried {1}). Is the bridge running?" xml:space="preserve">
+    <value>Keine Antwort in {0} (versucht: {1}). Läuft die Bridge?</value>
+  </data>
+  <data name="Nothing can be made outright from what you are holding." xml:space="preserve">
+    <value>Aus deinen Vorräten lässt sich nichts direkt herstellen.</value>
+  </data>
+  <data name="Nothing could be read" xml:space="preserve">
+    <value>Nichts lesbar</value>
+  </data>
+  <data name="Nothing downloaded yet. Search only finds what the app has already seen, and the crafting guide has no recipes to work from." xml:space="preserve">
+    <value>Noch nichts heruntergeladen. Die Suche findet nur, was die App schon gesehen hat, und der Handwerksratgeber hat keine Rezepte als Grundlage.</value>
+  </data>
+  <data name="Nothing equipped." xml:space="preserve">
+    <value>Nichts ausgerüstet.</value>
+  </data>
+  <data name="Nothing hidden by hand." xml:space="preserve">
+    <value>Nichts von Hand ausgeblendet.</value>
+  </data>
+  <data name="Nothing in that pack was a chest, a jumping puzzle or a route." xml:space="preserve">
+    <value>Nichts in diesem Paket war eine Truhe, ein Sprungrätsel oder eine Route.</value>
+  </data>
+  <data name="Nothing in the catalogue still grants {0} experience at {1}. Recipes bought from a trainer are not auto-learned, so the API cannot see those until you use them." xml:space="preserve">
+    <value>Nichts im Katalog gibt bei {1} noch Erfahrung für {0}. Bei einem Lehrer gekaufte Rezepte werden nicht automatisch gelernt, also sieht die API sie erst, wenn du sie benutzt.</value>
+  </data>
+  <data name="Nothing in the catalogue uses this." xml:space="preserve">
+    <value>Nichts im Katalog verwendet das.</value>
+  </data>
+  <data name="Nothing in the wallet to convert." xml:space="preserve">
+    <value>Nichts in der Geldbörse zum Umtauschen.</value>
+  </data>
+  <data name="Nothing is equipped in this template." xml:space="preserve">
+    <value>In dieser Vorlage ist nichts ausgerüstet.</value>
+  </data>
+  <data name="nothing left" xml:space="preserve">
+    <value>nichts mehr offen</value>
+  </data>
+  <data name="Nothing logged yet. Use the bridge once and it will be here." xml:space="preserve">
+    <value>Noch nichts protokolliert. Nutze die Bridge einmal, dann steht es hier.</value>
+  </data>
+  <data name="Nothing matching that among the {0:N0} different items you own." xml:space="preserve">
+    <value>Nichts Passendes unter den {0:N0} verschiedenen Gegenständen, die du besitzt.</value>
+  </data>
+  <data name="Nothing missing. Every slot filled and every line spent." xml:space="preserve">
+    <value>Nichts fehlt. Jeder Platz belegt und jede Linie vergeben.</value>
+  </data>
+  <data name="Nothing on this map has coordinates the API will give." xml:space="preserve">
+    <value>Nichts auf dieser Karte hat Koordinaten, die die API herausgibt.</value>
+  </data>
+  <data name="Nothing part-finished. All {0:N0} you have touched are done." xml:space="preserve">
+    <value>Nichts halb fertig. Alle {0:N0}, die du begonnen hast, sind abgeschlossen.</value>
+  </data>
+  <data name="Nothing stored for {0} yet, and no connection to fetch it. Maps opened once with a connection stay available offline." xml:space="preserve">
+    <value>Für {0} ist noch nichts gespeichert, und es gibt keine Verbindung zum Laden. Einmal mit Verbindung geöffnete Karten bleiben offline verfügbar.</value>
+  </data>
+  <data name="nothing this app carries" xml:space="preserve">
+    <value>nichts, was diese App nutzt</value>
+  </data>
+  <data name="Nothing to complete from what you are already wearing." xml:space="preserve">
+    <value>An deiner jetzigen Ausrüstung gibt es nichts zu vervollständigen.</value>
+  </data>
+  <data name="Nothing to list for this achievement." xml:space="preserve">
+    <value>Für diesen Erfolg gibt es nichts aufzulisten.</value>
+  </data>
+  <data name="Nothing to report: no luck consumed, no fractals, no WvW rank." xml:space="preserve">
+    <value>Nichts zu berichten: kein Glück verbraucht, keine Fraktale, kein WvW-Rang.</value>
+  </data>
+  <data name="Nothing to show for this category." xml:space="preserve">
+    <value>In dieser Kategorie gibt es nichts zu zeigen.</value>
+  </data>
+  <data name="Nothing to show for this item." xml:space="preserve">
+    <value>Zu diesem Gegenstand gibt es nichts anzuzeigen.</value>
+  </data>
+  <data name="Nothing tradable matches that, among {0:N0} items." xml:space="preserve">
+    <value>Nichts Handelbares passt dazu, unter {0:N0} Gegenständen.</value>
+  </data>
+  <data name="Nothing waiting for collection." xml:space="preserve">
+    <value>Nichts wartet auf Abholung.</value>
+  </data>
+  <data name="Notifications arrive at any hour." xml:space="preserve">
+    <value>Benachrichtigungen kommen zu jeder Uhrzeit.</value>
+  </data>
+  <data name="Notify me about waiting rewards" xml:space="preserve">
+    <value>Über wartende Belohnungen benachrichtigen</value>
+  </data>
+  <data name="Novelties" xml:space="preserve">
+    <value>Neuheiten</value>
+  </data>
+  <data name="now" xml:space="preserve">
+    <value>jetzt</value>
+  </data>
+  <data name="Objectives" xml:space="preserve">
+    <value>Ziele</value>
+  </data>
+  <data name="Off hand" xml:space="preserve">
+    <value>Nebenhand</value>
+  </data>
+  <data name="Off hand (swap)" xml:space="preserve">
+    <value>Nebenhand (Zweitwaffe)</value>
+  </data>
+  <data name="ON THIS MAP" xml:space="preserve">
+    <value>AUF DIESER KARTE</value>
+  </data>
+  <data name="on {0}" xml:space="preserve">
+    <value>bei {0}</value>
+  </data>
+  <data name="once" xml:space="preserve">
+    <value>einmal</value>
+  </data>
+  <data name="One recipe can be made from what you are holding." xml:space="preserve">
+    <value>Aus deinen Vorräten lässt sich ein Rezept herstellen.</value>
+  </data>
+  <data name="Only at certain hours" xml:space="preserve">
+    <value>Nur zu bestimmten Zeiten</value>
+  </data>
+  <data name="Only between {0:HH:mm} and {1:HH:mm}, and all day at weekends." xml:space="preserve">
+    <value>Nur zwischen {0:HH:mm} und {1:HH:mm}, am Wochenende den ganzen Tag.</value>
+  </data>
+  <data name="Only between {0:HH:mm} and {1:HH:mm}." xml:space="preserve">
+    <value>Nur zwischen {0:HH:mm} und {1:HH:mm}.</value>
+  </data>
+  <data name="Only what your own gear already determines. Nothing here suggests which rune or sigil a build should run — the API has no view on that." xml:space="preserve">
+    <value>Nur was deine eigene Ausrüstung schon vorgibt. Hier wird keine Rune und kein Sigill für einen Build empfohlen – dazu hat die API keine Meinung.</value>
+  </data>
+  <data name="Open Find once to have the app count what you are holding." xml:space="preserve">
+    <value>Öffne einmal „Suchen“, damit die App zählt, was du hast.</value>
+  </data>
+  <data name="OPEN THE WIKI" xml:space="preserve">
+    <value>WIKI ÖFFNEN</value>
+  </data>
+  <data name="Opening the scanner…" xml:space="preserve">
+    <value>Scanner wird geöffnet…</value>
+  </data>
+  <data name="or paste https://…/pack.taco" xml:space="preserve">
+    <value>oder https://…/pack.taco einfügen</value>
+  </data>
+  <data name="Orders" xml:space="preserve">
+    <value>Aufträge</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>Sonstige</value>
+  </data>
+  <data name="outbid by {0}" xml:space="preserve">
+    <value>überboten um {0}</value>
+  </data>
+  <data name="Outfits" xml:space="preserve">
+    <value>Outfits</value>
+  </data>
+  <data name="Outside those hours the app still checks, so nothing piles up — it just stays off the notification shade. Nothing is held back for later: a world boss reminder that arrives after the boss has gone is worse than silence. While a paired PC says you are in the game, trading post and Wizard's Vault news stays off the phone too: the game already tells you." xml:space="preserve">
+    <value>Außerhalb dieser Zeiten prüft die App trotzdem, damit sich nichts anstaut – es erscheint nur nicht in der Benachrichtigungsleiste. Nichts wird für später aufgehoben: Eine Weltenboss-Erinnerung, die erst kommt, wenn der Boss schon weg ist, ist schlimmer als Stille. Solange ein gekoppelter PC meldet, dass du im Spiel bist, bleiben auch Neuigkeiten vom Handelsposten und aus dem Gewölbe des Zauberers vom Handy fern: Das Spiel sagt sie dir schon.</value>
+  </data>
+  <data name="Overview" xml:space="preserve">
+    <value>Übersicht</value>
+  </data>
+  <data name="OWNED" xml:space="preserve">
+    <value>IM BESITZ</value>
+  </data>
+  <data name="PAIR BY HAND" xml:space="preserve">
+    <value>VON HAND KOPPELN</value>
+  </data>
+  <data name="PAIRED PCS" xml:space="preserve">
+    <value>GEKOPPELTE PCS</value>
+  </data>
+  <data name="Paired with the Guild Wars 2 Companion" xml:space="preserve">
+    <value>Gekoppelt mit dem Guild Wars 2 Companion</value>
+  </data>
+  <data name="Paired with {0}. That sentence is on its clipboard now — paste it anywhere to check." xml:space="preserve">
+    <value>Gekoppelt mit {0}. Der Satz liegt jetzt in seiner Zwischenablage – füg ihn irgendwo ein, um es zu prüfen.</value>
+  </data>
+  <data name="Paired with {0}. That sentence is on its clipboard now." xml:space="preserve">
+    <value>Gekoppelt mit {0}. Der Satz liegt jetzt in seiner Zwischenablage.</value>
+  </data>
+  <data name="Paste a key first." xml:space="preserve">
+    <value>Füge zuerst einen Schlüssel ein.</value>
+  </data>
+  <data name="Paste the address of a .taco pack first." xml:space="preserve">
+    <value>Füge zuerst die Adresse eines .taco-Pakets ein.</value>
+  </data>
+  <data name="Paste your API key" xml:space="preserve">
+    <value>API-Schlüssel einfügen</value>
+  </data>
+  <data name="PC BRIDGE" xml:space="preserve">
+    <value>PC-BRIDGE</value>
+  </data>
+  <data name="PC FROM IMAGE" xml:space="preserve">
+    <value>PC AUS BILD</value>
+  </data>
+  <data name="PC refused it" xml:space="preserve">
+    <value>PC hat es abgelehnt</value>
+  </data>
+  <data name="PC rejected the code" xml:space="preserve">
+    <value>PC hat den Code abgelehnt</value>
+  </data>
+  <data name="PC's clipboard would not take it" xml:space="preserve">
+    <value>die Zwischenablage des PCs nahm es nicht an</value>
+  </data>
+  <data name="PERMISSIONS" xml:space="preserve">
+    <value>BERECHTIGUNGEN</value>
+  </data>
+  <data name="PERSONAL STORY" xml:space="preserve">
+    <value>PERSÖNLICHE GESCHICHTE</value>
+  </data>
+  <data name="Pickup" xml:space="preserve">
+    <value>Abholen</value>
+  </data>
+  <data name="PIN AS GOAL" xml:space="preserve">
+    <value>ALS ZIEL ANHEFTEN</value>
+  </data>
+  <data name="Pistol" xml:space="preserve">
+    <value>Pistole</value>
+  </data>
+  <data name="Play with the bridge running on your PC" xml:space="preserve">
+    <value>Spiele mit laufender Bridge auf deinem PC</value>
+  </data>
+  <data name="PLAYED" xml:space="preserve">
+    <value>GESPIELT</value>
+  </data>
+  <data name="played just now" xml:space="preserve">
+    <value>gerade gespielt</value>
+  </data>
+  <data name="playing now" xml:space="preserve">
+    <value>spielt gerade</value>
+  </data>
+  <data name="Point of interest" xml:space="preserve">
+    <value>Sehenswürdigkeit</value>
+  </data>
+  <data name="Point the camera at the QR code holding your API key." xml:space="preserve">
+    <value>Richte die Kamera auf den QR-Code mit deinem API-Schlüssel.</value>
+  </data>
+  <data name="Point the camera at the QR code in the bridge window." xml:space="preserve">
+    <value>Richte die Kamera auf den QR-Code im Bridge-Fenster.</value>
+  </data>
+  <data name="Pointing at the middle of {0}. The API publishes no spawn coordinate for a world boss, so this is the map, not the arena." xml:space="preserve">
+    <value>Zeigt auf die Mitte von {0}. Die API nennt für Weltenbosse keinen Spawnpunkt, also ist das die Karte, nicht die Arena.</value>
+  </data>
+  <data name="Points are earned and spent per region, so Central Tyria points cannot train a Maguuma track — what you can afford is judged against the region the track belongs to. Tracks you can take the next level of come first." xml:space="preserve">
+    <value>Punkte werden pro Region verdient und ausgegeben, Punkte aus Zentraltyria können also keine Maguuma-Linie trainieren – was du dir leisten kannst, misst sich an der Region der Linie. Linien, deren nächste Stufe du nehmen kannst, stehen zuerst.</value>
+  </data>
+  <data name="Potion" xml:space="preserve">
+    <value>Trank</value>
+  </data>
+  <data name="Power Core" xml:space="preserve">
+    <value>Energiekern</value>
+  </data>
+  <data name="PRICE WATCH" xml:space="preserve">
+    <value>PREISBEOBACHTUNG</value>
+  </data>
+  <data name="prices need a connection" xml:space="preserve">
+    <value>Preise brauchen eine Verbindung</value>
+  </data>
+  <data name="Prices need a connection." xml:space="preserve">
+    <value>Preise brauchen eine Verbindung.</value>
+  </data>
+  <data name="Pull down to load the timetable." xml:space="preserve">
+    <value>Zieh nach unten, um den Zeitplan zu laden.</value>
+  </data>
+  <data name="Pull down to load your characters." xml:space="preserve">
+    <value>Zum Laden deiner Charaktere nach unten ziehen.</value>
+  </data>
+  <data name="Pull down to load your currencies." xml:space="preserve">
+    <value>Zieh nach unten, um deine Währungen zu laden.</value>
+  </data>
+  <data name="Pull down to load your material storage." xml:space="preserve">
+    <value>Zieh nach unten, um dein Materialienlager zu laden.</value>
+  </data>
+  <data name="Pull down to load your objectives." xml:space="preserve">
+    <value>Zieh nach unten, um deine Ziele zu laden.</value>
+  </data>
+  <data name="Pull down to read your account." xml:space="preserve">
+    <value>Zum Lesen deines Accounts nach unten ziehen.</value>
+  </data>
+  <data name="Pull down to read your bank, your bags and material storage." xml:space="preserve">
+    <value>Zieh nach unten, um Bank, Taschen und Materialienlager zu lesen.</value>
+  </data>
+  <data name="Pull down to read your disciplines." xml:space="preserve">
+    <value>Zum Lesen deiner Disziplinen nach unten ziehen.</value>
+  </data>
+  <data name="Pull down to read your mastery tracks." xml:space="preserve">
+    <value>Zum Lesen deiner Beherrschungslinien nach unten ziehen.</value>
+  </data>
+  <data name="Pull down to read your storage first." xml:space="preserve">
+    <value>Zieh zuerst nach unten, um dein Lager zu lesen.</value>
+  </data>
+  <data name="Pull down to read your unlocks." xml:space="preserve">
+    <value>Zum Lesen deiner Freischaltungen nach unten ziehen.</value>
+  </data>
+  <data name="Pull down to refresh." xml:space="preserve">
+    <value>Zum Aktualisieren nach unten ziehen.</value>
+  </data>
+  <data name="Pull down to see what is left today." xml:space="preserve">
+    <value>Zieh nach unten, um zu sehen, was heute noch offen ist.</value>
+  </data>
+  <data name="Pull down to see what you are closest to." xml:space="preserve">
+    <value>Nach unten ziehen, um zu sehen, was du fast geschafft hast.</value>
+  </data>
+  <data name="PVP" xml:space="preserve">
+    <value>PVP</value>
+  </data>
+  <data name="QR FROM IMAGE" xml:space="preserve">
+    <value>QR AUS BILD</value>
+  </data>
+  <data name="queue shown for the largest orders only" xml:space="preserve">
+    <value>Warteschlange nur für die größten Aufträge</value>
+  </data>
+  <data name="Quoted for your own coin: the exchange prices each trade separately and prices a small one worse. It moves through the day, which is why gems are left out of the total above." xml:space="preserve">
+    <value>Für dein eigenes Gold berechnet: Der Umtausch bepreist jeden Handel einzeln, einen kleinen schlechter. Der Kurs schwankt über den Tag, darum fehlen Edelsteine in der Summe oben.</value>
+  </data>
+  <data name="Raid encounters" xml:space="preserve">
+    <value>Schlachtzug-Begegnungen</value>
+  </data>
+  <data name="Ranger" xml:space="preserve">
+    <value>Waldläufer</value>
+  </data>
+  <data name="Rare" xml:space="preserve">
+    <value>Selten</value>
+  </data>
+  <data name="Rate limited — slow down and retry." xml:space="preserve">
+    <value>Zu viele Anfragen – kurz warten und erneut versuchen.</value>
+  </data>
+  <data name="Reading Guild Wars 2 now." xml:space="preserve">
+    <value>Guild Wars 2 wird gerade gelesen.</value>
+  </data>
+  <data name="Reading this character's story…" xml:space="preserve">
+    <value>Lese die Geschichte dieses Charakters…</value>
+  </data>
+  <data name="ready" xml:space="preserve">
+    <value>bereit</value>
+  </data>
+  <data name="READY TO COLLECT" xml:space="preserve">
+    <value>BEREIT ZUM ABHOLEN</value>
+  </data>
+  <data name="RECENTRE" xml:space="preserve">
+    <value>ZENTRIEREN</value>
+  </data>
+  <data name="RECHECK PROGRESS" xml:space="preserve">
+    <value>FORTSCHRITT PRÜFEN</value>
+  </data>
+  <data name="Recipe" xml:space="preserve">
+    <value>Rezept</value>
+  </data>
+  <data name="Refinement" xml:space="preserve">
+    <value>Veredelung</value>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>Aktualisieren</value>
+  </data>
+  <data name="Relic" xml:space="preserve">
+    <value>Relikt</value>
+  </data>
+  <data name="REMIND" xml:space="preserve">
+    <value>ERINNERN</value>
+  </data>
+  <data name="Reminders" xml:space="preserve">
+    <value>Erinnerungen</value>
+  </data>
+  <data name="Reminders off." xml:space="preserve">
+    <value>Erinnerungen aus.</value>
+  </data>
+  <data name="Reminders on. The app checks every 30 minutes and tells you what is waiting." xml:space="preserve">
+    <value>Erinnerungen an. Die App prüft alle 30 Minuten und sagt dir, was wartet.</value>
+  </data>
+  <data name="REMINDING" xml:space="preserve">
+    <value>ERINNERT</value>
+  </data>
+  <data name="reminding: {0}" xml:space="preserve">
+    <value>Erinnerung: {0}</value>
+  </data>
+  <data name="REMOVE" xml:space="preserve">
+    <value>ENTFERNEN</value>
+  </data>
+  <data name="REMOVE KEY" xml:space="preserve">
+    <value>SCHLÜSSEL ENTFERNEN</value>
+  </data>
+  <data name="Resets in {0}" xml:space="preserve">
+    <value>Reset in {0}</value>
+  </data>
+  <data name="Restart to update" xml:space="preserve">
+    <value>Für Update neu starten</value>
+  </data>
+  <data name="Restore" xml:space="preserve">
+    <value>Wiederherstellen</value>
+  </data>
+  <data name="Revenant" xml:space="preserve">
+    <value>Wiedergänger</value>
+  </data>
+  <data name="Rewards" xml:space="preserve">
+    <value>Belohnungen</value>
+  </data>
+  <data name="Rifle" xml:space="preserve">
+    <value>Gewehr</value>
+  </data>
+  <data name="Ring" xml:space="preserve">
+    <value>Ring</value>
+  </data>
+  <data name="Ring 1" xml:space="preserve">
+    <value>Ring 1</value>
+  </data>
+  <data name="Ring 2" xml:space="preserve">
+    <value>Ring 2</value>
+  </data>
+  <data name="Ring1" xml:space="preserve">
+    <value>Ring 1</value>
+  </data>
+  <data name="Ring2" xml:space="preserve">
+    <value>Ring 2</value>
+  </data>
+  <data name="ROUTES" xml:space="preserve">
+    <value>ROUTEN</value>
+  </data>
+  <data name="Rune" xml:space="preserve">
+    <value>Rune</value>
+  </data>
+  <data name="Rune missing" xml:space="preserve">
+    <value>Rune fehlt</value>
+  </data>
+  <data name="Rune set mixed" xml:space="preserve">
+    <value>Runen gemischt</value>
+  </data>
+  <data name="S" xml:space="preserve">
+    <value>S</value>
+  </data>
+  <data name="Salvage" xml:space="preserve">
+    <value>Wiederverwerten</value>
+  </data>
+  <data name="SCAN A PC" xml:space="preserve">
+    <value>PC SCANNEN</value>
+  </data>
+  <data name="SCAN KEY" xml:space="preserve">
+    <value>SCHLÜSSEL SCANNEN</value>
+  </data>
+  <data name="SCAN QR" xml:space="preserve">
+    <value>QR SCANNEN</value>
+  </data>
+  <data name="Scanning needs camera access. Grant it in Android's app settings, or paste the key by hand under Settings." xml:space="preserve">
+    <value>Zum Scannen braucht die App Zugriff auf die Kamera. Erlaube ihn in den App-Einstellungen von Android oder füge den Schlüssel unter Einstellungen von Hand ein.</value>
+  </data>
+  <data name="Scepter" xml:space="preserve">
+    <value>Zepter</value>
+  </data>
+  <data name="Scribe" xml:space="preserve">
+    <value>Schreiber</value>
+  </data>
+  <data name="Sell instantly" xml:space="preserve">
+    <value>Sofort verkaufen</value>
+  </data>
+  <data name="Sell listing" xml:space="preserve">
+    <value>Verkaufsangebot</value>
+  </data>
+  <data name="Sell price at or above {0}" xml:space="preserve">
+    <value>Verkaufspreis bei oder über {0}</value>
+  </data>
+  <data name="Sell price at or below {0}" xml:space="preserve">
+    <value>Verkaufspreis bei oder unter {0}</value>
+  </data>
+  <data name="Sell-order value of everything tradable, after the 15% trading post fee." xml:space="preserve">
+    <value>Sofortverkaufswert alles Handelbaren, nach 15% Handelspostengebühr.</value>
+  </data>
+  <data name="Sellers ask {0}, buyers offer {1}." xml:space="preserve">
+    <value>Verkäufer verlangen {0}, Käufer bieten {1}.</value>
+  </data>
+  <data name="Sellers ask {0}. Nobody is buying." xml:space="preserve">
+    <value>Verkäufer verlangen {0}. Niemand kauft.</value>
+  </data>
+  <data name="Selling" xml:space="preserve">
+    <value>Verkauf</value>
+  </data>
+  <data name="Sending {0}…" xml:space="preserve">
+    <value>Sende {0}…</value>
+  </data>
+  <data name="sent to PC" xml:space="preserve">
+    <value>an PC gesendet</value>
+  </data>
+  <data name="sent to {0}" xml:space="preserve">
+    <value>an {0} gesendet</value>
+  </data>
+  <data name="Sent {0} to {1}" xml:space="preserve">
+    <value>{0} an {1} gesendet</value>
+  </data>
+  <data name="Session recap · {0}" xml:space="preserve">
+    <value>Sitzungsrückblick · {0}</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Einstellungen</value>
+  </data>
+  <data name="SHARE LOG" xml:space="preserve">
+    <value>PROTOKOLL TEILEN</value>
+  </data>
+  <data name="Shared slots" xml:space="preserve">
+    <value>Gemeinsame Inventarplätze</value>
+  </data>
+  <data name="Shield" xml:space="preserve">
+    <value>Schild</value>
+  </data>
+  <data name="Shop" xml:space="preserve">
+    <value>Shop</value>
+  </data>
+  <data name="Short Bow" xml:space="preserve">
+    <value>Kurzbogen</value>
+  </data>
+  <data name="Short {0:N0} {1}." xml:space="preserve">
+    <value>Es fehlen {0:N0} {1}.</value>
+  </data>
+  <data name="Short {0}" xml:space="preserve">
+    <value>Es fehlen {0}</value>
+  </data>
+  <data name="Short {0} and {1} more" xml:space="preserve">
+    <value>Es fehlen {0} und {1} weitere</value>
+  </data>
+  <data name="Short {0} of the {1} ingredients." xml:space="preserve">
+    <value>Es fehlen {0} der {1} Zutaten.</value>
+  </data>
+  <data name="Shortbow" xml:space="preserve">
+    <value>Kurzbogen</value>
+  </data>
+  <data name="Shoulders" xml:space="preserve">
+    <value>Schultern</value>
+  </data>
+  <data name="SHOW" xml:space="preserve">
+    <value>ZEIGEN</value>
+  </data>
+  <data name="SHOW EVERYTHING HIDDEN BY HAND" xml:space="preserve">
+    <value>ALLES VON HAND AUSGEBLENDETE ZEIGEN</value>
+  </data>
+  <data name="Showing the {0} with the most materials, of {1:N0}." xml:space="preserve">
+    <value>Gezeigt werden die {0} mit den meisten Materialien von {1:N0}.</value>
+  </data>
+  <data name="SHOWN" xml:space="preserve">
+    <value>SICHTBAR</value>
+  </data>
+  <data name="Sigil" xml:space="preserve">
+    <value>Sigill</value>
+  </data>
+  <data name="Sigil missing" xml:space="preserve">
+    <value>Sigill fehlt</value>
+  </data>
+  <data name="Sigil {0}" xml:space="preserve">
+    <value>Sigill {0}</value>
+  </data>
+  <data name="Skiff skins" xml:space="preserve">
+    <value>Skiff-Skins</value>
+  </data>
+  <data name="Skin" xml:space="preserve">
+    <value>Skin</value>
+  </data>
+  <data name="Skins" xml:space="preserve">
+    <value>Skins</value>
+  </data>
+  <data name="slot|Chest" xml:space="preserve">
+    <value>Brust</value>
+  </data>
+  <data name="Sold" xml:space="preserve">
+    <value>Verkauft</value>
+  </data>
+  <data name="sold and bought, not collected" xml:space="preserve">
+    <value>verkauft und gekauft, nicht abgeholt</value>
+  </data>
+  <data name="some of it cannot be bought" xml:space="preserve">
+    <value>manches davon ist nicht käuflich</value>
+  </data>
+  <data name="somewhere" xml:space="preserve">
+    <value>irgendwo</value>
+  </data>
+  <data name="Somewhere in Tyria" xml:space="preserve">
+    <value>Irgendwo in Tyria</value>
+  </data>
+  <data name="Soulbound" xml:space="preserve">
+    <value>Seelengebunden</value>
+  </data>
+  <data name="Soulbound on use" xml:space="preserve">
+    <value>Bei Benutzung seelengebunden</value>
+  </data>
+  <data name="south" xml:space="preserve">
+    <value>Süden</value>
+  </data>
+  <data name="south-east" xml:space="preserve">
+    <value>Südosten</value>
+  </data>
+  <data name="south-west" xml:space="preserve">
+    <value>Südwesten</value>
+  </data>
+  <data name="Spear" xml:space="preserve">
+    <value>Speer</value>
+  </data>
+  <data name="Speargun" xml:space="preserve">
+    <value>Harpunenschleuder</value>
+  </data>
+  <data name="Special" xml:space="preserve">
+    <value>Spezial</value>
+  </data>
+  <data name="Special meta reward ready" xml:space="preserve">
+    <value>Spezielle Meta-Belohnung bereit</value>
+  </data>
+  <data name="Special objective complete" xml:space="preserve">
+    <value>Spezielles Ziel erledigt</value>
+  </data>
+  <data name="Specialization line unused" xml:space="preserve">
+    <value>Spezialisierungslinie ungenutzt</value>
+  </data>
+  <data name="Staff" xml:space="preserve">
+    <value>Stab</value>
+  </data>
+  <data name="Standing" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Starter" xml:space="preserve">
+    <value>Starter</value>
+  </data>
+  <data name="Step" xml:space="preserve">
+    <value>Schritt</value>
+  </data>
+  <data name="still needed" xml:space="preserve">
+    <value>fehlt noch</value>
+  </data>
+  <data name="Still needed first. Tap an item for its page, anything else for the wiki — the API names every entry but never says where one comes from." xml:space="preserve">
+    <value>Fehlendes zuerst. Tippe auf einen Gegenstand für seine Seite, auf alles andere für das Wiki – die API nennt jeden Eintrag, sagt aber nie, woher er kommt.</value>
+  </data>
+  <data name="STOP" xml:space="preserve">
+    <value>STOPP</value>
+  </data>
+  <data name="Stop watching" xml:space="preserve">
+    <value>Nicht mehr beobachten</value>
+  </data>
+  <data name="Stop watching this?" xml:space="preserve">
+    <value>Nicht mehr beobachten?</value>
+  </data>
+  <data name="Stopped following the chain at six levels — the rest is listed as it stands." xml:space="preserve">
+    <value>Die Kette endet hier nach sechs Ebenen — der Rest steht, wie er ist.</value>
+  </data>
+  <data name="stopped six levels down" xml:space="preserve">
+    <value>nach sechs Ebenen abgebrochen</value>
+  </data>
+  <data name="Stopped." xml:space="preserve">
+    <value>Gestoppt.</value>
+  </data>
+  <data name="Stopped. What arrived is kept — starting again picks up where this left off." xml:space="preserve">
+    <value>Gestoppt. Was angekommen ist, bleibt – ein neuer Start macht dort weiter, wo dieser aufgehört hat.</value>
+  </data>
+  <data name="STORAGE" xml:space="preserve">
+    <value>LAGER</value>
+  </data>
+  <data name="Story" xml:space="preserve">
+    <value>Geschichte</value>
+  </data>
+  <data name="straight ahead" xml:space="preserve">
+    <value>geradeaus</value>
+  </data>
+  <data name="Sword" xml:space="preserve">
+    <value>Schwert</value>
+  </data>
+  <data name="Sylvari" xml:space="preserve">
+    <value>Sylvari</value>
+  </data>
+  <data name="Tab {0}" xml:space="preserve">
+    <value>Vorlage {0}</value>
+  </data>
+  <data name="Tailor" xml:space="preserve">
+    <value>Schneider</value>
+  </data>
+  <data name="Tap a skill to read what it does." xml:space="preserve">
+    <value>Tippe auf eine Fertigkeit, um zu lesen, was sie bewirkt.</value>
+  </data>
+  <data name="tap for the checklist" xml:space="preserve">
+    <value>tippen für die Checkliste</value>
+  </data>
+  <data name="Tell me when I can buy it (sell price falls). Off: when it is worth selling (buy price rises)." xml:space="preserve">
+    <value>Sag mir Bescheid, wenn ich es kaufen kann (Verkaufspreis fällt). Aus: wenn sich der Verkauf lohnt (Kaufpreis steigt).</value>
+  </data>
+  <data name="That address answered, but not with a list of marker packs." xml:space="preserve">
+    <value>Diese Adresse hat geantwortet, aber nicht mit einer Liste von Markerpaketen.</value>
+  </data>
+  <data name="That category is not one this app knows." xml:space="preserve">
+    <value>Diese Kategorie kennt die App nicht.</value>
+  </data>
+  <data name="That character is no longer on the account." xml:space="preserve">
+    <value>Dieser Charakter ist nicht mehr auf dem Account.</value>
+  </data>
+  <data name="That is not an https address." xml:space="preserve">
+    <value>Das ist keine https-Adresse.</value>
+  </data>
+  <data name="That pack is not here any more." xml:space="preserve">
+    <value>Dieses Paket ist nicht mehr da.</value>
+  </data>
+  <data name="That pack's address is no longer valid." xml:space="preserve">
+    <value>Die Adresse dieses Pakets ist nicht mehr gültig.</value>
+  </data>
+  <data name="That picture holds no code this app can read." xml:space="preserve">
+    <value>Dieses Bild enthält keinen Code, den die App lesen kann.</value>
+  </data>
+  <data name="That QR code does not hold a Guild Wars 2 API key. Try another." xml:space="preserve">
+    <value>Dieser QR-Code enthält keinen Guild Wars 2-API-Schlüssel. Versuch einen anderen.</value>
+  </data>
+  <data name="That QR code is not a bridge pairing. Try the one in the bridge window." xml:space="preserve">
+    <value>Dieser QR-Code ist keine Bridge-Kopplung. Nimm den aus dem Bridge-Fenster.</value>
+  </data>
+  <data name="The API does not know this item." xml:space="preserve">
+    <value>Die API kennt diesen Gegenstand nicht.</value>
+  </data>
+  <data name="The API does not report every purchase from the vault, so a limit is shown as set unless a purchase was reported — and then as &quot;at most&quot; what is left." xml:space="preserve">
+    <value>Die API meldet nicht jeden Kauf aus dem Gewölbe. Ein Limit wird daher wie festgelegt angezeigt, außer ein Kauf wurde gemeldet — dann als „höchstens“ das, was übrig ist.</value>
+  </data>
+  <data name="The API has no drop tables, no salvage results and no gathering locations — it knows what an item is, what it costs, and what makes it. The wiki knows the rest." xml:space="preserve">
+    <value>Die API kennt keine Beutetabellen, keine Wiederverwertungsergebnisse und keine Sammelorte — sie weiß, was ein Gegenstand ist, was er kostet und woraus er entsteht. Den Rest weiß das Wiki.</value>
+  </data>
+  <data name="The API has no item search, and it will not say which recipes you know — it reports only the ones learned from an item. So the app keeps its own copy of both. Without it a price watch cannot be set on something you do not own, and the crafting guide has nothing to work from. About 74,000 items and 13,000 recipes, roughly 11 MB." xml:space="preserve">
+    <value>Die API hat keine Gegenstandssuche und verrät nicht, welche Rezepte du kennst – sie meldet nur die, die du durch einen Gegenstand gelernt hast. Deshalb hält die App eine eigene Kopie von beidem. Ohne sie lässt sich keine Preisbeobachtung für etwas einrichten, das du nicht besitzt, und der Handwerksratgeber hat keine Grundlage. Etwa 74.000 Gegenstände und 13.000 Rezepte, rund 11 MB.</value>
+  </data>
+  <data name="The API is temporarily unavailable." xml:space="preserve">
+    <value>Die API ist vorübergehend nicht verfügbar.</value>
+  </data>
+  <data name="The API rejected the request: {0}." xml:space="preserve">
+    <value>Die API hat die Anfrage abgelehnt: {0}.</value>
+  </data>
+  <data name="The API reports no achievement progress for this account." xml:space="preserve">
+    <value>Die API meldet für diesen Account keinen Erfolgsfortschritt.</value>
+  </data>
+  <data name="The API reports no completed steps for this character. It is also known to miss some — see below." xml:space="preserve">
+    <value>Die API meldet für diesen Charakter keine abgeschlossenen Schritte. Sie lässt bekanntlich auch einige aus – siehe unten.</value>
+  </data>
+  <data name="The API returns no description for this skill." xml:space="preserve">
+    <value>Die API liefert keine Beschreibung für diese Fertigkeit.</value>
+  </data>
+  <data name="The API returns no description for this trait." xml:space="preserve">
+    <value>Die API liefert keine Beschreibung für diese Eigenschaft.</value>
+  </data>
+  <data name="the bank" xml:space="preserve">
+    <value>die Bank</value>
+  </data>
+  <data name="The build came back in a format this version does not understand." xml:space="preserve">
+    <value>Der Build kam in einem Format zurück, das diese Version nicht versteht.</value>
+  </data>
+  <data name="The elite slot is empty." xml:space="preserve">
+    <value>Der Eliteplatz ist leer.</value>
+  </data>
+  <data name="The first weapon set carries {0} twice. Identical sigils do not stack." xml:space="preserve">
+    <value>Das erste Waffenset trägt {0} doppelt. Gleiche Sigille sind nicht stapelbar.</value>
+  </data>
+  <data name="The first weapon set has nothing in the main hand." xml:space="preserve">
+    <value>Das erste Waffenset hat nichts in der Haupthand.</value>
+  </data>
+  <data name="The Guild Wars 2 Wiki's event timer data could not be read." xml:space="preserve">
+    <value>Die Event-Timer-Daten des Guild Wars 2 Wiki konnten nicht gelesen werden.</value>
+  </data>
+  <data name="The heal slot is empty." xml:space="preserve">
+    <value>Der Heilplatz ist leer.</value>
+  </data>
+  <data name="The kept copy of the list could not be read." xml:space="preserve">
+    <value>Die gespeicherte Kopie der Liste ließ sich nicht lesen.</value>
+  </data>
+  <data name="The list could not be fetched just now; this is the last copy." xml:space="preserve">
+    <value>Die Liste ließ sich gerade nicht laden; das ist die letzte Kopie.</value>
+  </data>
+  <data name="The list could not be fetched: {0}" xml:space="preserve">
+    <value>Die Liste ließ sich nicht laden: {0}</value>
+  </data>
+  <data name="The list only names each pack's own download address. Adding one fetches it from its author, as a pasted address does, and nothing is copied into the app." xml:space="preserve">
+    <value>Die Liste nennt nur die Download-Adresse jedes Pakets. Beim Hinzufügen wird es direkt bei seinem Autor geladen, wie bei einer eingefügten Adresse, und nichts wird in die App kopiert.</value>
+  </data>
+  <data name="The list's address is not an https address." xml:space="preserve">
+    <value>Die Adresse der Liste ist keine https-Adresse.</value>
+  </data>
+  <data name="The map list could not be read — {0}" xml:space="preserve">
+    <value>Die Kartenliste ließ sich nicht lesen — {0}</value>
+  </data>
+  <data name="The meta timetable comes from the Guild Wars 2 Wiki and could not be fetched." xml:space="preserve">
+    <value>Der Meta-Zeitplan kommt aus dem Guild Wars 2 Wiki und konnte nicht geladen werden.</value>
+  </data>
+  <data name="The probe could not be sent — {0}" xml:space="preserve">
+    <value>Die Suchanfrage ließ sich nicht senden — {0}</value>
+  </data>
+  <data name="The second weapon set carries {0} twice. Identical sigils do not stack." xml:space="preserve">
+    <value>Das zweite Waffenset trägt {0} doppelt. Gleiche Sigille sind nicht stapelbar.</value>
+  </data>
+  <data name="The vault's shop could not be read just now." xml:space="preserve">
+    <value>Der Shop des Gewölbes konnte gerade nicht gelesen werden.</value>
+  </data>
+  <data name="the wallet did not change" xml:space="preserve">
+    <value>die Geldbörse hat sich nicht verändert</value>
+  </data>
+  <data name="Thief" xml:space="preserve">
+    <value>Dieb</value>
+  </data>
+  <data name="This achievement has no checklist — it counts progress rather than listing what to collect." xml:space="preserve">
+    <value>Dieser Erfolg hat keine Checkliste – er zählt Fortschritt, statt aufzulisten, was zu sammeln ist.</value>
+  </data>
+  <data name="This device is on no network with a gateway, so there is nowhere to look." xml:space="preserve">
+    <value>Dieses Gerät ist in keinem Netzwerk mit Gateway, also gibt es nichts zu durchsuchen.</value>
+  </data>
+  <data name="This is the previous daily cycle. The Wizard's Vault only updates once you log into the game." xml:space="preserve">
+    <value>Das ist der vorige tägliche Zyklus. Das Gewölbe des Zauberers aktualisiert sich erst, wenn du dich im Spiel anmeldest.</value>
+  </data>
+  <data name="This is the previous special cycle. The Wizard's Vault only updates once you log into the game." xml:space="preserve">
+    <value>Das ist der vorige spezielle Zyklus. Das Gewölbe des Zauberers aktualisiert sich erst, wenn du dich im Spiel anmeldest.</value>
+  </data>
+  <data name="This is the previous weekly cycle. The Wizard's Vault only updates once you log into the game." xml:space="preserve">
+    <value>Das ist der vorige wöchentliche Zyklus. Das Gewölbe des Zauberers aktualisiert sich erst, wenn du dich im Spiel anmeldest.</value>
+  </data>
+  <data name="This key carries: {0}" xml:space="preserve">
+    <value>Dieser Schlüssel hat: {0}</value>
+  </data>
+  <data name="This key has no 'account' permission. Create a new key that includes it." xml:space="preserve">
+    <value>Diesem Schlüssel fehlt die Berechtigung „account“. Erstelle einen neuen Schlüssel, der sie enthält.</value>
+  </data>
+  <data name="This key has no 'characters' permission. Create a new key that includes it." xml:space="preserve">
+    <value>Diesem Schlüssel fehlt die Berechtigung „characters“. Erstelle einen neuen Schlüssel, der sie enthält.</value>
+  </data>
+  <data name="This key has no 'inventories' permission. Create a new key that includes it." xml:space="preserve">
+    <value>Diesem Schlüssel fehlt die Berechtigung 'inventories'. Erstelle einen neuen Schlüssel, der sie enthält.</value>
+  </data>
+  <data name="This key has no 'progression' permission. Create a new key that includes it." xml:space="preserve">
+    <value>Diesem Schlüssel fehlt die Berechtigung „progression“. Erstelle einen neuen Schlüssel, der sie enthält.</value>
+  </data>
+  <data name="This key has no 'tradingpost' permission. Create a new key that includes it." xml:space="preserve">
+    <value>Diesem Schlüssel fehlt die Berechtigung 'tradingpost'. Erstelle einen neuen Schlüssel, der sie enthält.</value>
+  </data>
+  <data name="This key has no 'wallet' permission. Create a new key that includes it." xml:space="preserve">
+    <value>Diesem Schlüssel fehlt die Berechtigung 'wallet'. Erstelle einen neuen Schlüssel, der sie enthält.</value>
+  </data>
+  <data name="this network" xml:space="preserve">
+    <value>diesem Netzwerk</value>
+  </data>
+  <data name="This phone is not on Wi-Fi, so there is no network to look on." xml:space="preserve">
+    <value>Dieses Handy ist nicht im WLAN, also gibt es kein Netzwerk zum Suchen.</value>
+  </data>
+  <data name="This session · {0} so far" xml:space="preserve">
+    <value>Diese Sitzung · bisher {0}</value>
+  </data>
+  <data name="This week" xml:space="preserve">
+    <value>Diese Woche</value>
+  </data>
+  <data name="Time-gated crafting" xml:space="preserve">
+    <value>Zeitbegrenzte Herstellung</value>
+  </data>
+  <data name="Times are local. Add a key with the 'progression' permission to see which bosses you have already killed today." xml:space="preserve">
+    <value>Zeiten in Ortszeit. Füge einen Schlüssel mit der Berechtigung „progression“ hinzu, um zu sehen, welche Bosse du heute schon besiegt hast.</value>
+  </data>
+  <data name="Times are local. Drakkar and the Mists and Monsters titans count for the daily but are not on this timetable." xml:space="preserve">
+    <value>Zeiten in Ortszeit. Drakkar und die Titanen aus Mists and Monsters zählen für die Tagesaufgabe, stehen aber nicht in diesem Zeitplan.</value>
+  </data>
+  <data name="Timetable" xml:space="preserve">
+    <value>Zeitplan</value>
+  </data>
+  <data name="Titles" xml:space="preserve">
+    <value>Titel</value>
+  </data>
+  <data name="to" xml:space="preserve">
+    <value>bis</value>
+  </data>
+  <data name="TO COMPLETE" xml:space="preserve">
+    <value>ZUM VERVOLLSTÄNDIGEN</value>
+  </data>
+  <data name="Today" xml:space="preserve">
+    <value>Heute</value>
+  </data>
+  <data name="Today, Achievements, Masteries, world bosses, and the compass's finished hero points" xml:space="preserve">
+    <value>Heute, Erfolge, Beherrschungen, Weltenbosse und die abgeschlossenen Heldenpunkte im Kompass</value>
+  </data>
+  <data name="Too many requests. Wait a moment before refreshing again." xml:space="preserve">
+    <value>Zu viele Anfragen. Warte einen Moment, bevor du erneut aktualisierst.</value>
+  </data>
+  <data name="Tool" xml:space="preserve">
+    <value>Werkzeug</value>
+  </data>
+  <data name="Torch" xml:space="preserve">
+    <value>Fackel</value>
+  </data>
+  <data name="TRACKS" xml:space="preserve">
+    <value>LINIEN</value>
+  </data>
+  <data name="Trading Post" xml:space="preserve">
+    <value>Handelsposten</value>
+  </data>
+  <data name="Trading Post orders and deliveries" xml:space="preserve">
+    <value>Aufträge und Abholungen am Handelsposten</value>
+  </data>
+  <data name="Trained" xml:space="preserve">
+    <value>Trainiert</value>
+  </data>
+  <data name="Trait" xml:space="preserve">
+    <value>Eigenschaft</value>
+  </data>
+  <data name="Trait {0}" xml:space="preserve">
+    <value>Eigenschaft {0}</value>
+  </data>
+  <data name="Traits not fully picked" xml:space="preserve">
+    <value>Eigenschaften nicht vollständig gewählt</value>
+  </data>
+  <data name="Trident" xml:space="preserve">
+    <value>Dreizack</value>
+  </data>
+  <data name="Trinket" xml:space="preserve">
+    <value>Schmuckstück</value>
+  </data>
+  <data name="TRINKETS" xml:space="preserve">
+    <value>SCHMUCK</value>
+  </data>
+  <data name="Trinkets incomplete" xml:space="preserve">
+    <value>Schmuck unvollständig</value>
+  </data>
+  <data name="Trophy" xml:space="preserve">
+    <value>Trophäe</value>
+  </data>
+  <data name="turn around" xml:space="preserve">
+    <value>umdrehen</value>
+  </data>
+  <data name="turn left" xml:space="preserve">
+    <value>links abbiegen</value>
+  </data>
+  <data name="turn right" xml:space="preserve">
+    <value>rechts abbiegen</value>
+  </data>
+  <data name="Type at least two letters." xml:space="preserve">
+    <value>Gib mindestens zwei Buchstaben ein.</value>
+  </data>
+  <data name="Uncommon" xml:space="preserve">
+    <value>Ungewöhnlich</value>
+  </data>
+  <data name="under 1 MB" xml:space="preserve">
+    <value>unter 1 MB</value>
+  </data>
+  <data name="under a minute" xml:space="preserve">
+    <value>unter einer Minute</value>
+  </data>
+  <data name="undercut by {0}" xml:space="preserve">
+    <value>unterboten um {0}</value>
+  </data>
+  <data name="Unexpected response: {0} {1}." xml:space="preserve">
+    <value>Unerwartete Antwort: {0} {1}.</value>
+  </data>
+  <data name="Unfiled route" xml:space="preserve">
+    <value>Nicht einsortierte Route</value>
+  </data>
+  <data name="Unique" xml:space="preserve">
+    <value>Einzigartig</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>Unbekannt</value>
+  </data>
+  <data name="Unknown endpoint or id." xml:space="preserve">
+    <value>Unbekannter Endpunkt oder unbekannte ID.</value>
+  </data>
+  <data name="unlimited" xml:space="preserve">
+    <value>unbegrenzt</value>
+  </data>
+  <data name="unlocked" xml:space="preserve">
+    <value>freigeschaltet</value>
+  </data>
+  <data name="Unlocks" xml:space="preserve">
+    <value>Freischaltungen</value>
+  </data>
+  <data name="Unlocks are account-wide, so these are the same on every character. Tap a category to see which ones you have." xml:space="preserve">
+    <value>Freischaltungen gelten für den ganzen Account, also auf jedem Charakter gleich. Tippe auf eine Kategorie, um zu sehen, welche du hast.</value>
+  </data>
+  <data name="UNPIN GOAL" xml:space="preserve">
+    <value>ZIEL LÖSEN</value>
+  </data>
+  <data name="unreadable|material storage" xml:space="preserve">
+    <value>das Materialienlager</value>
+  </data>
+  <data name="unreadable|shared slots" xml:space="preserve">
+    <value>die gemeinsamen Inventarplätze</value>
+  </data>
+  <data name="until the daily reset" xml:space="preserve">
+    <value>bis zum täglichen Reset</value>
+  </data>
+  <data name="up now" xml:space="preserve">
+    <value>jetzt aktiv</value>
+  </data>
+  <data name="Up to date: {0}, checked {1:HH:mm}." xml:space="preserve">
+    <value>Aktuell: {0}, geprüft um {1:HH:mm}.</value>
+  </data>
+  <data name="UPDATE" xml:space="preserve">
+    <value>AKTUALISIEREN</value>
+  </data>
+  <data name="UPDATE ALL" xml:space="preserve">
+    <value>ALLE AKTUALISIEREN</value>
+  </data>
+  <data name="updated {0:MMM yyyy}" xml:space="preserve">
+    <value>aktualisiert {0:MMM yyyy}</value>
+  </data>
+  <data name="UPDATES" xml:space="preserve">
+    <value>UPDATES</value>
+  </data>
+  <data name="Upgrade Component" xml:space="preserve">
+    <value>Aufwertungskomponente</value>
+  </data>
+  <data name="USE THE NEW ADDRESS" xml:space="preserve">
+    <value>NEUE ADRESSE VERWENDEN</value>
+  </data>
+  <data name="USE THIS LIST" xml:space="preserve">
+    <value>DIESE LISTE NUTZEN</value>
+  </data>
+  <data name="USED IN" xml:space="preserve">
+    <value>VERWENDET IN</value>
+  </data>
+  <data name="Used in one recipe." xml:space="preserve">
+    <value>In einem Rezept verwendet.</value>
+  </data>
+  <data name="Used in {0:N0} recipes — the {1} soonest to reach." xml:space="preserve">
+    <value>In {0:N0} Rezepten verwendet — hier die {1} am schnellsten erreichbaren.</value>
+  </data>
+  <data name="Used in {0:N0} recipes." xml:space="preserve">
+    <value>In {0:N0} Rezepten verwendet.</value>
+  </data>
+  <data name="Utility" xml:space="preserve">
+    <value>Hilfsfertigkeiten</value>
+  </data>
+  <data name="Utility slot empty" xml:space="preserve">
+    <value>Hilfsplatz leer</value>
+  </data>
+  <data name="Values need a connection — this is coin only, not what your items are worth." xml:space="preserve">
+    <value>Werte brauchen eine Verbindung — das ist nur dein Gold, nicht der Wert deiner Gegenstände.</value>
+  </data>
+  <data name="Values need a connection — this is what you are holding, not what it is worth." xml:space="preserve">
+    <value>Werte brauchen eine Verbindung — das ist, was du besitzt, nicht was es wert ist.</value>
+  </data>
+  <data name="Vault" xml:space="preserve">
+    <value>Gewölbe</value>
+  </data>
+  <data name="Vendor" xml:space="preserve">
+    <value>Händler</value>
+  </data>
+  <data name="via {0} · then {1:0}" xml:space="preserve">
+    <value>über {0} · dann {1:0}</value>
+  </data>
+  <data name="via {0} · then {1:0} along the trail" xml:space="preserve">
+    <value>über {0} · dann {1:0} den Pfad entlang</value>
+  </data>
+  <data name="via {0} · then {1:0} to the trail, {2:0} along it" xml:space="preserve">
+    <value>über {0} · dann {1:0} zum Pfad, {2:0} auf ihm</value>
+  </data>
+  <data name="Vista" xml:space="preserve">
+    <value>Panorama</value>
+  </data>
+  <data name="Vistas" xml:space="preserve">
+    <value>Panoramen</value>
+  </data>
+  <data name="W" xml:space="preserve">
+    <value>W</value>
+  </data>
+  <data name="Waiting for the bridge…" xml:space="preserve">
+    <value>Warte auf die Bridge…</value>
+  </data>
+  <data name="waiting to sell, at buy-order value" xml:space="preserve">
+    <value>wartet auf Verkauf, zum Wert der Kaufaufträge</value>
+  </data>
+  <data name="Wallet" xml:space="preserve">
+    <value>Geldbörse</value>
+  </data>
+  <data name="Warhorn" xml:space="preserve">
+    <value>Kriegshorn</value>
+  </data>
+  <data name="Warrior" xml:space="preserve">
+    <value>Krieger</value>
+  </data>
+  <data name="Watch" xml:space="preserve">
+    <value>Beobachten</value>
+  </data>
+  <data name="WATCH PRICE" xml:space="preserve">
+    <value>PREIS BEOBACHTEN</value>
+  </data>
+  <data name="Watching. You will be told when the price gets there." xml:space="preserve">
+    <value>Wird beobachtet. Du erfährst es, wenn der Preis erreicht ist.</value>
+  </data>
+  <data name="Water" xml:space="preserve">
+    <value>Wasser</value>
+  </data>
+  <data name="Waypoint" xml:space="preserve">
+    <value>Wegmarke</value>
+  </data>
+  <data name="Waypoint {0} is ready. Restart to use it, or it is applied on the next start." xml:space="preserve">
+    <value>Waypoint {0} ist bereit. Starte neu, um es zu nutzen, sonst wird es beim nächsten Start installiert.</value>
+  </data>
+  <data name="Waypoint {0}. Looks for updates a minute after start, then every six hours." xml:space="preserve">
+    <value>Waypoint {0}. Sucht eine Minute nach dem Start nach Updates, danach alle sechs Stunden.</value>
+  </data>
+  <data name="Waypoints" xml:space="preserve">
+    <value>Wegmarken</value>
+  </data>
+  <data name="Weapon" xml:space="preserve">
+    <value>Waffe</value>
+  </data>
+  <data name="Weapon swap" xml:space="preserve">
+    <value>Zweitwaffe</value>
+  </data>
+  <data name="WeaponA1" xml:space="preserve">
+    <value>Haupthand</value>
+  </data>
+  <data name="WeaponA2" xml:space="preserve">
+    <value>Nebenhand</value>
+  </data>
+  <data name="WeaponB1" xml:space="preserve">
+    <value>Haupthand (Zweitwaffe)</value>
+  </data>
+  <data name="WeaponB2" xml:space="preserve">
+    <value>Nebenhand (Zweitwaffe)</value>
+  </data>
+  <data name="Weaponsmith" xml:space="preserve">
+    <value>Waffenschmied</value>
+  </data>
+  <data name="Weekly" xml:space="preserve">
+    <value>Wöchentlich</value>
+  </data>
+  <data name="Weekly meta reward ready" xml:space="preserve">
+    <value>Wöchentliche Meta-Belohnung bereit</value>
+  </data>
+  <data name="Weekly objective complete" xml:space="preserve">
+    <value>Wöchentliches Ziel erledigt</value>
+  </data>
+  <data name="west" xml:space="preserve">
+    <value>Westen</value>
+  </data>
+  <data name="What is left to gather or buy after what you are already holding." xml:space="preserve">
+    <value>Was nach deinem Bestand noch zu sammeln oder zu kaufen bleibt.</value>
+  </data>
+  <data name="What one costs in raw materials. Open Find to have your own counted." xml:space="preserve">
+    <value>Was eines an Rohstoffen kostet. Öffne die Suche, um deinen Bestand mitzuzählen.</value>
+  </data>
+  <data name="What the API reports. It is known to omit some Heart of Thorns and Icebrood Saga steps even when they are finished, and replaying a chapter can disturb what follows it — so a gap here is not proof you missed something." xml:space="preserve">
+    <value>Was die API meldet. Sie lässt bekanntlich einige Schritte aus Heart of Thorns und der Eisbrut-Saga aus, auch wenn sie abgeschlossen sind, und ein wiederholtes Kapitel kann das Folgende durcheinanderbringen – eine Lücke hier beweist also nicht, dass du etwas verpasst hast.</value>
+  </data>
+  <data name="What the app did with the bridge and the game: which PC it found, where, how long it took, and what came back. Useful after a session rather than during one, because the interesting failures happen while nobody is looking at either screen. It records lengths and outcomes, never what was pasted or your API key." xml:space="preserve">
+    <value>Was die App mit der Bridge und dem Spiel gemacht hat: welchen PC sie gefunden hat, wo, wie lange es gedauert hat und was zurückkam. Nützlich nach einer Sitzung, nicht währenddessen, denn die interessanten Fehler passieren, wenn niemand auf einen der beiden Bildschirme schaut. Festgehalten werden Längen und Ergebnisse, nie das Eingefügte oder dein API-Schlüssel.</value>
+  </data>
+  <data name="WHAT TO MAKE NEXT" xml:space="preserve">
+    <value>WAS DU ALS NÄCHSTES HERSTELLST</value>
+  </data>
+  <data name="WHAT YOU OWN" xml:space="preserve">
+    <value>WAS DU BESITZT</value>
+  </data>
+  <data name="What your coin buys at today's exchange" xml:space="preserve">
+    <value>Was dein Gold beim heutigen Umtausch bringt</value>
+  </data>
+  <data name="WHERE IS MY…" xml:space="preserve">
+    <value>WO IST MEIN…</value>
+  </data>
+  <data name="WHERE TO FIND THIS" xml:space="preserve">
+    <value>WO ES ZU FINDEN IST</value>
+  </data>
+  <data name="WINDOW" xml:space="preserve">
+    <value>FENSTER</value>
+  </data>
+  <data name="Wizard's Vault" xml:space="preserve">
+    <value>Gewölbe des Zauberers</value>
+  </data>
+  <data name="Wizard's Vault dailies" xml:space="preserve">
+    <value>Tägliche Gewölbe-Ziele</value>
+  </data>
+  <data name="Wizard's Vault rewards waiting to be claimed, and trades that closed." xml:space="preserve">
+    <value>Abholbereite Belohnungen im Gewölbe des Zauberers und abgeschlossene Handelsposten-Geschäfte.</value>
+  </data>
+  <data name="Wizard's Vault weekly" xml:space="preserve">
+    <value>Wöchentliche Gewölbe-Ziele</value>
+  </data>
+  <data name="Works in chairs" xml:space="preserve">
+    <value>Geht auf Stühlen</value>
+  </data>
+  <data name="World boss" xml:space="preserve">
+    <value>Weltenboss</value>
+  </data>
+  <data name="World Bosses" xml:space="preserve">
+    <value>Weltenbosse</value>
+  </data>
+  <data name="WvW rank" xml:space="preserve">
+    <value>WvW-Rang</value>
+  </data>
+  <data name="yesterday" xml:space="preserve">
+    <value>gestern</value>
+  </data>
+  <data name="you are on this map" xml:space="preserve">
+    <value>du bist auf dieser Karte</value>
+  </data>
+  <data name="You can make one right now." xml:space="preserve">
+    <value>Du kannst jetzt eins herstellen.</value>
+  </data>
+  <data name="You can make {0:N0} right now." xml:space="preserve">
+    <value>Du kannst jetzt {0:N0} herstellen.</value>
+  </data>
+  <data name="You have none of what this needs." xml:space="preserve">
+    <value>Du hast nichts von dem, was dafür nötig ist.</value>
+  </data>
+  <data name="You would keep {0} selling one instantly." xml:space="preserve">
+    <value>Beim Sofortverkauf von einem bleiben dir {0}.</value>
+  </data>
+  <data name="Your API key is missing a permission this screen needs." xml:space="preserve">
+    <value>Deinem API-Schlüssel fehlt eine Berechtigung, die diese Seite braucht.</value>
+  </data>
+  <data name="Your API key is missing the 'unlocks' permission. Settings shows which permissions this key carries." xml:space="preserve">
+    <value>Deinem API-Schlüssel fehlt die Berechtigung „unlocks“. Unter Einstellungen siehst du, welche Berechtigungen er hat.</value>
+  </data>
+  <data name="Your API key was rejected. Add a new one under Settings." xml:space="preserve">
+    <value>Dein API-Schlüssel wurde abgelehnt. Füge unter Einstellungen einen neuen hinzu.</value>
+  </data>
+  <data name="your characters" xml:space="preserve">
+    <value>deine Charaktere</value>
+  </data>
+  <data name="Your key has everything the app asks for." xml:space="preserve">
+    <value>Dein Schlüssel hat alles, was die App braucht.</value>
+  </data>
+  <data name="Your key is missing {0}. Tick it on account.arena.net, make a new key, and scan it again — a key's permissions cannot be changed after it is made." xml:space="preserve">
+    <value>Deinem Schlüssel fehlt {0}. Hake es auf account.arena.net an, erstelle einen neuen Schlüssel und scanne ihn erneut – die Berechtigungen eines Schlüssels lassen sich nachträglich nicht ändern.</value>
+  </data>
+  <data name="your storage" xml:space="preserve">
+    <value>dein Lager</value>
+  </data>
+  <data name="your unlocks" xml:space="preserve">
+    <value>deine Freischaltungen</value>
+  </data>
+  <data name="your wallet" xml:space="preserve">
+    <value>deine Geldbörse</value>
+  </data>
+  <data name="YOURS" xml:space="preserve">
+    <value>DEINE</value>
+  </data>
+  <data name="yours alone" xml:space="preserve">
+    <value>nur deins</value>
+  </data>
+  <data name="{0:0.#} MB" xml:space="preserve">
+    <value>{0:0.#} MB</value>
+  </data>
+  <data name="{0:0} along the trail" xml:space="preserve">
+    <value>{0:0} den Pfad entlang</value>
+  </data>
+  <data name="{0:0} away" xml:space="preserve">
+    <value>{0:0} entfernt</value>
+  </data>
+  <data name="{0:0} away · {1}" xml:space="preserve">
+    <value>{0:0} entfernt · {1}</value>
+  </data>
+  <data name="{0:0} m higher" xml:space="preserve">
+    <value>{0:0} m höher</value>
+  </data>
+  <data name="{0:0} m lower" xml:space="preserve">
+    <value>{0:0} m tiefer</value>
+  </data>
+  <data name="{0:0} min" xml:space="preserve">
+    <value>{0:0} Min.</value>
+  </data>
+  <data name="{0:0} to the trail" xml:space="preserve">
+    <value>{0:0} bis zum Pfad</value>
+  </data>
+  <data name="{0:0} to the trail, then {1:0} along it" xml:space="preserve">
+    <value>{0:0} bis zum Pfad, dann {1:0} auf ihm entlang</value>
+  </data>
+  <data name="{0:N0} ahead of you" xml:space="preserve">
+    <value>{0:N0} vor dir</value>
+  </data>
+  <data name="{0:N0} d" xml:space="preserve">
+    <value>{0:N0} Tg.</value>
+  </data>
+  <data name="{0:N0} earned, {1:N0} spent." xml:space="preserve">
+    <value>{0:N0} verdient, {1:N0} ausgegeben.</value>
+  </data>
+  <data name="{0:N0} from stock" xml:space="preserve">
+    <value>{0:N0} aus dem Vorrat</value>
+  </data>
+  <data name="{0:N0} gems sell back for {1} — {2} of what went in" xml:space="preserve">
+    <value>{0:N0} Edelsteine bringen zurück {1} — {2} des Einsatzes</value>
+  </data>
+  <data name="{0:N0} gems sell for {1}" xml:space="preserve">
+    <value>{0:N0} Edelsteine bringen {1}</value>
+  </data>
+  <data name="{0:N0} h" xml:space="preserve">
+    <value>{0:N0} Std.</value>
+  </data>
+  <data name="{0:N0} held" xml:space="preserve">
+    <value>{0:N0} vorhanden</value>
+  </data>
+  <data name="{0:N0} item" xml:space="preserve">
+    <value>{0:N0} Gegenstand</value>
+  </data>
+  <data name="{0:N0} items" xml:space="preserve">
+    <value>{0:N0} Gegenstände</value>
+  </data>
+  <data name="{0:N0} items known, {1:N0} of them tradable · {2:N0} recipes." xml:space="preserve">
+    <value>{0:N0} Gegenstände bekannt, davon {1:N0} handelbar · {2:N0} Rezepte.</value>
+  </data>
+  <data name="{0:N0} items · {1}" xml:space="preserve">
+    <value>{0:N0} Gegenstände · {1}</value>
+  </data>
+  <data name="{0:N0} luck consumed · {1:N0} more for {2}%. Base magic find only." xml:space="preserve">
+    <value>{0:N0} Glück verbraucht · noch {1:N0} bis {2} %. Nur der Grundwert der Magiefundchance.</value>
+  </data>
+  <data name="{0:N0} luck consumed — the 300% cap, which costs {1:N0}." xml:space="preserve">
+    <value>{0:N0} Glück verbraucht – die Obergrenze von 300 %, die {1:N0} kostet.</value>
+  </data>
+  <data name="{0:N0} mastery points waiting to be spent." xml:space="preserve">
+    <value>{0:N0} Beherrschungspunkte warten darauf, ausgegeben zu werden.</value>
+  </data>
+  <data name="{0:N0} more at your price" xml:space="preserve">
+    <value>{0:N0} weitere zu deinem Preis</value>
+  </data>
+  <data name="{0:N0} needed" xml:space="preserve">
+    <value>{0:N0} benötigt</value>
+  </data>
+  <data name="{0:N0} of {1:N0}" xml:space="preserve">
+    <value>{0:N0} von {1:N0}</value>
+  </data>
+  <data name="{0:N0} of {1:N0} collected" xml:space="preserve">
+    <value>{0:N0} von {1:N0} gesammelt</value>
+  </data>
+  <data name="{0:N0} of {1:N0} unlocked" xml:space="preserve">
+    <value>{0:N0} von {1:N0} freigeschaltet</value>
+  </data>
+  <data name="{0:N0} of {1:N0} {2} · {3:N0} still to unlock" xml:space="preserve">
+    <value>{0:N0} von {1:N0} {2} · {3:N0} noch freizuschalten</value>
+  </data>
+  <data name="{0:N0} outbid" xml:space="preserve">
+    <value>{0:N0} überboten</value>
+  </data>
+  <data name="{0:N0} recipes can be made from what you are holding." xml:space="preserve">
+    <value>Aus deinen Vorräten lassen sich {0:N0} Rezepte herstellen.</value>
+  </data>
+  <data name="{0:N0} stacks are account-bound and have no market value." xml:space="preserve">
+    <value>{0:N0} Stapel sind accountgebunden und haben keinen Marktwert.</value>
+  </data>
+  <data name="{0:N0} still named in the phone's earlier language; downloading renames them." xml:space="preserve">
+    <value>{0:N0} tragen noch Namen in der früheren Sprache des Handys; Herunterladen benennt sie um.</value>
+  </data>
+  <data name="{0:N0} to go" xml:space="preserve">
+    <value>noch {0:N0}</value>
+  </data>
+  <data name="{0:N0} to spend · {1:N0} earned" xml:space="preserve">
+    <value>{0:N0} verfügbar · {1:N0} verdient</value>
+  </data>
+  <data name="{0:N0} undercut" xml:space="preserve">
+    <value>{0:N0} unterboten</value>
+  </data>
+  <data name="{0:N0} {1} in the game" xml:space="preserve">
+    <value>{0:N0} {1} im Spiel</value>
+  </data>
+  <data name="{0} already up to date" xml:space="preserve">
+    <value>{0} schon aktuell</value>
+  </data>
+  <data name="{0} Also tried every address on {1} directly." xml:space="preserve">
+    <value>{0} Außerdem jede Adresse in {1} direkt versucht.</value>
+  </data>
+  <data name="{0} and {1}" xml:space="preserve">
+    <value>{0} und {1}</value>
+  </data>
+  <data name="{0} and {1} more" xml:space="preserve">
+    <value>{0} und {1} weitere</value>
+  </data>
+  <data name="{0} answered at {1} but could not prove it holds the same pairing secret. If the bridge was reinstalled or its settings were cleared, scan its QR code again." xml:space="preserve">
+    <value>{0} hat unter {1} geantwortet, konnte aber nicht beweisen, dass er dasselbe Kopplungsgeheimnis hat. Wurde die Bridge neu installiert oder wurden ihre Einstellungen gelöscht, scanne ihren QR-Code erneut.</value>
+  </data>
+  <data name="{0} Astral Acclaim waiting in the Wizard's Vault." xml:space="preserve">
+    <value>{0} Astraler Ruhm wartet im Gewölbe des Zauberers.</value>
+  </data>
+  <data name="{0} at {1:HH:mm}" xml:space="preserve">
+    <value>{0} um {1:HH:mm}</value>
+  </data>
+  <data name="{0} attunement" xml:space="preserve">
+    <value>{0}-Einstimmung</value>
+  </data>
+  <data name="{0} bought" xml:space="preserve">
+    <value>{0} gekauft</value>
+  </data>
+  <data name="{0} buys {1:N0} gem" xml:space="preserve">
+    <value>{0} kauft {1:N0} Edelstein</value>
+  </data>
+  <data name="{0} buys {1:N0} gems" xml:space="preserve">
+    <value>{0} kauft {1:N0} Edelsteine</value>
+  </data>
+  <data name="{0} chosen line(s) have fewer than three traits." xml:space="preserve">
+    <value>{0} gewählte Linie(n) haben weniger als drei Eigenschaften.</value>
+  </data>
+  <data name="{0} could not be reached" xml:space="preserve">
+    <value>{0} nicht erreichbar</value>
+  </data>
+  <data name="{0} days ago" xml:space="preserve">
+    <value>vor {0} Tagen</value>
+  </data>
+  <data name="{0} different runes: {1}. A set of six gives the full bonus." xml:space="preserve">
+    <value>{0} verschiedene Runen: {1}. Erst sechs gleiche geben den vollen Bonus.</value>
+  </data>
+  <data name="{0} expansions" xml:space="preserve">
+    <value>{0} Erweiterungen</value>
+  </data>
+  <data name="{0} finished hero points and bosses hidden, {1} by the filter." xml:space="preserve">
+    <value>{0} erledigte Heldenpunkte und Bosse ausgeblendet, {1} durch den Filter.</value>
+  </data>
+  <data name="{0} finished hero points and bosses hidden. Hearts, waypoints and vistas stay: the API publishes no completion for them — hide them yourself under Filter." xml:space="preserve">
+    <value>{0} erledigte Heldenpunkte und Bosse ausgeblendet. Herz-Aufgaben, Wegmarken und Panoramen bleiben: Die API meldet für sie keinen Abschluss — blende sie selbst unter Filter aus.</value>
+  </data>
+  <data name="{0} forgotten." xml:space="preserve">
+    <value>{0} vergessen.</value>
+  </data>
+  <data name="{0} free to every account · {1} unlockable" xml:space="preserve">
+    <value>{0} für jeden Account frei · {1} freischaltbar</value>
+  </data>
+  <data name="{0} h {1:00} min" xml:space="preserve">
+    <value>{0} Std. {1:00} Min.</value>
+  </data>
+  <data name="{0} hidden by hand." xml:space="preserve">
+    <value>{0} von Hand ausgeblendet.</value>
+  </data>
+  <data name="{0} hidden by the filter." xml:space="preserve">
+    <value>{0} durch den Filter ausgeblendet.</value>
+  </data>
+  <data name="{0} hours ago" xml:space="preserve">
+    <value>vor {0} Stunden</value>
+  </data>
+  <data name="{0} in a minute" xml:space="preserve">
+    <value>{0} in einer Minute</value>
+  </data>
+  <data name="{0} in {1} min" xml:space="preserve">
+    <value>{0} in {1} Min.</value>
+  </data>
+  <data name="{0} in {1} minutes" xml:space="preserve">
+    <value>{0} in {1} Minuten</value>
+  </data>
+  <data name="{0} is answering at {1} instead of {2}. Use it? This is asked because that PC was paired by typing a code, which cannot prove it is really the same machine. Pairing by QR code never has to ask." xml:space="preserve">
+    <value>{0} antwortet unter {1} statt unter {2}. Verwenden? Das wird gefragt, weil dieser PC per eingetipptem Code gekoppelt wurde, und der kann nicht beweisen, dass es wirklich derselbe Rechner ist. Beim Koppeln per QR-Code ist diese Frage nie nötig.</value>
+  </data>
+  <data name="{0} is at {1}" xml:space="preserve">
+    <value>{0} steht bei {1}</value>
+  </data>
+  <data name="{0} is at {1} now." xml:space="preserve">
+    <value>{0} ist jetzt unter {1}.</value>
+  </data>
+  <data name="{0} is at {1}. Nothing left to learn." xml:space="preserve">
+    <value>{0} ist auf {1}. Nichts mehr zu lernen.</value>
+  </data>
+  <data name="{0} is in the list of paired PCs but this phone has no pairing secret for it. Forget it and pair it again." xml:space="preserve">
+    <value>{0} steht in der Liste der gekoppelten PCs, aber dieses Handy hat kein Kopplungsgeheimnis dafür. Entferne ihn und kopple ihn erneut.</value>
+  </data>
+  <data name="{0} is paired but {1}. It will be found when it is running." xml:space="preserve">
+    <value>{0} ist gekoppelt, aber {1}. Er wird gefunden, sobald er läuft.</value>
+  </data>
+  <data name="{0} is starting" xml:space="preserve">
+    <value>{0} beginnt</value>
+  </data>
+  <data name="{0} is up now" xml:space="preserve">
+    <value>{0} ist jetzt da</value>
+  </data>
+  <data name="{0} is waiting for pickup at the trading post." xml:space="preserve">
+    <value>{0} wartet am Handelsposten auf Abholung.</value>
+  </data>
+  <data name="{0} locked" xml:space="preserve">
+    <value>{0} gesperrt</value>
+  </data>
+  <data name="{0} maps" xml:space="preserve">
+    <value>{0} Karten</value>
+  </data>
+  <data name="{0} maps match — showing the first {1}." xml:space="preserve">
+    <value>{0} Karten passen — die ersten {1} werden gezeigt.</value>
+  </data>
+  <data name="{0} maps." xml:space="preserve">
+    <value>{0} Karten.</value>
+  </data>
+  <data name="{0} markers across {1} maps" xml:space="preserve">
+    <value>{0} Markierungen auf {1} Karten</value>
+  </data>
+  <data name="{0} markers · {1} maps" xml:space="preserve">
+    <value>{0} Marker · {1} Karten</value>
+  </data>
+  <data name="{0} min" xml:space="preserve">
+    <value>{0} Min.</value>
+  </data>
+  <data name="{0} minutes ago" xml:space="preserve">
+    <value>vor {0} Minuten</value>
+  </data>
+  <data name="{0} moved but {1}." xml:space="preserve">
+    <value>{0} ist umgezogen, aber {1}.</value>
+  </data>
+  <data name="{0} nearest of {1:N0} in progress · {2:N0} finished" xml:space="preserve">
+    <value>Die {0} nächsten von {1:N0} begonnenen · {2:N0} abgeschlossen</value>
+  </data>
+  <data name="{0} of 3 utility skills slotted." xml:space="preserve">
+    <value>{0} von 3 Hilfsfertigkeiten belegt.</value>
+  </data>
+  <data name="{0} of 6 missing: {1}." xml:space="preserve">
+    <value>{0} von 6 fehlen: {1}.</value>
+  </data>
+  <data name="{0} of 6 pieces missing: {1}." xml:space="preserve">
+    <value>{0} von 6 Teilen fehlen: {1}.</value>
+  </data>
+  <data name="{0} of the {1:N0} different items you own." xml:space="preserve">
+    <value>{0} von {1:N0} verschiedenen Gegenständen, die du besitzt.</value>
+  </data>
+  <data name="{0} of {1:N0} items the app has seen." xml:space="preserve">
+    <value>{0} von {1:N0} Gegenständen, die die App kennt.</value>
+  </data>
+  <data name="{0} of {1:N0} tradable items." xml:space="preserve">
+    <value>{0} von {1:N0} handelbaren Gegenständen.</value>
+  </data>
+  <data name="{0} of {1}" xml:space="preserve">
+    <value>{0} von {1}</value>
+  </data>
+  <data name="{0} of {1} armour pieces have no rune." xml:space="preserve">
+    <value>{0} von {1} Rüstungsteilen haben keine Rune.</value>
+  </data>
+  <data name="{0} of {1} hero points left" xml:space="preserve">
+    <value>{0} von {1} Heldenpunkten offen</value>
+  </data>
+  <data name="{0} of {1} lines chosen at level {2}." xml:space="preserve">
+    <value>{0} von {1} Linien gewählt auf Stufe {2}.</value>
+  </data>
+  <data name="{0} of {1} pieces are {2}; {3} differ." xml:space="preserve">
+    <value>{0} von {1} Teilen sind {2}; {3} weichen ab.</value>
+  </data>
+  <data name="{0} of {1} timed bosses left" xml:space="preserve">
+    <value>{0} von {1} Bossen mit fester Zeit offen</value>
+  </data>
+  <data name="{0} of {1} unfinished" xml:space="preserve">
+    <value>{0} von {1} offen</value>
+  </data>
+  <data name="{0} on now" xml:space="preserve">
+    <value>{0} läuft gerade</value>
+  </data>
+  <data name="{0} on this map" xml:space="preserve">
+    <value>{0} auf dieser Karte</value>
+  </data>
+  <data name="{0} open-world maps — type a name to reach story and dungeon instances." xml:space="preserve">
+    <value>{0} Karten der offenen Welt — tippe einen Namen für Story- und Verlies-Instanzen.</value>
+  </data>
+  <data name="{0} outbid" xml:space="preserve">
+    <value>{0} überboten</value>
+  </data>
+  <data name="{0} packs from {1}" xml:space="preserve">
+    <value>{0} Pakete von {1}</value>
+  </data>
+  <data name="{0} packs from {1} · {2} left out, offered over plain http" xml:space="preserve">
+    <value>{0} Pakete von {1} · {2} ausgelassen, nur über unverschlüsseltes http angeboten</value>
+  </data>
+  <data name="{0} paired. Looking for it…" xml:space="preserve">
+    <value>{0} gekoppelt. Suche danach…</value>
+  </data>
+  <data name="{0} pieces are more than 10 levels below {1}." xml:space="preserve">
+    <value>{0} Teile liegen mehr als 10 Stufen unter {1}.</value>
+  </data>
+  <data name="{0} points" xml:space="preserve">
+    <value>{0} Punkte</value>
+  </data>
+  <data name="{0} removed." xml:space="preserve">
+    <value>{0} entfernt.</value>
+  </data>
+  <data name="{0} rewards" xml:space="preserve">
+    <value>{0} Belohnungen</value>
+  </data>
+  <data name="{0} routes" xml:space="preserve">
+    <value>{0} Routen</value>
+  </data>
+  <data name="{0} routes — the most this app keeps" xml:space="preserve">
+    <value>{0} Routen — mehr behält diese App nicht</value>
+  </data>
+  <data name="{0} sold" xml:space="preserve">
+    <value>{0} verkauft</value>
+  </data>
+  <data name="{0} spent. Collect it at any trading post." xml:space="preserve">
+    <value>{0} ausgegeben. Abholen an jedem Handelsposten.</value>
+  </data>
+  <data name="{0} steps" xml:space="preserve">
+    <value>{0} Schritte</value>
+  </data>
+  <data name="{0} the API cannot see" xml:space="preserve">
+    <value>{0} für die API unsichtbar</value>
+  </data>
+  <data name="{0} time-gated crafts not done" xml:space="preserve">
+    <value>{0} zeitbegrenzte Herstellungen offen</value>
+  </data>
+  <data name="{0} to claim" xml:space="preserve">
+    <value>{0} abzuholen</value>
+  </data>
+  <data name="{0} to claim · meta {1}/{2}" xml:space="preserve">
+    <value>{0} abzuholen · Meta {1}/{2}</value>
+  </data>
+  <data name="{0} to convert." xml:space="preserve">
+    <value>{0} zum Umtauschen.</value>
+  </data>
+  <data name="{0} undercut" xml:space="preserve">
+    <value>{0} unterboten</value>
+  </data>
+  <data name="{0} updated" xml:space="preserve">
+    <value>{0} aktualisiert</value>
+  </data>
+  <data name="{0} Wizard's Vault dailies left" xml:space="preserve">
+    <value>{0} tägliche Gewölbe-Ziele offen</value>
+  </data>
+  <data name="{0} you can use" xml:space="preserve">
+    <value>{0} nutzbar</value>
+  </data>
+  <data name="{0} {1} {2} · {3:N0} mastery points" xml:space="preserve">
+    <value>{2} ({1}, {0}) · {3:N0} Beherrschungspunkte</value>
+  </data>
+  <data name="{0} {1} · {2:N0} mastery points" xml:space="preserve">
+    <value>{1} ({0}) · {2:N0} Beherrschungspunkte</value>
+  </data>
+  <data name="{0} · and {1} more" xml:space="preserve">
+    <value>{0} · und {1} weitere</value>
+  </data>
+  <data name="{0} · at {1:HH:mm}" xml:space="preserve">
+    <value>{0} · um {1:HH:mm}</value>
+  </data>
+  <data name="{0} · done in game on {1}" xml:space="preserve">
+    <value>{0} · im Spiel ausgeführt auf {1}</value>
+  </data>
+  <data name="{0} · done today" xml:space="preserve">
+    <value>{0} · heute erledigt</value>
+  </data>
+  <data name="{0} · in {1}" xml:space="preserve">
+    <value>{0} · in {1}</value>
+  </data>
+  <data name="{0} · last seen {1}" xml:space="preserve">
+    <value>{0} · zuletzt gesehen {1}</value>
+  </data>
+  <data name="{0} · level {1}" xml:space="preserve">
+    <value>{0} · Stufe {1}</value>
+  </data>
+  <data name="{0} · until {1:HH:mm}" xml:space="preserve">
+    <value>{0} · bis {1:HH:mm}</value>
+  </data>
+  <data name="{0} · {1:0} away" xml:space="preserve">
+    <value>{0} · {1:0} entfernt</value>
+  </data>
+  <data name="{0} · {1} days left" xml:space="preserve">
+    <value>{0} · noch {1} Tage</value>
+  </data>
+  <data name="{0} · {1} other recipe(s)" xml:space="preserve">
+    <value>{0} · {1} weitere(s) Rezept(e)</value>
+  </data>
+  <data name="{0} · {1} to the next tier" xml:space="preserve">
+    <value>{0} · noch {1} bis zur nächsten Stufe</value>
+  </data>
+  <data name="{0} · {1} unread" xml:space="preserve">
+    <value>{0} · {1} nicht gelesen</value>
+  </data>
+  <data name="{0} · {1} · copied here" xml:space="preserve">
+    <value>{0} · {1} · hier kopiert</value>
+  </data>
+  <data name="{0} · {1} · level {2} → {3}" xml:space="preserve">
+    <value>{0} · {1} · Stufe {2} → {3}</value>
+  </data>
+  <data name="{0} · {1} — not enough in {2}" xml:space="preserve">
+    <value>{0} · {1} – nicht genug in {2}</value>
+  </data>
+  <data name="{0} × {1} bought" xml:space="preserve">
+    <value>{0} × {1} gekauft</value>
+  </data>
+  <data name="{0} × {1} sold" xml:space="preserve">
+    <value>{0} × {1} verkauft</value>
+  </data>
+  <data name="{0} — at the cap" xml:space="preserve">
+    <value>{0} – am Maximum</value>
+  </data>
+  <data name="{0} — equipped" xml:space="preserve">
+    <value>{0} — angelegt</value>
+  </data>
+  <data name="{0} — you asked to be told." xml:space="preserve">
+    <value>{0} — du wolltest Bescheid bekommen.</value>
+  </data>
+  <data name="{0} — you have not done this one today." xml:space="preserve">
+    <value>{0} — heute noch nicht erledigt.</value>
+  </data>
+  <data name="{0} — {1} Astral Acclaim waiting to be claimed." xml:space="preserve">
+    <value>{0} — {1} Astraler Ruhm wartet auf Abholung.</value>
+  </data>
+  <data name="{0}h {1:00}m" xml:space="preserve">
+    <value>{0} Std. {1:00} Min.</value>
+  </data>
+</root>

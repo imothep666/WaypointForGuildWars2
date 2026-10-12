@@ -28,7 +28,7 @@ public abstract class ScanPage : PageView
     {
         Content = new TextBlock
         {
-            Text = "Opening the scanner…",
+            Text = L.T("Opening the scanner…"),
             Classes = { "caption" },
             HorizontalAlignment = HorizontalAlignment.Center,
             Margin = new Thickness(24, 40)
@@ -62,10 +62,10 @@ public abstract class ScanPage : PageView
 public sealed class ScanKeyView : ScanPage
 {
     protected override ScanRequest Request { get; } = new(
-        "Point the camera at the QR code holding your API key.",
+        L.T("Point the camera at the QR code holding your API key."),
         Gw2ApiKey.LooksValid,
-        "That QR code does not hold a Guild Wars 2 API key. Try another.",
-        "Choose a picture of the QR code holding your API key");
+        L.T("That QR code does not hold a Guild Wars 2 API key. Try another."),
+        L.T("Choose a picture of the QR code holding your API key"));
 
     protected override void Deliver(SettingsViewModel settings, string payload) =>
         settings.ScannedKey = payload.Trim();
@@ -82,10 +82,10 @@ public sealed class ScanKeyView : ScanPage
 public sealed class ScanBridgeView : ScanPage
 {
     protected override ScanRequest Request { get; } = new(
-        "Point the camera at the QR code in the bridge window.",
+        L.T("Point the camera at the QR code in the bridge window."),
         payload => BridgeCard.TryParse(payload) is not null,
-        "That QR code is not a bridge pairing. Try the one in the bridge window.",
-        "Choose a picture of the QR code in the bridge window");
+        L.T("That QR code is not a bridge pairing. Try the one in the bridge window."),
+        L.T("Choose a picture of the QR code in the bridge window"));
 
     protected override void Deliver(SettingsViewModel settings, string payload) =>
         settings.ScannedCard = BridgeCard.TryParse(payload);

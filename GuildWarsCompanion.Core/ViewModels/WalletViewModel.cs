@@ -44,7 +44,7 @@ public sealed partial class WalletViewModel(
 
     public ObservableCollection<WalletRow> Currencies { get; } = [];
 
-    protected override string DefaultEmptyMessage => "Pull down to load your currencies.";
+    protected override string DefaultEmptyMessage => L.T("Pull down to load your currencies.");
 
     [RelayCommand]
     public Task RefreshAsync() => RunAsync(async ct =>
@@ -57,13 +57,13 @@ public sealed partial class WalletViewModel(
 
         if (!session.IsAuthenticated)
         {
-            Notice = "Add your API key under Settings to see your wallet.";
+            Notice = L.T("Add your API key under Settings to see your wallet.");
             return;
         }
 
         if (!session.HasPermission(Gw2Permissions.Wallet))
         {
-            Notice = "This key has no 'wallet' permission. Create a new key that includes it.";
+            Notice = L.T("This key has no 'wallet' permission. Create a new key that includes it.");
             return;
         }
 
@@ -81,7 +81,7 @@ public sealed partial class WalletViewModel(
 
         // Said once, at the top: these numbers are from the last time there was a signal.
         if (wallet.FetchedAt is { } taken)
-            Notice = Stale.Describe("your wallet", taken, DateTimeOffset.UtcNow);
+            Notice = Stale.Describe(L.T("your wallet"), taken, DateTimeOffset.UtcNow);
     });
 
     /// <summary>
@@ -142,7 +142,7 @@ public sealed partial class WalletViewModel(
             WorthCaveat = view.Caveat;
 
             if (!view.HasTotal)
-                ErrorMessage = "Nothing added up — the key may be missing a permission.";
+                ErrorMessage = L.T("Nothing added up — the key may be missing a permission.");
         }
         catch (Gw2ApiException ex)
         {

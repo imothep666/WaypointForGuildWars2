@@ -20,7 +20,7 @@ public sealed record AchievementRow(
     /// Only collections name what they are made of, so only those rows lead anywhere. The
     /// hint marks which ones, rather than leaving taps to be discovered by trial.
     /// </summary>
-    public string ChecklistHint => HasChecklist ? "tap for the checklist" : string.Empty;
+    public string ChecklistHint => HasChecklist ? L.T("tap for the checklist") : string.Empty;
 }
 
 /// <summary>What the screen shows, and what it is a slice of.</summary>
@@ -44,19 +44,33 @@ public sealed record CollectionRow(
     /// </summary>
     public bool HasItemPage => ItemId is not null;
 
+    /// <summary>The wiki in the language the name came in, which is the phone's.</summary>
     public string WikiUrl => Wiki.UrlFor(
-        ItemId is null && Kind == "Step" ? Wiki.SearchTerm(Name) : Name);
+        ItemId is null && Kind == "Step" ? Wiki.SearchTerm(Name) : Name, Gw2Language.Current);
 
     /// <summary>Quiet once held; brass while it is still something to go and get.</summary>
     public Color EdgeColor => Done ? Theme.Banked : Theme.Brass;
 
-    public string StatusText => Done ? "have it" : "still needed";
+    public string StatusText => Done ? L.T("have it") : L.T("still needed");
 
     /// <summary>
     /// Most collections are one kind throughout, where "Item" under all fifty rows says
     /// nothing. It earns its place only where skins, miniatures and items are mixed.
     /// </summary>
-    public string KindText => ShowKind ? Kind : string.Empty;
+    public string KindText => ShowKind ? KindName(Kind) : string.Empty;
+
+    /// <summary>
+    /// The kind in the phone's language. <see cref="Kind"/> itself stays English, because
+    /// <see cref="WikiUrl"/> asks it whether this is a step.
+    /// </summary>
+    public static string KindName(string kind) => kind switch
+    {
+        "Skin" => L.T("Skin"),
+        "Item" => L.T("Item"),
+        "Miniature" => L.T("Miniature"),
+        "Step" => L.T("Step"),
+        _ => kind
+    };
 }
 
 /// <summary>A collection achievement, opened.</summary>
@@ -112,12 +126,12 @@ public sealed class AchievementService(
 
         return new AchievementRow(
             tracked.Id,
-            detail?.Name ?? $"Achievement {tracked.Id}",
+            detail?.Name ?? L.F("Achievement {0}", tracked.Id),
             // The instruction, with this tier's number in it — the API leaves a gap there.
             Prose.Clean(AchievementProgress.Requirement(detail?.Requirement, tracked.Max)),
             AchievementProgress.ProgressText(tracked),
             AchievementProgress.RemainingText(tracked),
-            points is > 0 ? $"+{points} AP" : string.Empty,
+            points is > 0 ? L.F("+{0} AP", points) : string.Empty,
             tracked.Fraction,
             detail?.Bits is { Count: > 0 });
     }
@@ -161,8 +175,8 @@ public sealed class AchievementService(
                 detail.Requirement, account?.Max ?? entries.Count)),
             Collection.Summarise(entries),
             rows,
-            "Still needed first. Tap an item for its page, anything else for the wiki — the " +
-            "API names every entry but never says where one comes from.");
+            L.T("Still needed first. Tap an item for its page, anything else for the wiki — the " +
+                "API names every entry but never says where one comes from."));
     }
 
     /// <summary>
@@ -190,7 +204,9 @@ public sealed class AchievementService(
 
         var name = bit.Text is { Length: > 0 } text
             ? text
-            : found?.Name ?? (bit.Id is { } id ? $"{kind} {id}" : kind);
+            : found?.Name ?? (bit.Id is { } id
+                ? $"{CollectionRow.KindName(kind)} {id}"
+                : CollectionRow.KindName(kind));
 
         return new CollectionRow(
             name, kind, done, showKind, found?.Icon,
@@ -242,7 +258,7 @@ public sealed class AchievementService(
         var started = tracked.Count(a => !a.Done && a.Max > 0 && a.Current > 0 && a.Current < a.Max);
         var done = tracked.Count(a => a.Done);
 
-        return $"{shown} nearest of {started:N0} in progress · {done:N0} finished";
+        return L.F("{0} nearest of {1:N0} in progress · {2:N0} finished", shown, started, done);
     }
 
     /// <summary>
@@ -250,6 +266,6 @@ public sealed class AchievementService(
     /// </summary>
     private static string NothingInFlight(IReadOnlyList<Tracked> tracked) =>
         tracked.Count == 0
-            ? "The API reports no achievement progress for this account."
-            : $"Nothing part-finished. All {tracked.Count(a => a.Done):N0} you have touched are done.";
+            ? L.T("The API reports no achievement progress for this account.")
+            : L.F("Nothing part-finished. All {0:N0} you have touched are done.", tracked.Count(a => a.Done));
 }

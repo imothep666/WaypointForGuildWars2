@@ -16,7 +16,7 @@
             <!-- Coins from completed sales, in the same three metals as the wallet. -->
             <Border Classes="card" IsVisible="{Binding HasCoins}">
                 <StackPanel Spacing="8">
-                    <TextBlock Text="READY TO COLLECT" Classes="heading small" />
+                    <TextBlock Text="{ui:T 'READY TO COLLECT'}" Classes="heading small" />
                     <!-- The metals in their own colours. -->
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <TextBlock Text="{Binding Coins.Gold}" FontFamily="{StaticResource BarlowSemiBold}"

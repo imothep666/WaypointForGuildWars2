@@ -31,18 +31,18 @@ public static class Areas
     {
         "account" =>
         [
-            new("Wallet", "//account/wallet"),
-            new("Materials", "//account/materials"),
-            new("Find", "//account/find"),
-            new("Standing", "//account/standing"),
-            new("Masteries", "//account/masteries")
+            new(L.T("Wallet"), "//account/wallet"),
+            new(L.T("Materials"), "//account/materials"),
+            new(L.T("Find"), "//account/find"),
+            new(L.T("Standing"), "//account/standing"),
+            new(L.T("Masteries"), "//account/masteries")
         ],
         "tradingpost" =>
         [
-            new("Orders", "//tradingpost/orders"),
-            new("Pickup", "//tradingpost/delivery"),
-            new("Watch", "//tradingpost/watch"),
-            new("History", "//tradingpost/history")
+            new(L.T("Orders"), "//tradingpost/orders"),
+            new(L.T("Pickup"), "//tradingpost/delivery"),
+            new(L.T("Watch"), "//tradingpost/watch"),
+            new(L.T("History"), "//tradingpost/history")
         ],
         _ => []
     };

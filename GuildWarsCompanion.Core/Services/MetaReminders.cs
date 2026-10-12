@@ -77,10 +77,10 @@ public static class MetaAlerts
     /// <summary>"Battle in Tarir (Octovine) in 20 minutes".</summary>
     public static string Title(MetaCall call) => call.MinutesAway switch
     {
-        <= 0 => $"{call.Event} is starting",
-        1 => $"{call.Event} in a minute",
-        _ => $"{call.Event} in {call.MinutesAway} minutes"
+        <= 0 => L.F("{0} is starting", call.Event),
+        1 => L.F("{0} in a minute", call.Event),
+        _ => L.F("{0} in {1} minutes", call.Event, call.MinutesAway)
     };
 
-    public static string Body(MetaCall call) => $"{call.MapName} · at {call.At.ToLocalTime():HH:mm}";
+    public static string Body(MetaCall call) => L.F("{0} · at {1:HH:mm}", call.MapName, call.At.ToLocalTime());
 }

@@ -41,7 +41,7 @@ public static class Collection
     {
         var have = entries.Count(entry => entry.Done);
 
-        return $"{have:N0} of {entries.Count:N0} collected";
+        return L.F("{0:N0} of {1:N0} collected", have, entries.Count);
     }
 
     /// <summary>How many are still wanted.</summary>
@@ -55,6 +55,6 @@ public static class Collection
     {
         var have = count - Outstanding(count, completed);
 
-        return $"{have:N0} of {count:N0} collected";
+        return L.F("{0:N0} of {1:N0} collected", have, count);
     }
 }

@@ -92,14 +92,14 @@ public sealed record CompassVisibility(
     /// <summary>The plural a filter row is labelled with. "Hearts", not "Heart".</summary>
     public static string Plural(TargetKind kind) => kind switch
     {
-        TargetKind.Heart => "Hearts",
-        TargetKind.Waypoint => "Waypoints",
-        TargetKind.Landmark => "Landmarks",
-        TargetKind.Vista => "Vistas",
-        TargetKind.HeroPoint => "Hero points",
-        TargetKind.Chest => "Chests",
-        TargetKind.JumpingPuzzle => "Jumping puzzles",
-        _ => "World bosses"
+        TargetKind.Heart => L.T("Hearts"),
+        TargetKind.Waypoint => L.T("Waypoints"),
+        TargetKind.Landmark => L.T("Landmarks"),
+        TargetKind.Vista => L.T("Vistas"),
+        TargetKind.HeroPoint => L.T("Hero points"),
+        TargetKind.Chest => L.T("Chests"),
+        TargetKind.JumpingPuzzle => L.T("Jumping puzzles"),
+        _ => L.T("World bosses")
     };
 }
 

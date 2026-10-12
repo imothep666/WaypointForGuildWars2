@@ -268,8 +268,8 @@ public static class Emotes
     public static string Summarise(IReadOnlySet<string>? unlocked)
     {
         if (unlocked is null)
-            return $"{Catalogue.Count(emote => emote.IsFree)} free to every account · " +
-                   $"{Catalogue.Count(emote => !emote.IsFree)} unlockable";
+            return L.F("{0} free to every account · {1} unlockable",
+                Catalogue.Count(emote => emote.IsFree), Catalogue.Count(emote => !emote.IsFree));
 
         var states = Catalogue.Select(emote => StateOf(emote, unlocked)).ToList();
 
@@ -277,15 +277,16 @@ public static class Emotes
         var locked = states.Count(state => state is EmoteState.Locked);
         var untracked = states.Count(state => state is EmoteState.Untracked);
 
-        var parts = new List<string> { $"{usable} you can use" };
+        var parts = new List<string> { L.F("{0} you can use", usable) };
 
-        if (locked > 0) parts.Add($"{locked} locked");
-        if (untracked > 0) parts.Add($"{untracked} the API cannot see");
+        if (locked > 0) parts.Add(L.F("{0} locked", locked));
+        if (untracked > 0) parts.Add(L.F("{0} the API cannot see", untracked));
 
         return string.Join(" · ", parts);
     }
 
-    /// <summary>Why a third of the screen has no verdict on it.</summary>
+    /// <summary>Why a third of the screen has no verdict on it. English; see
+    /// <see cref="EmoteService.View"/> for where it is put in the phone's language.</summary>
     public const string Note =
         "Guild Wars 2 publishes only 14 of its 43 unlockable emotes, so the account endpoint " +
         "can answer for those and no others. The rest — every gem-store emote tome — are " +

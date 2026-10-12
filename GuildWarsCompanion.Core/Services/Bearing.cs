@@ -77,14 +77,14 @@ public static class Bearing
 
         return ((((eighth % 8) + 8) % 8) switch
         {
-            1 => "north-east",
-            2 => "east",
-            3 => "south-east",
-            4 => "south",
-            5 => "south-west",
-            6 => "west",
-            7 => "north-west",
-            _ => "north"
+            1 => L.T("north-east"),
+            2 => L.T("east"),
+            3 => L.T("south-east"),
+            4 => L.T("south"),
+            5 => L.T("south-west"),
+            6 => L.T("west"),
+            7 => L.T("north-west"),
+            _ => L.T("north")
         });
     }
 
@@ -99,15 +99,16 @@ public static class Bearing
     {
         var degrees = relativeRadians * 180 / Math.PI;
         var turn = Math.Abs(degrees);
-        var side = degrees < 0 ? "left" : "right";
+        var left = degrees < 0;
 
+        // Whole phrases rather than a word and a side: another language may put the side first.
         return turn switch
         {
-            < 10 => "straight ahead",
-            < 60 => $"bear {side}",
-            < 120 => $"turn {side}",
-            < 170 => $"hard {side}",
-            _ => "turn around"
+            < 10 => L.T("straight ahead"),
+            < 60 => left ? L.T("bear left") : L.T("bear right"),
+            < 120 => left ? L.T("turn left") : L.T("turn right"),
+            < 170 => left ? L.T("hard left") : L.T("hard right"),
+            _ => L.T("turn around")
         };
     }
 }

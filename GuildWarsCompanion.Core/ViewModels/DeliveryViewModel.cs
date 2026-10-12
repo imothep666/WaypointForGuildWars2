@@ -16,7 +16,7 @@ public sealed partial class DeliveryViewModel(TradingPostService trading, ApiKey
 
     public ObservableCollection<OrderRow> Items { get; } = [];
 
-    protected override string DefaultEmptyMessage => "Nothing waiting for collection.";
+    protected override string DefaultEmptyMessage => L.T("Nothing waiting for collection.");
 
     [RelayCommand]
     public Task RefreshAsync() => RunAsync(async ct =>
@@ -28,13 +28,13 @@ public sealed partial class DeliveryViewModel(TradingPostService trading, ApiKey
 
         if (!session.IsAuthenticated)
         {
-            Notice = "Add your API key under Settings to see the trading post.";
+            Notice = L.T("Add your API key under Settings to see the trading post.");
             return;
         }
 
         if (!session.HasPermission(Gw2Permissions.TradingPost))
         {
-            Notice = "This key has no 'tradingpost' permission. Create a new key that includes it.";
+            Notice = L.T("This key has no 'tradingpost' permission. Create a new key that includes it.");
             return;
         }
 
@@ -49,6 +49,6 @@ public sealed partial class DeliveryViewModel(TradingPostService trading, ApiKey
         // One statement per screen: the coin panel already says coins are waiting, so the
         // empty list must not answer "nothing is waiting" underneath it.
         if (view.Items.Count == 0)
-            Notice = view.HasCoins ? "No items waiting — only coins." : "Nothing waiting for collection.";
+            Notice = view.HasCoins ? L.T("No items waiting — only coins.") : L.T("Nothing waiting for collection.");
     });
 }

@@ -19,7 +19,7 @@ public sealed partial class UnlockCategoryRow(UnlockTally tally) : ObservableObj
     public string Name => Category.Name;
 
     /// <summary>"412 of 682", or a reason when the category could not be read.</summary>
-    public string Line => IsUnknown ? "could not be read" : tally.Line;
+    public string Line => IsUnknown ? L.T("could not be read") : tally.Line;
 
     public double Fraction => tally.Fraction;
 
@@ -37,7 +37,7 @@ public sealed partial class UnlockCategoryRow(UnlockTally tally) : ObservableObj
 
     /// <summary>Said on the row rather than after a tap that does nothing.</summary>
     public string? Aside =>
-        Category.Browsable ? null : "count only — fourteen thousand names is a download of its own";
+        Category.Browsable ? null : L.T("count only — fourteen thousand names is a download of its own");
 
     public bool HasAside => Aside is not null;
 }
@@ -175,7 +175,7 @@ public sealed partial class UnlocksViewModel(UnlockService unlocks, ApiKeySessio
     /// </summary>
     [ObservableProperty] private bool _isRefreshing;
 
-    protected override string DefaultEmptyMessage => "Pull down to read your unlocks.";
+    protected override string DefaultEmptyMessage => L.T("Pull down to read your unlocks.");
 
     [RelayCommand]
     public Task RefreshAsync() => RunAsync(async ct =>
@@ -190,14 +190,14 @@ public sealed partial class UnlocksViewModel(UnlockService unlocks, ApiKeySessio
 
             if (!session.IsAuthenticated)
             {
-                Notice = "Add your API key under Settings to see your unlocks.";
+                Notice = L.T("Add your API key under Settings to see your unlocks.");
                 return;
             }
 
             if (!unlocks.CanRead)
             {
-                Notice = "Your API key is missing the 'unlocks' permission. " +
-                         "Settings shows which permissions this key carries.";
+                Notice = L.T("Your API key is missing the 'unlocks' permission. " +
+                             "Settings shows which permissions this key carries.");
                 return;
             }
 

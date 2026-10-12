@@ -48,7 +48,7 @@ public sealed class WorthService(
         var coin = wallet.Value.FirstOrDefault(row => row.CurrencyId == CoinCurrencyId)?.RawValue ?? 0;
 
         if (coin <= 0)
-            return new GemView(string.Empty, null, "Nothing in the wallet to convert.", false);
+            return new GemView(string.Empty, null, L.T("Nothing in the wallet to convert."), false);
 
         var buying = await client.GetGemsForCoinAsync(coin, ct);
 
@@ -68,9 +68,9 @@ public sealed class WorthService(
         return new GemView(
             GemExchange.Buys(coin, buying.Quantity),
             back,
-            "Quoted for your own coin: the exchange prices each trade separately and prices a " +
-            "small one worse. It moves through the day, which is why gems are left out of the " +
-            "total above.",
+            L.T("Quoted for your own coin: the exchange prices each trade separately and prices a " +
+                "small one worse. It moves through the day, which is why gems are left out of the " +
+                "total above."),
             true);
     }
 

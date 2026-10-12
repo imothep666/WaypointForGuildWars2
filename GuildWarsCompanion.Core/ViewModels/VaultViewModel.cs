@@ -24,7 +24,7 @@ public sealed partial class VaultViewModel(VaultService vault, ApiKeySession ses
     public bool HasShopNote => ShopNote is not null;
 
     /// <summary>What there is to do, and what there is to spend it on: two lists, not one scroll.</summary>
-    public ObservableCollection<PageTab> Tabs { get; } = [new("Objectives", 0) { IsSelected = true }, new("Shop", 1)];
+    public ObservableCollection<PageTab> Tabs { get; } = [new(L.T("Objectives"), 0) { IsSelected = true }, new(L.T("Shop"), 1)];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsObjectives))]
@@ -41,7 +41,7 @@ public sealed partial class VaultViewModel(VaultService vault, ApiKeySession ses
         foreach (var candidate in Tabs) candidate.IsSelected = candidate.Index == tab.Index;
     }
 
-    protected override string DefaultEmptyMessage => "Pull down to load your objectives.";
+    protected override string DefaultEmptyMessage => L.T("Pull down to load your objectives.");
 
     [RelayCommand]
     public Task RefreshAsync() => RunAsync(async ct =>
@@ -54,13 +54,13 @@ public sealed partial class VaultViewModel(VaultService vault, ApiKeySession ses
 
         if (!session.IsAuthenticated)
         {
-            Notice = "Add your API key under Settings to see the Wizard's Vault.";
+            Notice = L.T("Add your API key under Settings to see the Wizard's Vault.");
             return;
         }
 
         if (!session.HasPermission(Gw2Permissions.Progression))
         {
-            Notice = "This key has no 'progression' permission. Create a new key that includes it.";
+            Notice = L.T("This key has no 'progression' permission. Create a new key that includes it.");
             return;
         }
 

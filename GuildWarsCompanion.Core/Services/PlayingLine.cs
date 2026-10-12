@@ -14,6 +14,6 @@ public static class PlayingLine
 {
     public static string? Describe(GameReport? report) =>
         report is { IsLive: true, State: { CharacterName.Length: > 0 } state }
-            ? $"{state.Line} · in {report.MapLabel}"
+            ? L.F("{0} · in {1}", GameText.Line(state), report.MapLabel)
             : null;
 }

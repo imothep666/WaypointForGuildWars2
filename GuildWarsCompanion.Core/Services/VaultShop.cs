@@ -6,12 +6,14 @@ namespace GuildWarsCompanion.Services;
 /// <param name="Left">At most how many more may be bought, when the API reported a purchase of
 /// it; null when unlimited, or when it reported none — which says nothing; see <see cref="VaultShop"/>.</param>
 /// <param name="Featured">On the vault's banner, where the game paints each reward large.</param>
+/// <param name="EnglishName">The reward's English name, when it is known: the wiki's banner
+/// files are named in English whatever the phone is set to.</param>
 public sealed record VaultShopRow(
     int ItemId, string Name, string? Icon, int Count, int Cost, int? Limit, int? Left, bool Affordable,
-    bool Featured = false)
+    bool Featured = false, string? EnglishName = null)
 {
     /// <summary>The name the wiki files the reward's banner painting under; only featured rewards have one.</summary>
-    public string? BannerName => Featured ? Name : null;
+    public string? BannerName => Featured ? EnglishName ?? Name : null;
 
     public string Title => Count > 1 ? $"{Name} × {Count}" : Name;
 
@@ -19,10 +21,10 @@ public sealed record VaultShopRow(
 
     public string LimitText => Limit switch
     {
-        null => "unlimited",
-        _ when Left is 0 => "bought out",
-        _ when Left is { } left => $"at most {left} of {Limit} left",
-        _ => $"limit {Limit}"
+        null => L.T("unlimited"),
+        _ when Left is 0 => L.T("bought out"),
+        _ when Left is { } left => L.F("at most {0} of {1} left", left, Limit),
+        _ => L.F("limit {0}", Limit)
     };
 
     /// <summary>Brass when it can be bought now — enough Acclaim, and not bought out.</summary>
@@ -52,16 +54,18 @@ public sealed class VaultShopSection(string name, string summary, IEnumerable<Va
 public static class VaultShop
 {
     /// <summary>Said above the shop, because the reason the numbers are cautious is not visible.</summary>
-    public const string Caution =
+    public static readonly string Caution = L.T(
         "The API does not report every purchase from the vault, so a limit is shown as set unless a " +
-        "purchase was reported — and then as \"at most\" what is left.";
+        "purchase was reported — and then as \"at most\" what is left.");
 
-    /// <summary>The game's three places, in its order: the banner, the rewards table, the legacy vault.</summary>
+    /// <summary>The game's three places, in its order: the banner, the rewards table, the legacy vault.
+    /// The type is the API's; the name is what the screen says.</summary>
     private static readonly (string Type, string Name)[] Places =
-        [("Featured", "Featured"), ("Normal", "Rewards"), ("Legacy", "Legacy vault")];
+        [("Featured", L.T("Featured")), ("Normal", L.T("Rewards")), ("Legacy", L.T("Legacy vault"))];
 
     public static IReadOnlyList<VaultShopSection> Sections(
-        IReadOnlyList<VaultListing> listings, Func<int, (string Name, string? Icon)> item, long? acclaim)
+        IReadOnlyList<VaultListing> listings, Func<int, (string Name, string? Icon)> item, long? acclaim,
+        Func<int, string?>? englishName = null)
     {
         var sections = new List<VaultShopSection>();
 
@@ -79,7 +83,7 @@ public static class VaultShop
 
                     return new VaultShopRow(listing.ItemId, itemName, icon, listing.ItemCount, listing.Cost,
                         listing.PurchaseLimit, left, acclaim is { } balance && balance >= listing.Cost,
-                        Featured: type == "Featured");
+                        Featured: type == "Featured", EnglishName: englishName?.Invoke(listing.ItemId));
                 })
                 .OrderBy(row => row.Cost)
                 .ThenBy(row => row.Name, StringComparer.CurrentCulture)
@@ -89,7 +93,7 @@ public static class VaultShop
 
             // Just the count: a total of what is left would add up the zeros the API gets wrong,
             // and be the largest wrong number on the screen.
-            sections.Add(new VaultShopSection(name, rows.Count == 1 ? "1 reward" : $"{rows.Count} rewards", rows));
+            sections.Add(new VaultShopSection(name, rows.Count == 1 ? L.T("1 reward") : L.F("{0} rewards", rows.Count), rows));
         }
 
         return sections;

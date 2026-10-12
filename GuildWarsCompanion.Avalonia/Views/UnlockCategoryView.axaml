@@ -86,7 +86,7 @@
                             <TextBlock Text="{Binding Name}" VerticalAlignment="Center"
                                        TextTrimming="CharacterEllipsis"
                                        Foreground="{Binding Ink, Converter={x:Static ui:Paint.Brush}}" />
-                            <TextBlock Grid.Column="1" Text="locked" FontSize="10"
+                            <TextBlock Grid.Column="1" Text="{ui:T 'locked'}" FontSize="10"
                                        Foreground="{StaticResource BrassDimBrush}"
                                        IsVisible="{Binding IsLocked}" VerticalAlignment="Center" />
                         </Grid>

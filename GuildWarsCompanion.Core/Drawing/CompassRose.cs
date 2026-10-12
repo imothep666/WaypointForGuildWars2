@@ -199,19 +199,20 @@ public sealed class CompassRose : IDrawable
         }
     }
 
+    /// <summary>The ring's four letters, in the phone's language: German writes O for east.</summary>
+    private static readonly string[] Letters = [L.T("N"), L.T("E"), L.T("S"), L.T("W")];
+
     private void Cardinals(ICanvas canvas, PointF centre, float radius)
     {
-        string[] letters = ["N", "E", "S", "W"];
-
         canvas.FontSize = 13;
         canvas.FontColor = Mist;
 
-        for (var i = 0; i < letters.Length; i++)
+        for (var i = 0; i < Letters.Length; i++)
         {
             var at = At(centre, radius - 30, i * Math.PI / 2 - Facing);
 
             canvas.DrawString(
-                letters[i], at.X - 10, at.Y - 9, 20, 18,
+                Letters[i], at.X - 10, at.Y - 9, 20, 18,
                 HorizontalAlignment.Center, VerticalAlignment.Center);
         }
     }

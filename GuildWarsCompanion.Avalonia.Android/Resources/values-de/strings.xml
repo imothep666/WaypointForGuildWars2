@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_bosses">Weltenbosse</string>
+    <string name="widget_here">Hier</string>
+    <string name="widget_vault">Gewölbe des Zauberers</string>
+    <string name="widget_daily">TÄGLICH</string>
+    <string name="widget_weekly">WÖCHENTLICH</string>
+</resources>

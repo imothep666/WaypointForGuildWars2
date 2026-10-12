@@ -96,13 +96,15 @@ public static class SessionRecap
     {
         var span = TimeSpan.FromSeconds(seconds);
 
-        return span.TotalHours >= 1 ? $"{(int)span.TotalHours} h {span.Minutes:00} min" : $"{Math.Max(1, (int)span.TotalMinutes)} min";
+        return span.TotalHours >= 1
+            ? L.F("{0} h {1:00} min", (int)span.TotalHours, span.Minutes)
+            : L.F("{0} min", Math.Max(1, (int)span.TotalMinutes));
     }
 
     /// <summary>"Sweet Child O Night · 1 h 20 min · level 79 → 80".</summary>
     public static string Line(SessionCharacter character) =>
         character.LevelTo > character.LevelFrom
-            ? $"{character.Name} · {Duration(character.Seconds)} · level {character.LevelFrom} → {character.LevelTo}"
+            ? L.F("{0} · {1} · level {2} → {3}", character.Name, Duration(character.Seconds), character.LevelFrom, character.LevelTo)
             : $"{character.Name} · {Duration(character.Seconds)}";
 
     /// <summary>The coin shown before every currency and as coin; then the rest by size.</summary>
@@ -128,7 +130,7 @@ public static class SessionRecap
         var rest = others.Count - shown;
 
         return parts.Count == 0
-            ? "the wallet did not change"
-            : rest > 0 ? $"{string.Join(" · ", parts)} and {rest} more" : string.Join(" · ", parts);
+            ? L.T("the wallet did not change")
+            : rest > 0 ? L.F("{0} and {1} more", string.Join(" · ", parts), rest) : string.Join(" · ", parts);
     }
 }

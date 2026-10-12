@@ -59,7 +59,7 @@ public sealed record BridgeSend(BridgeOutcome Outcome, string? Pc = null, bool I
     /// no PC to name.</summary>
     public string Text =>
         Outcome == BridgeOutcome.Sent && Pc is not null
-            ? InGame ? $"done in game on {Pc}" : $"sent to {Pc}"
+            ? InGame ? L.F("done in game on {0}", Pc) : L.F("sent to {0}", Pc)
             : BridgeClient.Describe(Outcome);
 }
 
@@ -308,11 +308,11 @@ public sealed class BridgeClient(
     /// <summary>One sentence, in the vocabulary of the person who has to fix it.</summary>
     public static string Describe(BridgeOutcome outcome) => outcome switch
     {
-        BridgeOutcome.Sent => "sent to PC",
-        BridgeOutcome.NotSetUp => "no PC set up",
-        BridgeOutcome.NoAnswer => "no PC answered",
-        BridgeOutcome.WrongCode => "PC rejected the code",
-        BridgeOutcome.ClipboardRefused => "PC's clipboard would not take it",
-        _ => "PC refused it"
+        BridgeOutcome.Sent => L.T("sent to PC"),
+        BridgeOutcome.NotSetUp => L.T("no PC set up"),
+        BridgeOutcome.NoAnswer => L.T("no PC answered"),
+        BridgeOutcome.WrongCode => L.T("PC rejected the code"),
+        BridgeOutcome.ClipboardRefused => L.T("PC's clipboard would not take it"),
+        _ => L.T("PC refused it")
     };
 }

@@ -40,7 +40,7 @@ public enum StreamState
 /// internet. See ROADMAP.md, "SignalR for the compass, HTTP for everything else".
 /// </summary>
 public sealed class GameStream(
-    IStreamBinding binding, BridgeFinder finder, Bridge.Protocol.Journal journal)
+    IStreamBinding binding, BridgeFinder finder, Bridge.Protocol.Journal journal, LocalMapNames names)
 {
     /// <summary>
     /// How long to wait before the first retry after a connection dies.
@@ -141,7 +141,7 @@ public sealed class GameStream(
 
             if (found is null)
             {
-                Trouble = finder.Problem ?? "No paired PC answered.";
+                Trouble = finder.Problem ?? L.T("No paired PC answered.");
                 Pc = null;
 
                 return null;
@@ -285,7 +285,7 @@ public sealed class GameStream(
 
                 State = StreamState.Live;
 
-                yield return report;
+                yield return names.Name(report);
             }
         }
         finally
