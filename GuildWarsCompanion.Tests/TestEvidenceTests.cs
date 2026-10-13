@@ -49,7 +49,7 @@ public class TestEvidenceTests
         var rows = plan.Groups.SelectMany(group => group.Rows).ToList();
 
         Assert.Equal("tick by hand", rows.Single(row => row.Check.Id == "today-here").Evidence);
-        Assert.Equal("ticks itself when the app sees it", rows.Single(row => row.Check.Id == "trail-arrival").Evidence);
+        Assert.Equal("ticks itself when the app sees it", rows.Single(row => row.Check.Id == "goal-pin").Evidence);
     }
 
     [Fact]

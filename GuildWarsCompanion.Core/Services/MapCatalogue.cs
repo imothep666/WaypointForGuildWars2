@@ -66,9 +66,40 @@ public sealed class MapCatalogue(Gw2Client api, Gw2Cache cache)
             }
         }
 
-        _choices = MapPicks.Choices(stored);
+        _choices = MapPicks.Choices(stored, await EnglishNamesAsync(ct));
 
         return _choices;
+    }
+
+    /// <summary>
+    /// Every map's English name, for the picker to search beside the phone's own. Null on an
+    /// English phone, where the names already are English.
+    ///
+    /// Stored names when there are any, otherwise one request — the same one
+    /// <see cref="EnglishNameAsync"/> makes for the wiki's art. With no connection and nothing
+    /// stored the picker simply searches one language, which is what it did before.
+    /// </summary>
+    private async Task<IReadOnlyDictionary<int, string>?> EnglishNamesAsync(CancellationToken ct)
+    {
+        if (api.Language == Gw2Language.English) return null;
+
+        var stored = await cache.GetEnglishMapNamesAsync(ct);
+
+        if (stored.Count > 0 || _englishAsked) return stored;
+
+        try
+        {
+            var names = await api.GetEnglishMapNamesAsync(ct);
+
+            await cache.SaveEnglishMapNamesAsync(names, ct);
+            _englishAsked = true;
+
+            return names;
+        }
+        catch (Gw2ApiException)
+        {
+            return stored;
+        }
     }
 
     /// <summary>Whether every map's English name has been asked for this run, so a map the

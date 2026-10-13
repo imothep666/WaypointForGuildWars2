@@ -11,7 +11,8 @@ namespace GuildWarsCompanion.Services;
 /// opinions, and it answers the question people actually open a companion app to ask.
 /// </summary>
 public sealed class TodayService(
-    Gw2Client client, SnapshotStore snapshots, OfflineReader offline, VaultSignal vaultSignal)
+    Gw2Client client, SnapshotStore snapshots, OfflineReader offline, VaultSignal vaultSignal,
+    FractalService fractals, TestEvidence evidence)
 {
     /// <summary>Dailies roll over at 00:00 UTC; the weekly vault at Monday 07:30 UTC.</summary>
     public static DateTimeOffset NextDailyReset(DateTimeOffset utcNow) =>
@@ -75,6 +76,8 @@ public sealed class TodayService(
             key: "dailycrafting"));
 
         daily.Add(await DungeonsAsync(ct));
+
+        daily.Add(await FractalsAsync(ct));
 
         // Raids are the one tracker on the weekly clock: encounters clear at Monday 07:30
         // UTC, not at the daily reset, so listing them under "Today" would be a lie.
@@ -163,6 +166,35 @@ public sealed class TodayService(
         catch (Gw2ApiException)
         {
             return new TodayRow(L.T("Dungeon paths"), 0, 0, null, Unread: true);
+        }
+    }
+
+    /// <summary>
+    /// The daily fractals left: each of the day's three at the account's tier, and the recommended
+    /// scales it can enter. An account that has never run a fractal has none, and no row.
+    /// </summary>
+    private async Task<TodayRow> FractalsAsync(CancellationToken ct)
+    {
+        try
+        {
+            var view = await fractals.GetAsync(withWallet: false, ct);
+
+            // Kept from before the reset and read offline: yesterday's three fractals are not
+            // today's, and saying so beats listing them.
+            if (view.IsYesterday)
+                return new TodayRow(L.T("Daily fractals"), 0, 0, null, Route: "fractals", Unread: true);
+
+            var counted = view.Counted;
+
+            if (counted.Count > 0) evidence.Saw("fractals-row");
+
+            return new TodayRow(
+                L.T("Daily fractals"), counted.Count(task => task.Done), counted.Count,
+                Join([.. counted.Where(task => !task.Done).Select(task => task.Name)]), Route: "fractals");
+        }
+        catch (Gw2ApiException)
+        {
+            return new TodayRow(L.T("Daily fractals"), 0, 0, null, Route: "fractals", Unread: true);
         }
     }
 

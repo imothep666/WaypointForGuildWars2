@@ -103,6 +103,52 @@ public class MarkerIndexTests
         Assert.Equal(packs, MarkerIndex.Read(MarkerIndex.Write(packs)));
     }
 
+    private const string Tekkit = "https://www.tekkitsworkshop.net/download?download=1:tw-all-in-one";
+
+    [Fact]
+    public void Remembers_the_size_the_server_announced()
+    {
+        var pack = Assert.Single(MarkerIndex.Read(MarkerIndex.Write(
+            [new MarkerPackRecord("t", Tekkit, "tw_ALL_IN_ONE", "", "", 900, 60, 300, 5, 49378661)])));
+
+        Assert.Equal(49378661, pack.Size);
+    }
+
+    /// <summary>A line from before the size was kept reads as "not known", which never matches,
+    /// so the next update downloads once and remembers it.</summary>
+    [Fact]
+    public void A_line_written_before_sizes_has_none()
+    {
+        var pack = Assert.Single(MarkerIndex.Read(
+            MarkerIndex.Version + "\nt\t" + Tekkit + "\ttw\t\t\t900\t60\t300\t5\n"));
+
+        Assert.Equal(0, pack.Size);
+        Assert.False(MarkerIndex.Unchanged(pack, 0));
+    }
+
+    /// <summary>Tekkit's case: no validators, so the size it announces is all there is to go by.</summary>
+    [Fact]
+    public void A_pack_without_validators_is_unchanged_at_the_same_size()
+    {
+        var held = new MarkerPackRecord("t", Tekkit, "tw", "", "", 900, 60, 300, 5, 49378661);
+
+        Assert.True(MarkerIndex.Unchanged(held, 49378661));
+        Assert.False(MarkerIndex.Unchanged(held, 49378662));
+        Assert.False(MarkerIndex.Unchanged(held, null));
+    }
+
+    /// <summary>A server that sets a validator answered 200 despite it, so the pack changed —
+    /// whatever its size says.</summary>
+    [Fact]
+    public void A_pack_with_validators_is_never_judged_by_size()
+    {
+        var tagged = new MarkerPackRecord("m", Metal, "Metal", "\"0x8DD\"", "", 106, 17, 1334, 5, 7000000);
+        var dated = tagged with { Tag = "", Modified = "Sat, 07 Jun 2025 17:00:11 GMT" };
+
+        Assert.False(MarkerIndex.Unchanged(tagged, 7000000));
+        Assert.False(MarkerIndex.Unchanged(dated, 7000000));
+    }
+
     /// <summary>An ETag is a quoted string from a stranger's server; it must not be able to break
     /// the line it is written on.</summary>
     [Fact]

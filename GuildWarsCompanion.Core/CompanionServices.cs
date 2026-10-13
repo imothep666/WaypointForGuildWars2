@@ -61,6 +61,7 @@ public static class CompanionServices
         services.AddSingleton<MasteryService>();
         services.AddSingleton<EventService>();
         services.AddSingleton<TodayService>();
+        services.AddSingleton<FractalService>();
         services.AddSingleton<HereService>();
         services.AddSingleton<MetaSource>();
         services.AddSingleton<MetaReminderStore>();
@@ -156,6 +157,7 @@ public static class CompanionServices
         services.AddSingleton<AchievementsViewModel>();
         services.AddSingleton<CraftingViewModel>();
         services.AddSingleton<StandingViewModel>();
+        services.AddSingleton<FractalsViewModel>();
         services.AddSingleton<EventsViewModel>();
         services.AddSingleton<OrdersViewModel>();
         services.AddSingleton<WatchViewModel>();

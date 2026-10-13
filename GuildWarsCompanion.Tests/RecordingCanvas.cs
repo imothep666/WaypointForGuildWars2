@@ -8,8 +8,13 @@ namespace GuildWarsCompanion.Tests;
 /// transform: the tests here ask what was drawn, in what order and how strongly, not where the
 /// pixels ended up.
 /// </summary>
+/// <param name="Colour">The colour the call drew in: the fill colour for a fill, the font colour
+/// for text, the stroke colour for the rest.</param>
+/// <param name="Stroke">The stroke width at the time of the call.</param>
+/// <param name="Path">The path itself, for a path: its points, and whether a later frame was
+/// handed the same one.</param>
 public sealed record DrawCall(string Name, float X, float Y, float Width, float Height, float Alpha,
-    string? Text = null);
+    string? Text = null, Color? Colour = null, float Stroke = 0, PathF? Path = null);
 
 /// <summary>
 /// A canvas that draws nothing and remembers everything, so a drawable can be tested without a
@@ -52,8 +57,12 @@ public sealed class RecordingCanvas : ICanvas
     public BlendMode BlendMode { get; set; }
 
     private void Record(string name, float x = 0, float y = 0, float width = 0, float height = 0,
-        string? text = null) =>
-        Calls.Add(new DrawCall(name, x, y, width, height, Alpha, text));
+        string? text = null, PathF? path = null) =>
+        Calls.Add(new DrawCall(name, x, y, width, height, Alpha, text,
+            name.StartsWith("Fill", StringComparison.Ordinal) ? FillColor
+            : text is not null ? FontColor
+            : StrokeColor,
+            StrokeSize, path));
 
     public void DrawLine(float x1, float y1, float x2, float y2) => Record(nameof(DrawLine), x1, y1, x2, y2);
 
@@ -80,9 +89,9 @@ public sealed class RecordingCanvas : ICanvas
     public void DrawText(IAttributedText value, float x, float y, float width, float height) =>
         Record(nameof(DrawText), x, y, width, height, value.Text);
 
-    public void DrawPath(PathF path) => Record(nameof(DrawPath));
+    public void DrawPath(PathF path) => Record(nameof(DrawPath), path: path);
 
-    public void FillPath(PathF path, WindingMode windingMode) => Record(nameof(FillPath));
+    public void FillPath(PathF path, WindingMode windingMode) => Record(nameof(FillPath), path: path);
 
     public void FillArc(float x, float y, float width, float height, float startAngle, float endAngle,
         bool clockwise) => Record(nameof(FillArc), x, y, width, height);

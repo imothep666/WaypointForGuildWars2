@@ -3122,4 +3122,49 @@
   <data name="{0}h {1:00}m" xml:space="preserve">
     <value>{0} Std. {1:00} Min.</value>
   </data>
+  <data name="Daily fractals" xml:space="preserve">
+    <value>Tägliche Fraktale</value>
+  </data>
+  <data name="Fractals" xml:space="preserve">
+    <value>Fraktale</value>
+  </data>
+  <data name="Tomorrow" xml:space="preserve">
+    <value>Morgen</value>
+  </data>
+  <data name="Tier {0} to do" xml:space="preserve">
+    <value>Rang {0} offen</value>
+  </data>
+  <data name="Tiers done: {0}" xml:space="preserve">
+    <value>Erledigt: Rang {0}</value>
+  </data>
+  <data name="Recommended scale {0}" xml:space="preserve">
+    <value>Empfohlen: Schwierigkeitsgrad {0}</value>
+  </data>
+  <data name="Above your fractal level" xml:space="preserve">
+    <value>Über deiner Fraktalstufe</value>
+  </data>
+  <data name="Done" xml:space="preserve">
+    <value>Erledigt</value>
+  </data>
+  <data name="To do" xml:space="preserve">
+    <value>Offen</value>
+  </data>
+  <data name="scales {0}" xml:space="preserve">
+    <value>Schwierigkeitsgrade {0}</value>
+  </data>
+  <data name="Fractal level {0} · tier {1}" xml:space="preserve">
+    <value>Fraktalstufe {0} · Rang {1}</value>
+  </data>
+  <data name="No fractals run yet: the dailies start at fractal level 1." xml:space="preserve">
+    <value>Noch kein Fraktal gelaufen: die Tagesaufgaben beginnen ab Fraktalstufe 1.</value>
+  </data>
+  <data name="Pull down to see today's fractals." xml:space="preserve">
+    <value>Nach unten ziehen, um die heutigen Fraktale zu sehen.</value>
+  </data>
+  <data name="No connection, and what is stored is from before the reset: these are yesterday's fractals." xml:space="preserve">
+    <value>Keine Verbindung, und das Gespeicherte stammt von vor dem Reset: das sind die Fraktale von gestern.</value>
+  </data>
+  <data name="The day's instabilities are not in the API, so they are not shown here." xml:space="preserve">
+    <value>Die Instabilitäten des Tages stehen nicht in der API, deshalb fehlen sie hier.</value>
+  </data>
 </root>

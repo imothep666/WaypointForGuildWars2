@@ -25,38 +25,11 @@ Nothing small is waiting just now; what is left needs the game or a device (belo
 - **Karka Queen keeps the map centre**, and should. v1 publishes four events with her exact name on
   Southsun Cove, all with different centres; she is fought at whichever settlement she attacks. A
   precise answer to a question with four answers would be worse than the hollow needle.
-- **What is left of `MapViewModel` has no unit tests.** Everything pure has been extracted —
-  `TileGeometry`, `QuarterTurn`, `ZoomPad`, `MapSpace`, `MarkerLibrary`, `MarkerIndex`, `MapPicks`,
-  `FollowBox` and `MapFocus`, the last of which holds the rule that a pinned map outranks the
-  game. What remains is starting a load, moving the centre and telling the canvas to redraw.
-  `MapCanvas` itself is tested since 2026-10-02: it draws from `IMapScene` rather than from the
-  view model, so `MapCanvasTests` draws a fake scene onto a recording canvas and checks the zoom
-  pad (a dimmed button keeps its plate solid, the pad comes after every tile and the player) and
-  which tiles are drawn, asked for and kept. Markers, routes and the guide are still checked on a
-  device only.
-- **Tekkit's jumping puzzles that never say "jp"** are not imported. `MarkerKinds.Tekkit` takes a
-  puzzle from its `…_startsign` only under a path with a `jp` word, which finds 63; Abaddon's
-  Ascent (`tw_lws3_sirenslanding_abaddonsascent`) and others like it have the same signs and trail
-  steps without the word. Telling them from a chest run's start sign needs the siblings, which the
-  per-marker reading does not see.
-- **Tekkit sends no `ETag` or `Last-Modified`**, so its UPDATE downloads all 47 MB every time.
-- **The objective alone in the game is untested in the game.** Since 2026-10-06 an objective with
-  no trail goes to the module by itself (`GuidedTrail.IsObjectiveOnly`), drawn with the trail's
-  beam and ring: at its own height for a marker pack chest (heights kept since `ImportFormat` 5),
-  at the character's height for the API's flat points (`height unknown`), and not at all for a
-  world boss. Covered by tests and the test plan; the drawing itself needs the real game, since
-  MumbleSim gets Blish HUD to update the module only every ten seconds.
+- **`freebooterinitiate` in Tekkit's pack may be 'Booter's Path.** It is a run with a start sign
+  and jumps in Shipwreck Strand, named after an achievement; nothing confirmed it is the puzzle, so
+  it is not on the list of puzzles. Settled in the game, then add its name beside `discodelver`.
 
 ### Waiting on hardware, or on the game
-
-- **Whether the Special track's "Tenebral Ward" can be claimed.** The API reports the objective as
-  0 of 0 and unclaimed, so `VaultSignal` counts it as a reward waiting and the vault's dot in the
-  bar stays lit. If the game has nothing to claim there, objectives that count to 0 should be left
-  out, of the dot and of the vault screen alike.
-- **The map's painting behind Today, in the game.** While a character is in the game, Today's
-  masthead stands on the loading screen of their map (`WikiArt.ForMapAsync`). Seen with MumbleSim
-  in Crystal Oasis, which ticked `today-scene` on the test plan; 17 of 18 map names sampled match the
-  wiki's "<map> loading screen" files, and a map that does not keeps its wash.
 
 - **The Ubuntu Touch click has never been on a device.** `python
   packaging/ubuntu-touch/build-click.py` publishes linux-arm64 and writes
@@ -69,16 +42,6 @@ Nothing small is waiting just now; what is left needs the game or a device (belo
 - **What Ubuntu Touch will not have**, because the platform does not: a live camera scanner (the
   desktop's decode-a-picture scanner stands in), a WorkManager to poll for reminders with the app
   closed, and home screen widgets.
-- **The same linux-arm64 build should run on a Switch 1** under switchroot's L4T Ubuntu Noble,
-  which is X11, so without `--wayland`. Untested; the risk is the Tegra GL driver, which is what
-  `--software` is for. Since 2026-10-05 there is a way to get it there: `packaging\linux\build.ps1`
-  on the PC makes `artifacts\linux-arm64` — the self-contained app, `install.sh`, the menu entry's
-  icon, a `BUILD` stamp — and `bash install.sh [--software]` on the Switch installs it for the user
-  into `~/.local/share/gw2companion`, with a launcher in `~/.local/bin` and a menu entry, and
-  `--uninstall` takes it away again, leaving the data. The script refuses a build for the other
-  processor and names missing ICU or fontconfig. Tested end to end in WSL with a linux-x64 build,
-  software rendering included; not yet on the Switch. On Linux the app has no reminders or widgets
-  — there is no background poll — and keeps the API key as a file only the user can read.
 - **Whether Visions of Eternity ever appears in `access`.** On 2026-10-05 the account's array was
   `["GuildWars2", "PathOfFire", "EndOfDragons"]` though Visions of Eternity is bought, and the API
   documents no flag for it. The player means to visit its maps and see whether that changes it; the
@@ -91,10 +54,6 @@ Nothing small is waiting just now; what is left needs the game or a device (belo
   `/characters/:id/core`'s `age`. If it rises while playing, Today says "This session · … so far";
   if it only moves at logout, a session appears in one step after it, which the recap handles but
   the "playing now" wording never gets to show. Only a real evening settles which.
-- **Whether the phone clears the objective on arrival.** The in-world trail is confirmed in the
-  game; the phone's half, `TrailShare.HasArrived`, is not. Expect up to two seconds of poll lag
-  plus the 2.4 s arrival animation. MumbleSim cannot settle it: without a GW2 process Blish HUD
-  runs module updates only about every ten seconds.
 
 ### Paused
 
@@ -106,6 +65,83 @@ Nothing small is waiting just now; what is left needs the game or a device (belo
 ---
 
 ## Done
+
+### Confirmed, 2026-10-13: the game, the vault and the Switch
+
+- **Arriving clears the objective on the phone**, after a trail and without one, and an objective
+  with no trail draws its beam and ring as intended in the game. Their test-plan checks are gone.
+- **The map's painting stands behind Today** while a character plays, in the real game too.
+- **"Tenebral Ward" was a false positive.** The Special track reported it as 0 of 0 and unclaimed,
+  and there is nothing to claim in the game. `VaultTrack` now drops objectives that count to 0, so
+  the vault screen, its dot in the bar, Today, the widget and the alerts all leave it out; a meta
+  that counts to 0 likewise has no reward waiting.
+- **Tekkit's UPDATE no longer downloads 47 MB when nothing changed.** It sends no `ETag` or
+  `Last-Modified`, and its HEAD carries no size, but a plain GET answers with
+  `Content-Range: bytes 0-49378660/49378661` (and no `Content-Length`, being chunked). A pack with
+  no validators now keeps that size, and the next update stops at the headers when it matches
+  (`MarkerIndex.Unchanged`). A pack with validators never goes by size. On the phone the first
+  try threw `NetworkOnMainThreadException`: closing a response whose body was never read closes
+  the Java connection under it, which Android forbids on the UI thread, so that dispose now runs
+  on a pool thread. Seen working on the phone: the first update recorded the size, the second
+  answered "Bereits aktuell" at once.
+- **The map picker finds a map by its English name too.** Guides and the wiki are English, so
+  on a German phone "Siren" has to find Zaubersängerlände; it found nothing. The English names
+  were already stored for the wiki's loading screens, and now the picker searches them beside the
+  phone's own and shows them under the name where they differ ("Siren's Landing · Ruinen von Orr
+  · Tyria"). Every other search box already matched English: items in Find and Price Watch by
+  their stored English names, emotes and the pack list being English to begin with. Seen on the
+  phone.
+- **Tekkit's puzzles that never say "jp" are imported**, 79 puzzles where there were 63.
+  Nothing in the pack tells such a run from a chest run: of the 566 start signs outside `jp`, 28
+  sit beside jump steps, and those are puzzles, adventures and fractal skips alike. So
+  `MarkerKinds` carries the wiki's "List of jumping puzzles" (76 names, copied 2026-10-13) and a
+  run named after one is a puzzle, its start sign the only marker kept — which drops the four
+  chests inside Mad King's Clock Tower, as inside every other puzzle. Two the pack names its own
+  way are added by hand (`discodelver`, `halloween_clocktower`). New: Abaddon's Ascent, Searing
+  Ascent, Gauntlet of the Khan-Ur, Queen's Confidence, Master Mushroom Spelunker, Disco Dancing
+  Delver, Winter Wonderland, both Clock Towers and seven in Visions of Eternity. `ImportFormat`
+  went to 6, or the size check would have kept the old read for ever. Seen on the phone: the
+  stored read holds 1833 chests and 79 puzzles, as on the PC, and Siren's Landing shows the puzzle
+  (LadyElyssa marks it too, 1.85 m away, so the map keeps one).
+- **`MapViewModel` has tests, and they found a bug.** `MapViewModelTests` runs the real view model
+  with no network and no PC: Queensdale stored in a fresh cache, an API that answers 404, and the
+  test calling `Apply` where the stream would. 23 tests cover loading by pin and by following,
+  fitting in either order, panning and its clamp, following and the glide, zoom bounds and easing,
+  taps on markers and on the pad, and which reports cost a frame. The bug: a map picked by name
+  that could not be opened was "put back" as itself, because `Pin` sets the pin before the load
+  saved it, so the line named the failed map over the last map's tiles. The map on screen now
+  remembers the pin it was opened under (`_drawnPin`), and only a failed pin is taken back — a
+  map the character walked into failing does not re-pin one FOLLOW let go of.
+  Tried on the phone offline, which found a second half: picking Mistlock Sanctuary over
+  Queensdale (its row stored, the Mists' continent not) kept the name and pin but went blank,
+  because the load set the continent before fetching it and nothing redrew after the failure.
+  The continent is now fetched before the screen is touched, and a failed load asks for a frame.
+  Seen on the phone: Königintal's tiles stay, its name stays, and the error shows.
+- **Daily fractals on Today, with a page behind them.** The API has no fractal endpoint, but the
+  "Daily Fractals" achievement category (88) names fifteen achievements a day and, with the pinned
+  schema, tomorrow's fifteen. Their English names are the only place the fractal is written
+  ("Daily Tier 4 Aetherblade", "Daily Recommended Fractal—Scale 28"), so `Fractals` reads those
+  and leaves out any other shape. Today's row counts each fractal at the account's own tier (from
+  `fractal_level`: 1, 26, 51, 76) and the recommended scales it can enter; a scale above the level
+  is shown but not counted, and an account with no fractal level has no row. The page lists the
+  tiers done per fractal, tomorrow's fractals and scales, and Fractal Relics, Pristine Fractal
+  Relics and Unstable Fractal Essence from the wallet (a currency the account has none of is not in
+  the wallet answer, so not listed). Instabilities are not in the API and are left out. Offline
+  with a list from before the reset, the row reads as unreadable and the page says it is
+  yesterday's. Seen on the phone: level 5, tier 1, three fractals open, all three scales above
+  level 5, tomorrow Chaos · Cliffside · Twilight Oasis, 32 relics and 4 pristine.
+- **What the map draws is tested, not only the pad and the tiles.** `MapCanvasTests` gained 13:
+  a marker stamped at its place or, with no art, a dot in its kind's colour; the objective ringed
+  in brass and drawn last, and no ring for one on another map; markers off the screen skipped;
+  the order tiles, routes, guide, markers, player; a route's points at the zoom and its colour
+  (the pack's own, else faded brass); the guide as brass over a wider ink edge, starting where the
+  character is on it; and that route and guide paths are reused between frames and rebuilt only
+  for a new zoom, new routes or a step along the guide. `RecordingCanvas` now records each call's
+  colour, stroke width and path. Breaking the guide's edge or the drawing order fails them.
+- **The linux-arm64 build runs on a Switch 1** under switchroot's L4T Ubuntu Noble.
+  `packaging\linux\build.ps1` makes `artifacts\linux-arm64`, and `bash install.sh [--software]` on
+  the Switch installs it into `~/.local/share/gw2companion` with a launcher and a menu entry. On
+  Linux the app has no reminders or widgets, and keeps the API key as a file only the user can read.
 
 ### On the phone, 2026-10-07: a redesign, and a name
 
@@ -1407,7 +1443,8 @@ both validators answer 304, zero bytes — so checking a seven-megabyte pack cos
 This is deliberately *not* what TacO does. Its own `MarkerPacks.json` carries `versionurl`,
 `versionsearchstring` and `versionterminator` per pack: it scrapes a version string out of a web
 page. That needs configuration for every pack and breaks whenever a site is redesigned. HTTP
-validators need none and work for any host that sets them. A host that sets neither simply
+validators need none and work for any host that sets them. A host that sets neither is judged by
+the size it announces (since 2026-10-13, see Done); one that announces no size either simply
 re-downloads, which is correct and merely not free.
 
 **Two packs describing the same chest is the normal case, so the threshold was measured.** Where

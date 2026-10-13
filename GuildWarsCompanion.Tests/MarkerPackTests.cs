@@ -250,6 +250,33 @@ public class MarkerPackTests
         Assert.Null(MarkerKinds.Of(type));
     }
 
+    /// <summary>
+    /// Puzzles whose path never says "jp", known by the wiki's name for them, and by the pack's own
+    /// name for two. Paths as in the pack fetched on 2026-10-13.
+    /// </summary>
+    [Theory]
+    [InlineData("tw_guides.tw_lws3.tw_lws3_sirenslanding.tw_lws3_sirenslanding_abaddonsascent.tw_lws3_sirenslanding_abaddonsascent_signs.tw_lws3_sirenslanding_abaddonsascent_startsign")]
+    [InlineData("tw_guides.tw_voe.tw_voe_eternitysgarden.tw_voe_eternitysgarden_artificersrise.tw_voe_eternitysgarden_artificersrise_signs.tw_voe_eternitysgarden_artificersrise_startsign")]
+    [InlineData("tw_guides.tw_hot.tw_hot_td.tw_hot_td_discodelver.tw_hot_td_discodelver_startsign")]
+    public void A_puzzle_the_wiki_names_is_a_puzzle_without_saying_jp(string type)
+    {
+        Assert.Equal(TargetKind.JumpingPuzzle, MarkerKinds.Of(type));
+    }
+
+    /// <summary>
+    /// Inside such a puzzle only the start sign counts, as inside a "jp" one: the jumps are the way
+    /// through and the Clock Tower's chests are along it. An adventure has the same start sign and
+    /// the same jumps, and is not on the wiki's list.
+    /// </summary>
+    [Theory]
+    [InlineData("tw_guides.tw_lws3.tw_lws3_sirenslanding.tw_lws3_sirenslanding_abaddonsascent.tw_lws3_sirenslanding_abaddonsascent_signs.tw_lws3_sirenslanding_abaddonsascent_trail_jump")]
+    [InlineData("tw_guides.tw_festivals.tw_festival_halloween.tw_festival_halloween_clocktower.tw_festival_halloween_clocktower_signs.tw_festival_halloween_clocktower_chest")]
+    [InlineData("tw_guides.tw_hot.tw_hot_ab.tw_hot_ab_adv_fungusamongus.tw_hot_ab_adv_fungusamongus_signs.tw_hot_ab_adv_fungusamongus_startsign")]
+    public void Around_a_named_puzzle_only_its_start_counts(string type)
+    {
+        Assert.Null(MarkerKinds.Of(type));
+    }
+
     /// <summary>"jp" is two letters; it must be a whole segment or it matches words that are not
     /// it.</summary>
     [Fact]

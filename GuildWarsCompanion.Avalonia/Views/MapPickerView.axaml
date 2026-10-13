@@ -57,7 +57,7 @@
                                            TextTrimming="CharacterEllipsis" />
                                 <!-- "Shiverpeak Mountains · Tyria". A map name alone is ambiguous
                                      often enough — there are two Lion's Arches and a dozen guild halls. -->
-                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Where}"
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Under}"
                                            Classes="caption" Margin="16,2,10,12" />
                             </Grid>
                         </Button>

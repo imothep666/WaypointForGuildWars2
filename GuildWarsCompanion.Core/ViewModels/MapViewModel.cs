@@ -70,6 +70,17 @@ public sealed partial class MapViewModel(
     private string _pinnedName = string.Empty;
 
     /// <summary>
+    /// The pin the map on screen was opened under, null when it was opened by following.
+    ///
+    /// What a failed load puts back. It used to put back <see cref="_pinned"/> as the load found
+    /// it, but <see cref="Pin"/> sets that before the load starts, so a map that could not be
+    /// opened was "put back" as itself: its name on the line, over the last map's tiles.
+    /// </summary>
+    private int? _drawnPin;
+
+    private string _drawnPinName = string.Empty;
+
+    /// <summary>
     /// Whether the map walks with the character.
     ///
     /// On until the map is dragged, because a screen propped against the monitor while somebody
@@ -745,7 +756,9 @@ public sealed partial class MapViewModel(
         IsLive = false;
     }
 
-    private void Apply(GameReport report)
+    /// <summary>One report from the bridge. Internal so a test can be the bridge: the stream itself
+    /// is a held SignalR connection, and a test host has no PC to hold one to.</summary>
+    internal void Apply(GameReport report)
     {
         // What the canvas draws from a report, as it was, so a report that changed none of it does
         // not cost a frame; see MapRedraw.
@@ -790,10 +803,10 @@ public sealed partial class MapViewModel(
     {
         // What to go back to if this map cannot be opened at all. The screen keeps drawing the
         // last map until a new one is ready, so the identity has to travel with the drawing: a
-        // half-applied load is how the line came to name a map the tiles did not show.
+        // half-applied load is how the line came to name a map the tiles did not show. The pin
+        // comes from _drawnPin rather than from _pinned, which Pin has already moved on by now.
         var wasLoaded = _loadedMap;
-        var wasPinned = _pinned;
-        var wasNamed = _pinnedName;
+        var wasFitted = _fitted;
 
         _loadedMap = mapId;
         _fitted = false;
@@ -803,18 +816,32 @@ public sealed partial class MapViewModel(
             await OpenAsync(mapId, ct);
 
             _failed = null;
+
+            (_drawnPin, _drawnPinName) = (_pinned, _pinnedName);
         }
         catch (Gw2ApiException)
         {
             _failed = (mapId, DateTimeOffset.UtcNow);
 
             _loadedMap = wasLoaded;
-            _pinned = wasPinned;
-            _pinnedName = wasNamed;
+            _fitted = wasFitted;
 
-            IsPinned = wasPinned is not null;
+            // Only a pin is taken back. A map the character walked into failing to open is no
+            // reason to re-pin one that FOLLOW let go of.
+            if (_pinned == mapId)
+            {
+                _pinned = _drawnPin;
+                _pinnedName = _drawnPinName;
 
-            if (wasPinned is not null) MapLine = wasNamed;
+                IsPinned = _pinned is not null;
+
+                if (_pinned is not null) MapLine = _pinnedName;
+                else if (!IsLive) MapLine = L.T("Waiting for the bridge…");
+            }
+
+            // Draw the map that is still here. Start let go of its tiles before this load, and
+            // without a frame nothing asks for them again: the screen stayed blank.
+            Changed?.Invoke();
 
             // Out to RunAsync, which turns it into the sentence the screen shows.
             throw;
@@ -837,6 +864,16 @@ public sealed partial class MapViewModel(
 
         var map = await targets.InfoAsync(mapId, ct);
 
+        // Two numbers, one request, then kept on disk: the zoom at which continent coordinates
+        // are pixels, and the size of the grid. Nothing can be addressed without them — a phone
+        // with every tile of Frostgorge cached and no stored continent still draws nothing.
+        //
+        // Asked for before anything on screen is touched. Setting the continent first left a
+        // failed load half-applied: offline, picking Mistlock Sanctuary over Queensdale kept
+        // Queensdale's name and pin but asked for its tiles on the Mists' continent, so the map
+        // went blank (2026-10-13).
+        var continent = await ContinentAsync(map.ContinentId, ct);
+
         _map = map;
 
         // Not awaited: on a phone in another language the first map can cost a request for every
@@ -845,11 +882,6 @@ public sealed partial class MapViewModel(
 
         ContinentId = map.ContinentId;
         Floor = map.DefaultFloor;
-
-        // Two numbers, one request, then kept on disk: the zoom at which continent coordinates
-        // are pixels, and the size of the grid. Nothing can be addressed without them — a phone
-        // with every tile of Frostgorge cached and no stored continent still draws nothing.
-        var continent = await ContinentAsync(map.ContinentId, ct);
 
         Reference = Math.Max(0, continent.MaxZoom - 1);
         _dims = continent.Dims;

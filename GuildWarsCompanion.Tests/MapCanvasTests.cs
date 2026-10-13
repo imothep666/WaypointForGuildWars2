@@ -146,6 +146,211 @@ public class MapCanvasTests
         Assert.Equal(4, scene.Wanted.Count);
     }
 
+    // --- markers -------------------------------------------------------------
+
+    [Fact]
+    public void A_marker_with_art_is_stamped_where_it_is()
+    {
+        var calls = Draw(new Scene { Marks = [Heart], Art = { TargetKind.Heart } });
+
+        var stamp = calls.Single(c => c.Name == "DrawImage");
+
+        Assert.Equal((89f, 189f, 22f), (stamp.X, stamp.Y, stamp.Width));
+    }
+
+    /// <summary>Chests and puzzles have no art of their own; see TargetDot.</summary>
+    [Fact]
+    public void A_marker_with_no_art_is_a_dot_in_the_colour_of_its_kind()
+    {
+        var calls = Draw(new Scene { Marks = [Chest] });
+
+        var dot = calls.Single(c => c.Name == "FillEllipse");
+
+        Assert.Equal((295f, 395f, 10f), (dot.X, dot.Y, dot.Width));
+        Assert.Equal(Hex(TargetDot.For(TargetKind.Chest)), Hex(dot.Colour));
+    }
+
+    /// <summary>The objective is drawn last, ringed, so nothing covers the thing being aimed at.</summary>
+    [Fact]
+    public void The_objective_is_ringed_and_drawn_over_the_rest()
+    {
+        var calls = Draw(new Scene { Marks = [Chest, Heart], Chosen = Chest });
+
+        var ring = calls.FindIndex(c => c.Name == "DrawEllipse" && c.X == 300 - 22 * 0.85f);
+        var chest = calls.FindIndex(c => c.Name == "FillEllipse" && c.X == 295);
+        var heart = calls.FindIndex(c => c.Name == "FillEllipse" && c.X == 95);
+
+        Assert.True(heart >= 0 && ring > heart && chest > ring);
+        Assert.Equal(Hex(Brass), Hex(calls[ring].Colour));
+    }
+
+    /// <summary>An objective two maps away is not anywhere on these tiles.</summary>
+    [Fact]
+    public void An_objective_on_another_map_draws_no_ring()
+    {
+        var calls = Draw(new Scene { Marks = [Chest], Chosen = Heart with { MapId = 30 } });
+
+        Assert.DoesNotContain(calls, c => c.Name == "DrawEllipse");
+    }
+
+    [Fact]
+    public void A_marker_off_the_screen_is_not_drawn()
+    {
+        var calls = Draw(new Scene { Marks = [Chest with { X = 5000 }] });
+
+        Assert.DoesNotContain(calls, c => c.Name == "FillEllipse");
+    }
+
+    // --- routes and the guide ------------------------------------------------
+
+    /// <summary>A route is the ground; the guide is a route singled out; a marker is the thing to
+    /// reach, and the character stands on all of it.</summary>
+    [Fact]
+    public void Tiles_then_routes_then_the_guide_then_markers_then_the_player()
+    {
+        var calls = Draw(new Scene
+        {
+            Held = { (0, 0) }, Routes = [Line], Guide = Along(), Marks = [Chest], Player = (50, 50)
+        });
+
+        var tile = calls.FindLastIndex(c => c.Name == "DrawImage");
+        var route = calls.FindIndex(c => c.Name == "DrawPath");
+        var guide = calls.FindLastIndex(c => c.Name == "DrawPath");
+        var marker = calls.FindIndex(c => c.Name == "FillEllipse" && c.Width == 10);
+        var player = calls.FindIndex(c => c.Name == "FillEllipse" && c.Width == 14);
+
+        Assert.True(tile >= 0 && tile < route && route < guide && guide < marker && marker < player);
+    }
+
+    /// <summary>Continent units into pixels at the drawn zoom: at zoom 3 of reference 7 a pixel is
+    /// sixteen units.</summary>
+    [Fact]
+    public void A_route_is_drawn_through_its_points_at_the_zoom()
+    {
+        var calls = Draw(new Scene { Routes = [Line] });
+
+        var path = calls.Single(c => c.Name == "DrawPath").Path!;
+
+        Assert.Equal([new PointF(0, 0), new PointF(10, 0), new PointF(20, 0), new PointF(30, 0)], path.Points);
+    }
+
+    [Fact]
+    public void A_route_with_no_colour_of_its_own_is_faded_brass()
+    {
+        var calls = Draw(new Scene { Routes = [Line, Line with { Argb = unchecked((int)0xFF3060C0) }] });
+
+        var paths = calls.Where(c => c.Name == "DrawPath").ToList();
+
+        Assert.Equal(Hex(Brass.WithAlpha(0.65f)), Hex(paths[0].Colour));
+        Assert.Equal("#FF3060C0", Hex(paths[1].Colour));
+    }
+
+    /// <summary>A pan does not change what a unit is worth, so the paths are moved, not rebuilt; a
+    /// zoom does, and so does a new choice of routes.</summary>
+    [Fact]
+    public void Route_paths_are_built_again_only_for_a_new_zoom_or_new_routes()
+    {
+        var scene = new Scene { Routes = [Line] };
+        var canvas = new MapCanvas { Model = scene };
+
+        var first = Path(canvas);
+        var again = Path(canvas);
+
+        scene.Zoom = 4;
+        var zoomed = Path(canvas);
+
+        scene.Routes = [Line];
+        var chosen = Path(canvas);
+
+        Assert.Same(first, again);
+        Assert.NotSame(again, zoomed);
+        Assert.NotSame(zoomed, chosen);
+    }
+
+    /// <summary>An ink edge under full brass, so the way reads against sand and snow alike and never
+    /// looks like one more faded route.</summary>
+    [Fact]
+    public void The_guide_is_brass_over_a_wider_ink_edge()
+    {
+        var calls = Draw(new Scene { Guide = Along() });
+
+        var strokes = calls.Where(c => c.Name == "DrawPath").ToList();
+
+        Assert.Equal(2, strokes.Count);
+        Assert.Equal((Hex(Ink), 7f), (Hex(strokes[0].Colour), strokes[0].Stroke));
+        Assert.Equal((Hex(Brass), 4f), (Hex(strokes[1].Colour), strokes[1].Stroke));
+        Assert.Same(strokes[0].Path, strokes[1].Path);
+    }
+
+    /// <summary>Only what is left to walk: from the character's place on the trail to the objective.</summary>
+    [Fact]
+    public void The_guide_starts_where_the_character_is_on_it()
+    {
+        var calls = Draw(new Scene { Guide = Along(), GuideFrom = 1 });
+
+        var path = calls.First(c => c.Name == "DrawPath").Path!;
+
+        Assert.Equal([new PointF(10, 0), new PointF(20, 0), new PointF(30, 0)], path.Points);
+    }
+
+    [Fact]
+    public void The_guide_is_built_again_when_the_character_moves_along_it()
+    {
+        var scene = new Scene { Guide = Along() };
+        var canvas = new MapCanvas { Model = scene };
+
+        var first = Path(canvas);
+        var again = Path(canvas);
+
+        scene.GuideFrom = 2;
+        var moved = Path(canvas);
+
+        Assert.Same(first, again);
+        Assert.NotSame(again, moved);
+        Assert.Equal(2, moved.Count);
+    }
+
+    [Fact]
+    public void The_player_is_a_brass_ring_on_slate()
+    {
+        var calls = Draw(new Scene { Player = (50, 60) });
+
+        var fill = calls.Single(c => c.Name == "FillEllipse");
+        var ring = calls.Single(c => c.Name == "DrawEllipse");
+
+        Assert.Equal((43f, 53f, 14f), (fill.X, fill.Y, fill.Width));
+        Assert.Equal(Hex(Slate), Hex(fill.Colour));
+        Assert.Equal((Hex(Brass), 3f), (Hex(ring.Colour), ring.Stroke));
+    }
+
+    private static readonly Color Brass = Color.FromArgb("#C9A227");
+    private static readonly Color Ink = Color.FromArgb("#0E141B");
+    private static readonly Color Slate = Color.FromArgb("#18212C");
+
+    private static readonly CompassTarget Heart =
+        new("Help Farmer Diah", TargetKind.Heart, 15, "Queensdale", 100, 200);
+
+    private static readonly CompassTarget Chest = new("Chest", TargetKind.Chest, 15, "Queensdale", 300, 400);
+
+    /// <summary>A straight run east, 160 units a step: ten pixels a step at zoom 3.</summary>
+    private static readonly RouteLine Line =
+        new(15, "tw.trails.main", "Main trail", [(0, 0), (160, 0), (320, 0), (480, 0)]);
+
+    /// <summary>The guide along <see cref="Line"/> to its far end.</summary>
+    private static TrailGuide Along() => TrailGuide.Find([Line], 480, 0)!;
+
+    private static string Hex(Color? colour) => colour!.ToArgbHex(includeAlpha: true);
+
+    /// <summary>One frame through a canvas kept between frames, and the first path it drew.</summary>
+    private static PathF Path(MapCanvas canvas)
+    {
+        var recording = new RecordingCanvas();
+
+        canvas.Draw(recording, Screen);
+
+        return recording.Calls.First(c => c.Name == "DrawPath").Path!;
+    }
+
     private static List<DrawCall> Draw(Scene scene)
     {
         var canvas = new RecordingCanvas();
@@ -164,7 +369,8 @@ public class MapCanvasTests
 
     /// <summary>
     /// A two-by-two map at its outermost zoom, scrolled to its top left corner, with nothing on it
-    /// but what a test puts there.
+    /// but what a test puts there. A continent point is drawn at the same numbers, so a marker at
+    /// (100, 200) is centred on (100, 200).
     /// </summary>
     private sealed class Scene : IMapScene
     {
@@ -176,7 +382,7 @@ public class MapCanvasTests
 
         public int Quarter => 0;
 
-        public int Zoom => 3;
+        public int Zoom { get; set; } = 3;
 
         public double Scale { get; init; } = 1;
 
@@ -199,15 +405,18 @@ public class MapCanvasTests
 
         public int GridHeight => 2;
 
-        public IReadOnlyList<CompassTarget> Marks => [];
+        public IReadOnlyList<CompassTarget> Marks { get; init; } = [];
 
-        public IReadOnlyList<RouteLine> Routes => [];
+        public IReadOnlyList<RouteLine> Routes { get; set; } = [];
 
-        public TrailGuide? Guide => null;
+        public TrailGuide? Guide { get; init; }
 
-        public int GuideFrom => 0;
+        public int GuideFrom { get; set; }
 
-        public CompassTarget? Chosen => null;
+        public CompassTarget? Chosen { get; init; }
+
+        /// <summary>The kinds the game's art has arrived for; the rest are drawn as dots.</summary>
+        public HashSet<TargetKind> Art { get; } = [];
 
         public (double X, double Y)? Player { get; init; }
 
@@ -231,6 +440,6 @@ public class MapCanvasTests
 
         public void KeepTiles(IReadOnlySet<TileKey> visible) => Kept = new HashSet<TileKey>(visible);
 
-        public IImage? Symbol(TargetKind kind) => null;
+        public IImage? Symbol(TargetKind kind) => Art.Contains(kind) ? new BlankImage() : null;
     }
 }

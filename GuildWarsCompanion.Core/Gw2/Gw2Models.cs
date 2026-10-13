@@ -483,6 +483,19 @@ public sealed record Achievement(
     [property: JsonPropertyName("bits")] IReadOnlyList<AchievementBit>? Bits = null);
 
 /// <summary>
+/// GET /v2/achievements/categories/88, the day's fractal dailies.
+///
+/// A daily category names today's achievements and, with the schema this client pins, tomorrow's
+/// too. Each entry is an object rather than a bare id since the 2022-03-23 schema.
+/// </summary>
+public sealed record DailyCategory(
+    [property: JsonPropertyName("id")] int Id,
+    [property: JsonPropertyName("achievements")] IReadOnlyList<CategoryEntry> Achievements,
+    [property: JsonPropertyName("tomorrow")] IReadOnlyList<CategoryEntry>? Tomorrow = null);
+
+public sealed record CategoryEntry([property: JsonPropertyName("id")] int Id);
+
+/// <summary>
 /// One entry in a collection.
 ///
 /// The account reports which of these are done as a list of <em>indices into this array</em>,
@@ -703,9 +716,21 @@ public sealed record VaultTrack(
     [property: JsonPropertyName("meta_progress_complete")] int MetaProgressComplete,
     [property: JsonPropertyName("meta_reward_astral")] int MetaRewardAstral,
     [property: JsonPropertyName("meta_reward_claimed")] bool MetaRewardClaimed,
-    [property: JsonPropertyName("objectives")] IReadOnlyList<VaultObjective> Objectives)
+    IReadOnlyList<VaultObjective> Objectives)
 {
-    public bool IsMetaUnclaimed => MetaProgressCurrent >= MetaProgressComplete && !MetaRewardClaimed;
+    /// <summary>
+    /// The track's objectives, less any that count to nothing. The Special track has carried one,
+    /// "Tenebral Ward", reported as 0 of 0 and unclaimed: by the numbers it is done and waiting,
+    /// in the game there is nothing to claim. Dropped here, every reader agrees — the vault
+    /// screen, its dot in the bar, Today, the widget and the alerts.
+    /// </summary>
+    [JsonPropertyName("objectives")]
+    public IReadOnlyList<VaultObjective> Objectives { get; init; } =
+        Objectives.Where(objective => objective.ProgressComplete > 0).ToList();
+
+    /// <summary>Same reasoning as <see cref="Objectives"/>: a meta that counts to 0 has no reward.</summary>
+    public bool IsMetaUnclaimed =>
+        MetaProgressComplete > 0 && MetaProgressCurrent >= MetaProgressComplete && !MetaRewardClaimed;
 }
 
 // --- Trading post ----------------------------------------------------------

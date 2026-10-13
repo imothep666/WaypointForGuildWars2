@@ -83,8 +83,13 @@ public static class MarkerKinds
     /// So: inside a jumping puzzle (a segment word <c>jp</c>, as in <c>tw_jp_kryta_trollsrevenge</c>)
     /// only the <c>startsign</c> is the puzzle — where it begins, which is where to go; its
     /// <c>trail_jump</c> steps and <c>trail_chest</c> hints are the way through. Elsewhere a chest
-    /// is a last word with "chest" in it, unless the leaf is a trail. Puzzles whose path never says
-    /// <c>jp</c> (Abaddon's Ascent under <c>tw_lws3</c>) are missed rather than guessed at.
+    /// is a last word with "chest" in it, unless the leaf is a trail.
+    ///
+    /// Some puzzles never say <c>jp</c>: Abaddon's Ascent is <c>tw_lws3_sirenslanding_abaddonsascent</c>.
+    /// Nothing inside the pack tells it from a chest run — the same start sign, the same jump
+    /// steps, which adventures and fractal skips have too — so a run is also a puzzle when its
+    /// name is one of <see cref="KnownPuzzles"/>. 16 more on 2026-10-13, Abaddon's Ascent and the Visions of
+    /// Eternity ones among them.
     /// </summary>
     private static TargetKind? Tekkit(string path)
     {
@@ -93,11 +98,56 @@ public static class MarkerKinds
 
         if (leaf.Length == 0) return null;
 
-        if (segments.Any(segment => segment.Split('_').Contains("jp")))
+        if (segments.Any(segment => segment.Split('_') is var words &&
+                                    (words.Contains("jp") || TekkitPuzzles.Contains(words[^1]))))
             return leaf[^1] == "startsign" ? TargetKind.JumpingPuzzle : null;
 
         return leaf[^1].Contains("chest", StringComparison.Ordinal) && !leaf.Any(word => word.Contains("trail"))
             ? TargetKind.Chest
             : null;
     }
+
+    /// <summary>
+    /// Every jumping puzzle the wiki lists, from its "List of jumping puzzles" — the ones the game
+    /// itself calls puzzles through their achievements. Copied on 2026-10-13, 76 of them; the
+    /// Verdant Brink mastery insight in that table is left out, being an insight. A new puzzle means
+    /// a new row.
+    /// </summary>
+    private static readonly string[] KnownPuzzles =
+    [
+        "Loreclaw Expanse", "Crimson Plateau", "Grendich Gamble", "Wall Breach Blitz",
+        "Branded Mine", "Behem Gauntlet", "Craze's Folly", "Chaos Crystal Cavern",
+        "Pig Iron Quarry", "Gauntlet of the Khan-Ur", "Trials of the Tengu",
+        "Wind through the Walls", "'Booter's Path", "Orb Cavern", "Soaring Copse",
+        "Birdie Benefactor", "Inquest Hologram", "Meandering Magic", "Artificer's Rise",
+        "Munchin' Moths", "Coleopteran Cavern", "Inquest Cache", "Displaced Vizier's Tower",
+        "Egg Bearer", "Highest Gear", "Disco Dancing Delver", "Master Mushroom Spelunker",
+        "Treetop Beehive", "Vale Brazier", "Queen's Confidence", "Traversing the Titan",
+        "Troll's End", "Troll's Revenge", "Urmaug's Secret", "Weyandt's Revenge", "Demongrub Pits",
+        "The Collapsed Observatory", "Swashbuckler's Cove", "Not So Secret", "Fawcett's Bounty",
+        "Professor Portmatt's Lab", "Skipping Stones", "Under New Management", "Dark Reverie",
+        "Morgan's Leap", "Spekks's Laboratory", "Spelunker's Delve", "Goemm's Lab",
+        "Conundrum Cubed", "Hidden Garden", "Hexfoundry Unhinged", "Verarium Delves",
+        "Prospect Valley Crash Site", "Retrospective Runaround", "Skip up the Volcano",
+        "Searing Ascent", "Vizier's Tower", "Antre of Adjournment", "Scavenger's Chasm",
+        "Buried Archives", "Abaddon's Ascent", "Shaman's Rookery", "King Jalis's Refuge",
+        "Griffonrook Run", "Tribulation Caverns", "Tribulation Rift Scaffolding", "Coddler's Cove",
+        "Only Zuhl", "Shattered Ice Ruins", "Armistice Bastion", "Obsidian Sanctum",
+        "Mistwrought Vault", "Mistlock Mountaineer", "Winter Wonderland", "Mad King's Clock Tower",
+        "Stopped Clock Tower"
+    ];
+
+    /// <summary>
+    /// The puzzles above as Tekkit writes them in a category name — lower case, letters and digits
+    /// only — plus the pack's own names for two of them.
+    /// </summary>
+    private static readonly HashSet<string> TekkitPuzzles =
+    [
+        .. KnownPuzzles.Select(Squash),
+        "discodelver",  // Disco Dancing Delver, tw_hot_td_discodelver
+        "clocktower"    // Mad King's Clock Tower, tw_festival_halloween_clocktower
+    ];
+
+    private static string Squash(string name) =>
+        new(name.ToLowerInvariant().Where(char.IsAsciiLetterOrDigit).ToArray());
 }

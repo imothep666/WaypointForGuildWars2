@@ -37,7 +37,9 @@
                  Link="Protocol\EventSchedule.cs" />
 
         <!-- The emote list, for the same reason: it is what decides which texts the Blish HUD
-             module may type, and it has to be the list the phone shows, not a second one. -->
+             module may type, and it has to be the list the phone shows, not a second one.
+             Only Emotes.cs: Emotes.Summary.cs holds the phone's wording and needs L, which
+             lives in Core and is not built here. -->
         <Compile Include="..\GuildWarsCompanion.Core\Services\Emotes.cs"
                  Link="Protocol\Emotes.cs" />
     </ItemGroup>

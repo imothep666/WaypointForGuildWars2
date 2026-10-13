@@ -1,0 +1,70 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                xmlns:services="using:GuildWarsCompanion.Services"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
+                x:Class="GuildWarsCompanion.Ava.Views.FractalsView"
+                x:DataType="vm:FractalsViewModel"
+                ShowsWash="True">
+
+    <RefreshContainer RefreshRequested="OnPullRefresh">
+        <ScrollViewer>
+            <StackPanel Margin="20,16,20,32" Spacing="14">
+                <TextBlock Text="{ui:T 'TODAY'}" Classes="heading" />
+                <TextBlock Text="{Binding Standing}" Classes="caption" IsVisible="{Binding Standing, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
+                <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+
+                <!-- The three fractals at the account's tier, then the recommended scales. Brass
+                     for what is still to do, as on Today. -->
+                <ItemsControl ItemsSource="{Binding Today}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="services:FractalTask">
+                            <Grid ColumnDefinitions="4,*" RowDefinitions="Auto,Auto" MinHeight="52" Margin="0,0,0,8">
+                                <Border Grid.RowSpan="2" Background="{Binding EdgeColor, Converter={x:Static ui:Paint.Brush}}" />
+                                <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="16,8,0,0"
+                                           TextTrimming="CharacterEllipsis" />
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Note}"
+                                           Classes="caption small" Margin="16,2,0,8" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Whether to run one tonight or wait: the dailies change at the reset. -->
+                <StackPanel IsVisible="{Binding HasTomorrow}" Spacing="8">
+                    <Border Classes="rule" Margin="0,4,0,0" />
+                    <TextBlock Text="{ui:T 'TOMORROW'}" Classes="heading" />
+                    <TextBlock Text="{Binding Tomorrow}" Classes="caption" TextWrapping="Wrap" />
+                </StackPanel>
+
+                <!-- What fractals pay in, as the wallet names and draws them. -->
+                <StackPanel IsVisible="{Binding HasWallet}" Spacing="4">
+                    <Border Classes="rule" Margin="0,4,0,0" />
+                    <TextBlock Text="{ui:T 'WALLET'}" Classes="heading" Margin="0,0,0,4" />
+                    <ItemsControl ItemsSource="{Binding Wallet}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:WalletRow">
+                                <StackPanel>
+                                    <Grid ColumnDefinitions="34,14,*,Auto" Margin="0,9">
+                                        <Image ui:WebImage.Url="{Binding IconUrl}" Width="28" Height="28"
+                                               VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="2" Text="{Binding Name}" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="3" Text="{Binding Amount}" Classes="figure"
+                                                   VerticalAlignment="Center" />
+                                    </Grid>
+                                    <Border Classes="hairline" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <!-- Why there is no word about instabilities. -->
+                <TextBlock Text="{ui:T 'The day\'s instabilities are not in the API, so they are not shown here.'}"
+                           Classes="caption small" TextWrapping="Wrap" Margin="0,6,0,0" />
+            </StackPanel>
+        </ScrollViewer>
+    </RefreshContainer>
+</shell:PageView>

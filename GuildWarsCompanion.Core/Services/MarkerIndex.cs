@@ -21,9 +21,13 @@ namespace GuildWarsCompanion.Services;
 /// existed. See <see cref="MarkerStore"/>: it is what stops a pack answering 304 forever with
 /// data an older import never collected.
 /// </param>
+/// <param name="Size">
+/// How many bytes the server said the pack was, or zero when it did not say. The last resort for
+/// a host that sets neither validator; see <see cref="MarkerIndex.Unchanged"/>.
+/// </param>
 public sealed record MarkerPackRecord(
     string Id, string Url, string Name, string Tag, string Modified, int Count, int Maps,
-    int Routes = 0, int Imported = 0);
+    int Routes = 0, int Imported = 0, long Size = 0);
 
 /// <summary>
 /// The list of packs on the device.
@@ -97,7 +101,8 @@ public static class MarkerIndex
                 .Append(pack.Count.ToString(CultureInfo.InvariantCulture)).Append('\t')
                 .Append(pack.Maps.ToString(CultureInfo.InvariantCulture)).Append('\t')
                 .Append(pack.Routes.ToString(CultureInfo.InvariantCulture)).Append('\t')
-                .AppendLine(pack.Imported.ToString(CultureInfo.InvariantCulture));
+                .Append(pack.Imported.ToString(CultureInfo.InvariantCulture)).Append('	')
+                .AppendLine(pack.Size.ToString(CultureInfo.InvariantCulture));
 
         return text.ToString();
     }
@@ -137,12 +142,34 @@ public static class MarkerIndex
                 ? read
                 : 0;
 
+            var size = parts.Length > 9 &&
+                       long.TryParse(parts[9], NumberStyles.Integer, CultureInfo.InvariantCulture,
+                           out var bytes)
+                ? bytes
+                : 0;
+
             packs.Add(new MarkerPackRecord(
-                parts[0], parts[1], parts[2], parts[3], parts[4], count, maps, routes, imported));
+                parts[0], parts[1], parts[2], parts[3], parts[4], count, maps, routes, imported, size));
         }
 
         return packs;
     }
+
+    /// <summary>
+    /// Whether a pack whose server sets no validator is the one already here, judged by its size.
+    ///
+    /// Tekkit's All-In-One is the case: no <c>ETag</c>, no <c>Last-Modified</c>, and 47 MB on
+    /// every update. It does announce the size, in <c>Content-Range</c> even on a plain 200, so the
+    /// headers alone settle it and the body is never read. A new version the same size to the byte
+    /// would be missed; for a compressed archive that is not a real risk, and REMOVE then ADD
+    /// still fetches it whatever it weighs.
+    ///
+    /// Never used while the server sets a validator: those are exact, and a 200 despite them means
+    /// the pack changed.
+    /// </summary>
+    public static bool Unchanged(MarkerPackRecord held, long? announced) =>
+        held.Tag.Length == 0 && held.Modified.Length == 0 &&
+        held.Size > 0 && announced == held.Size;
 
     /// <summary>A value with nothing in it that would break the line it is written on. An ETag is
     /// a quoted string from a stranger's server, so it gets the same treatment as a name.</summary>

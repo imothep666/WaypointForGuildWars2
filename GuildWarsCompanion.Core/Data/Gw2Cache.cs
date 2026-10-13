@@ -562,6 +562,25 @@ public sealed class Gw2Cache(string databasePath, string language = Gw2Language.
         return await command.ExecuteScalarAsync(ct) as string;
     }
 
+    /// <summary>Every map's English name that has been stored, by id; empty when none has.</summary>
+    public async Task<Dictionary<int, string>> GetEnglishMapNamesAsync(CancellationToken ct = default)
+    {
+        await InitializeAsync(ct);
+
+        await using var connection = await OpenAsync(ct);
+        await using var command = connection.CreateCommand();
+        command.CommandText = "SELECT id, name FROM map_english";
+
+        var names = new Dictionary<int, string>();
+
+        await using var reader = await command.ExecuteReaderAsync(ct);
+
+        while (await reader.ReadAsync(ct))
+            names[reader.GetInt32(0)] = reader.GetString(1);
+
+        return names;
+    }
+
     /// <summary>Every map's English name, replacing what was there.</summary>
     public async Task SaveEnglishMapNamesAsync(
         IReadOnlyDictionary<int, string> names, CancellationToken ct = default)

@@ -64,8 +64,11 @@ public sealed class MarkerStore(AppEnvironment environment)
     /// every update anyway, had been cut short.
     /// 5 kept each marker's height, for drawing the chosen one in the game — a chest at the top of
     /// a jumping puzzle is not at the height of whoever is looking for it.
+    /// 6 knows Tekkit's puzzles that never say "jp" by the wiki's names (2026-10-13). Only Tekkit's
+    /// read changes, but since its size check, an unchanged All-In-One would otherwise never be
+    /// read again.
     /// </summary>
-    private const int ImportFormat = 5;
+    private const int ImportFormat = 6;
 
     /// <summary>The ceiling on routes kept from one pack. See <see cref="MarkerPack.ReadRoutes"/>
     /// for what it costs and why it is this number.</summary>
@@ -196,8 +199,11 @@ public sealed class MarkerStore(AppEnvironment environment)
     ///
     /// This is also why the app does not copy TacO's own approach, which scrapes a version string
     /// out of a web page per pack — that needs configuration for every pack and breaks whenever a
-    /// site is redesigned. A host that sets no validator simply re-downloads, which is correct and
-    /// merely not free.
+    /// site is redesigned.
+    ///
+    /// A host that sets no validator is judged by the size it announces instead, read from the
+    /// headers before the body; see <see cref="MarkerIndex.Unchanged"/>. One that announces no size
+    /// either simply re-downloads, which is correct and merely not free.
     /// </summary>
     public async Task<MarkerImport> UpdateAsync(string id, CancellationToken ct = default)
     {
@@ -299,6 +305,22 @@ public sealed class MarkerStore(AppEnvironment environment)
 
             response.EnsureSuccessStatusCode();
 
+            // Tekkit sends the size in Content-Range on a 200 and no Content-Length, because the
+            // body is chunked. Disposing the response drops the connection rather than reading
+            // the 47 MB behind it.
+            var size = response.Content.Headers.ContentLength ?? response.Content.Headers.ContentRange?.Length;
+
+            if (known is { } same && same.Imported >= ImportFormat && MarkerIndex.Unchanged(same, size))
+            {
+                // On a pool thread: on Android, closing a response whose body was never read
+                // closes the Java connection under it, which is network work, and on the UI
+                // thread that throws NetworkOnMainThreadException. A 304 has no body, so it never
+                // met this. The using above disposes again on the way out, which is a no-op.
+                await Task.Run(response.Dispose, CancellationToken.None);
+
+                return new MarkerImport(same.Count, same.Maps, UpToDate, true);
+            }
+
             // To disk rather than into memory: packs run to hundreds of megabytes of textures,
             // and the phone has no reason to hold one.
             await using (var body = await response.Content.ReadAsStreamAsync(ct))
@@ -355,7 +377,8 @@ public sealed class MarkerStore(AppEnvironment environment)
                 kept.Count,
                 maps,
                 routes.Count,
-                ImportFormat);
+                ImportFormat,
+                size ?? 0);
 
             var packs = Index().Where(p => p.Id != id).ToList();
 

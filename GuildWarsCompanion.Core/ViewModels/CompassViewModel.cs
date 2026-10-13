@@ -106,7 +106,7 @@ public sealed partial class CompassViewModel(
     GameStream stream, CompassTargets targets, MapIcons icons,
     ICompassVisibilityStore visibility, Objective objective,
     Bridge.Protocol.Journal journal, TrailShare trails,
-    IMainThread mainThread, TestEvidence evidence) : BaseViewModel
+    IMainThread mainThread) : BaseViewModel
 {
     /// <summary>
     /// How many marks the dial carries at once.
@@ -473,11 +473,7 @@ public sealed partial class CompassViewModel(
         IsLive = report.IsLive;
 
         // Reached in the game: the objective is done, here and on the map.
-        if (trails.HasArrived(report))
-        {
-            ClearObjective();
-            evidence.Saw("trail-arrival");
-        }
+        if (trails.HasArrived(report)) ClearObjective();
 
         if (report.State is not { } state)
         {

@@ -184,4 +184,57 @@ public class MapPicksTests
 
         Assert.Empty(MapPicks.Search(all, "Divinity"));
     }
+
+    private static readonly Dictionary<int, string> English = new()
+    {
+        [1203] = "Siren's Landing", [24] = "Gendarran Fields", [1195] = "Draconis Mons"
+    };
+
+    private static IReadOnlyList<MapChoice> German() => MapPicks.Choices(
+        [Map(1203, "Zaubersängerlände", region: "Ruinen von Orr"),
+         Map(24, "Gendarran-Felder", region: "Kryta"),
+         Map(1195, "Draconis Mons", region: "Ruinen von Orr")],
+        English);
+
+    /// <summary>The name every guide uses finds the map on a German phone.</summary>
+    [Fact]
+    public void Finds_a_map_by_its_English_name()
+    {
+        Assert.Equal("Zaubersängerlände", Assert.Single(MapPicks.Search(German(), "siren")).Name);
+    }
+
+    [Fact]
+    public void Still_finds_a_map_by_the_phones_own_name()
+    {
+        Assert.Equal("Gendarran-Felder", Assert.Single(MapPicks.Search(German(), "felder")).Name);
+    }
+
+    /// <summary>The English name goes on the line under the German one, and only where it differs.</summary>
+    [Fact]
+    public void Shows_the_English_name_only_where_it_differs()
+    {
+        var all = German();
+
+        Assert.Equal("Siren's Landing · Ruinen von Orr · Tyria", all.Single(c => c.Id == 1203).Under);
+        Assert.Equal("Ruinen von Orr · Tyria", all.Single(c => c.Id == 1195).Under);
+    }
+
+    [Fact]
+    public void An_English_name_that_starts_with_the_term_ranks_first()
+    {
+        // All three contain an "s" somewhere; only Siren's Landing starts with one.
+        var found = MapPicks.Search(German(), "s");
+
+        Assert.Equal(["Zaubersängerlände", "Draconis Mons", "Gendarran-Felder"], found.Select(c => c.Name));
+    }
+
+    /// <summary>No English names stored and no connection: one language, as before.</summary>
+    [Fact]
+    public void Without_English_names_a_row_has_one_name()
+    {
+        var choice = Assert.Single(MapPicks.Choices([Map(1203, "Zaubersängerlände")]));
+
+        Assert.Null(choice.English);
+        Assert.Equal(choice.Where, choice.Under);
+    }
 }

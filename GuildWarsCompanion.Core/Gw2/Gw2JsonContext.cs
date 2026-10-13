@@ -36,6 +36,7 @@ namespace GuildWarsCompanion.Gw2;
 [JsonSerializable(typeof(List<AccountLuck>))]
 [JsonSerializable(typeof(List<AccountAchievement>))]
 [JsonSerializable(typeof(List<Achievement>))]
+[JsonSerializable(typeof(DailyCategory))]
 [JsonSerializable(typeof(List<Skin>))]
 [JsonSerializable(typeof(List<Mini>))]
 [JsonSerializable(typeof(List<Quest>))]

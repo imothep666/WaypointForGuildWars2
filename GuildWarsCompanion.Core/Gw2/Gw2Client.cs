@@ -390,6 +390,20 @@ public sealed class Gw2Client(HttpClient http)
         IEnumerable<int> ids, CancellationToken ct = default) =>
         GetBulkAsync("achievements", ids, Gw2JsonContext.Default.ListAchievement, ct);
 
+    /// <summary>
+    /// Achievements as English names them, whatever <see cref="Language"/> is: the daily fractals
+    /// are told apart by their names alone ("Daily Tier 4 Aetherblade"), and the English ones are
+    /// the ones with a shape worth reading.
+    /// </summary>
+    public Task<List<Achievement>> GetEnglishAchievementsAsync(
+        IEnumerable<int> ids, CancellationToken ct = default) =>
+        GetBulkAsync("achievements", ids, Gw2JsonContext.Default.ListAchievement, ct, Gw2Language.English);
+
+    /// <summary>The fractal dailies, today's and tomorrow's. Unauthenticated; changes at the
+    /// daily reset.</summary>
+    public Task<DailyCategory> GetDailyFractalsAsync(CancellationToken ct = default) =>
+        GetAsync("achievements/categories/88", Gw2JsonContext.Default.DailyCategory, ct);
+
     // --- crafting ----------------------------------------------------------
 
     /// <summary>
@@ -669,14 +683,15 @@ public sealed class Gw2Client(HttpClient http)
     /// than failing the screen: one retired trait id should not blank a whole build.
     /// </summary>
     private async Task<List<T>> GetBulkAsync<T>(
-        string path, IEnumerable<int> ids, JsonTypeInfo<List<T>> typeInfo, CancellationToken ct)
+        string path, IEnumerable<int> ids, JsonTypeInfo<List<T>> typeInfo, CancellationToken ct,
+        string? language = null)
     {
         var result = new List<T>();
         foreach (var chunk in ids.Distinct().Chunk(MaxIdsPerRequest))
         {
             try
             {
-                result.AddRange(await GetAsync($"{path}?ids={string.Join(',', chunk)}", typeInfo, ct));
+                result.AddRange(await GetAsync($"{path}?ids={string.Join(',', chunk)}", typeInfo, ct, language));
             }
             catch (Gw2ApiException ex) when (ex.Kind is Gw2ErrorKind.NotFound or Gw2ErrorKind.BadRequest)
             {
