@@ -141,6 +141,12 @@ internal static class WidgetDraw
     {
         var views = new RemoteViews(context.PackageName, R.Layout.widget_here);
 
+        var art = panel.Art is { } map ? Painting(map) : null;
+
+        if (art is not null) views.SetImageViewBitmap(R.Id.here_art, art);
+        views.SetViewVisibility(R.Id.here_art, art is null ? ViewStates.Gone : ViewStates.Visible);
+        views.SetViewVisibility(R.Id.here_wash, art is null ? ViewStates.Visible : ViewStates.Gone);
+
         views.SetImageViewBitmap(R.Id.here_map, Carved(context, panel.Map, 17));
         views.SetTextViewText(R.Id.here_who, panel.Who);
 
@@ -157,6 +163,59 @@ internal static class WidgetDraw
         OpenApp(context, views, R.Id.here_root);
         return views;
     }
+
+    /// <summary>The widest a painting is kept for a widget, in pixels. The wiki's copy is 900; a
+    /// launcher has to hold every widget's bitmaps in one parcel, and a widget is a few inches.</summary>
+    private const int PaintingWidth = 720;
+
+    /// <summary>
+    /// A map's loading screen as the Here widget's ground, or null when none is kept: decoded
+    /// smaller, then darkened toward the left and the top, where the words are, and left brighter
+    /// on the right, where the painting can be seen. The darkening is in the picture rather than a
+    /// second view, since a launcher draws a widget from a fixed set of views.
+    /// </summary>
+    private static Bitmap? Painting(string map)
+    {
+        if (HostServices.Get<MapArt>()?.Held(map) is not { } file) return null;
+
+        try
+        {
+            var bounds = new BitmapFactory.Options { InJustDecodeBounds = true };
+            BitmapFactory.DecodeFile(file, bounds);
+
+            var sample = 1;
+            while (bounds.OutWidth / (sample * 2) >= PaintingWidth) sample *= 2;
+
+            using var source = BitmapFactory.DecodeFile(file, new BitmapFactory.Options { InSampleSize = sample });
+            if (source is null) return null;
+
+            var painting = source.Copy(Bitmap.Config.Argb8888!, true)!;
+
+            using var canvas = new Canvas(painting);
+            using var shade = new Paint();
+
+            // Across: words on the left, painting on the right.
+            shade.SetShader(new LinearGradient(0, 0, painting.Width, 0,
+                Ink(0xD8), Ink(0x50), Shader.TileMode.Clamp!));
+            canvas.DrawRect(0, 0, painting.Width, painting.Height, shade);
+
+            // And down a little, for the heading.
+            shade.SetShader(new LinearGradient(0, 0, 0, painting.Height,
+                Ink(0x60), Ink(0x00), Shader.TileMode.Clamp!));
+            canvas.DrawRect(0, 0, painting.Width, painting.Height / 2f, shade);
+
+            return painting;
+        }
+        catch (Exception)
+        {
+            // A half-written or unreadable file: the wash, as before there was art.
+            return null;
+        }
+    }
+
+    /// <summary>The app's ink, #0E141B, at a strength. A Color rather than an int: given ints,
+    /// LinearGradient takes them for Android's 64-bit colours and throws "Invalid ID".</summary>
+    private static Color Ink(int alpha) => new(Color.Argb(alpha, 0x0E, 0x14, 0x1B));
 
     private static Typeface? _marcellus;
 

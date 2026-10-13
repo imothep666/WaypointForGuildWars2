@@ -14,11 +14,24 @@
 #                  write, which is what creating a release and uploading to it takes.
 #
 # The version is the repository's own, from Directory.Build.targets: 1.0.<commits on main>.
-# Every push to main is a new number, so every push to main is a release.
+#
+# Not on every push. A run is a release, and a release costs a good share of the free tier's 1,800
+# hosted minutes a month; a day of small pushes spent them on releases nobody asked for. Instead:
+#   - by hand, whenever wanted (Pipelines > Run pipeline);
+#   - nightly at 02:00 UTC, only when main has moved and its newest commit is not released yet.
+# A release lists every commit since the one before it, so nothing is lost by releasing less often.
 
-trigger:
-  branches:
-    include: [main]
+trigger: none
+
+# always: false is Azure's own "only if changed", but it compares with the last scheduled run
+# alone, so a commit released by hand that day would be released again overnight. The first step
+# below checks the latest release itself.
+schedules:
+  - cron: "0 2 * * *"
+    displayName: Nightly, when main has changed
+    branches:
+      include: [main]
+    always: false
 
 pr: none
 
@@ -80,12 +93,9 @@ steps:
     fetchDepth: 0
     fetchTags: false
 
-  - task: UseDotNet@2
-    displayName: .NET 10 SDK
-    inputs:
-      packageType: sdk
-      version: 10.x
-
+  # Which commit the latest release was built from, read from the hidden line its notes end with.
+  # The night's run stops here when that is this commit: it was released already, by hand or by an
+  # earlier night. A run started by hand always goes on, since asking for it is the reason.
   - bash: |
       set -euo pipefail
       # An undefined variable arrives as its own name, $(ReleasesRepo), not as nothing.
@@ -93,6 +103,30 @@ steps:
         echo "##vso[task.logissue type=error]ReleasesRepo is not set; see the top of azure-pipelines.yml."
         exit 1
       fi
+      last=$( (curl -fsSL -H "Authorization: Bearer $GITHUB_TOKEN" \
+          "https://api.github.com/repos/${RELEASES_REPO#https://github.com/}/releases/latest" \
+          | grep -o 'Source: [0-9a-f]\{40\}' | head -1 | cut -d' ' -f2) || true)
+      echo "Latest release built from: ${last:-unknown}"
+      echo "##vso[task.setvariable variable=LastRelease]$last"
+      if [[ "$BUILD_REASON" == "Schedule" && "$last" == "$(git rev-parse HEAD)" ]]; then
+        echo "$(git rev-parse --short HEAD) is released already; nothing to do tonight."
+        echo "##vso[task.setvariable variable=Released]true"
+      fi
+    displayName: Released already?
+    env:
+      RELEASES_REPO: $(ReleasesRepo)
+      GITHUB_TOKEN: $(GitHubToken)
+      BUILD_REASON: $(Build.Reason)
+
+  - task: UseDotNet@2
+    displayName: .NET 10 SDK
+    condition: and(succeeded(), ne(variables['Released'], 'true'))
+    inputs:
+      packageType: sdk
+      version: 10.x
+
+  - bash: |
+      set -euo pipefail
       majorMinor=$(sed -n 's:.*<CompanionVersionMajorMinor>\(.*\)</CompanionVersionMajorMinor>.*:\1:p' Directory.Build.targets)
       version="$majorMinor.$(git rev-list --count HEAD)"
       echo "Waypoint $version from $(git rev-parse --short HEAD)"
@@ -100,13 +134,36 @@ steps:
       echo "##vso[build.updatebuildnumber]$version"
       dotnet tool install --global vpk --version "$(VpkVersion)"
       echo "##vso[task.prependpath]$HOME/.dotnet/tools"
-    displayName: Version and vpk
+
+      # The release's own page: what changed since the last release. Without notes GitHub shows
+      # the tagged commit's message instead, and every release is tagged on the public repo's main,
+      # which only moves when the code is published there, so release after release showed the
+      # same text. Each release's notes end with the commit it was built from, hidden, and the
+      # next one lists from there; with no such line to go on, only this commit is listed.
+      notes="$(Agent.TempDirectory)/notes.md"
+      last="${LAST_RELEASE:-}"
+      [[ "$last" == '$('* ]] && last=""   # set to nothing, it can arrive as its own name
+      {
+        echo "## Changes"
+        echo
+        if [[ -n "$last" ]] && git merge-base --is-ancestor "$last" HEAD 2>/dev/null; then
+          git log --reverse --no-merges --format='- %s' "$last..HEAD"
+        else
+          git log -1 --format='- %s' HEAD
+        fi
+        echo
+        echo "<!-- Source: $(git rev-parse HEAD) -->"
+      } > "$notes"
+      cat "$notes"
+    displayName: Version, vpk and notes
+    condition: and(succeeded(), ne(variables['Released'], 'true'))
     env:
-      RELEASES_REPO: $(ReleasesRepo)
+      LAST_RELEASE: $(LastRelease)
 
   # Debug, as locally: the test plan's own tests check behaviour that only the debug build has.
   - bash: dotnet test GuildWarsCompanion.Tests -nologo
     displayName: Tests
+    condition: and(succeeded(), ne(variables['Released'], 'true'))
 
   # The previous release is fetched first: vpk makes a delta package against it, which is what
   # most updates then download.
@@ -126,14 +183,16 @@ steps:
         vpk ${{ p.directive }} pack --packId ${{ p.packId }} --packTitle "${{ p.title }}" --packAuthors mpsoft \
           --packVersion "$(Version)" --packDir "$publish" --mainExe ${{ p.exe }} \
           --runtime ${{ p.rid }} --channel ${{ p.channel }} --icon "${{ p.icon }}" ${{ p.extra }} \
-          --outputDir "$out"
+          --releaseNotes "$(Agent.TempDirectory)/notes.md" --outputDir "$out"
       displayName: Pack ${{ p.channel }}
+      condition: and(succeeded(), ne(variables['Released'], 'true'))
       env:
         RELEASES_REPO: $(ReleasesRepo)
         GITHUB_TOKEN: $(GitHubToken)
 
   - task: PublishPipelineArtifact@1
     displayName: Artifact
+    condition: and(succeeded(), ne(variables['Released'], 'true'))
     inputs:
       targetPath: $(Out)
       artifact: waypoint-releases
@@ -147,7 +206,7 @@ steps:
           --releaseName "Waypoint $(Version)" --tag "v$(Version)"
       displayName: Release ${{ p.channel }}
       # Main only: a run started by hand on another branch builds the artifact and stops.
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+      condition: and(succeeded(), ne(variables['Released'], 'true'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
       env:
         RELEASES_REPO: $(ReleasesRepo)
         GITHUB_TOKEN: $(GitHubToken)

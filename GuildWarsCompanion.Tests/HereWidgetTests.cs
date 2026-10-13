@@ -67,6 +67,33 @@ public class HereWidgetTests
         Assert.Empty(panel.Lines);
     }
 
+    /// <summary>The painting is filed under the English name, whatever the heading says: the wiki
+    /// has "Crystal Oasis loading screen", not "Kristalloase".</summary>
+    [Fact]
+    public void The_painting_is_the_map_s_English_one()
+    {
+        var german = new HereReading("Sweet Child O Night", "Kristalloase", null, "Crystal Oasis");
+
+        var panel = HereWidget.Panel(german, Now.AddMinutes(-3), Now);
+
+        Assert.Equal("Kristalloase", panel.Map);
+        Assert.Equal("Crystal Oasis", panel.Art);
+    }
+
+    /// <summary>Last seen there, so still painted there.</summary>
+    [Fact]
+    public void An_old_reading_keeps_its_painting() =>
+        Assert.Equal("Crystal Oasis",
+            HereWidget.Panel(Playing with { English = "Crystal Oasis" }, Now.AddHours(-3), Now).Art);
+
+    /// <summary>A reading stored before the widget had paintings, and no reading at all, keep the wash.</summary>
+    [Fact]
+    public void Without_an_English_name_there_is_no_painting()
+    {
+        Assert.Null(HereWidget.Panel(Playing, Now, Now).Art);
+        Assert.Null(HereWidget.Panel(null, null, Now).Art);
+    }
+
     [Theory]
     [InlineData("Here: nothing left", "Nothing left")]
     [InlineData("Here: Battle in Tarir (Octovine) on now", "Battle in Tarir (Octovine) on now")]

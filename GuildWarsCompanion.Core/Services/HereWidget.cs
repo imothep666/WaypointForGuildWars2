@@ -6,7 +6,9 @@ namespace GuildWarsCompanion.Services;
 /// the game - by Today when it is opened, and by the widget's own poll - and never cleared when
 /// the game closes, so the widget can say where they were last.
 /// </summary>
-public sealed record HereReading(string Character, string? Map, string? Line);
+/// <param name="English">The map's English name, which the wiki files its loading screen under;
+/// null in a reading stored before the widget showed the painting.</param>
+public sealed record HereReading(string Character, string? Map, string? Line, string? English = null);
 
 /// <summary>What the Here widget draws.</summary>
 /// <param name="Map">The heading: the map, or what to do to get one.</param>
@@ -14,7 +16,9 @@ public sealed record HereReading(string Character, string? Map, string? Line);
 /// <param name="Lines">What is left on the map, one fact a line, at most three; empty when the
 /// reading is too old to be about now.</param>
 /// <param name="IsLive">Whether the reading is recent enough to be about now.</param>
-public sealed record HerePanel(string Map, string Who, IReadOnlyList<string> Lines, bool IsLive);
+/// <param name="Art">The map whose loading screen goes behind it, by English name; null for none.
+/// Kept when the reading is old: it is still the place they were last.</param>
+public sealed record HerePanel(string Map, string Who, IReadOnlyList<string> Lines, bool IsLive, string? Art = null);
 
 public static class HereWidget
 {
@@ -38,10 +42,12 @@ public static class HereWidget
 
         var map = reading.Map is { Length: > 0 } named ? named : L.T("Somewhere in Tyria");
 
-        if (now - at > LiveFor)
-            return new HerePanel(map, L.F("{0} · last seen {1}", reading.Character, Stale.Age(at, now)), [], false);
+        var art = reading.English is { Length: > 0 } english ? english : null;
 
-        return new HerePanel(map, reading.Character, Facts(reading.Line), true);
+        if (now - at > LiveFor)
+            return new HerePanel(map, L.F("{0} · last seen {1}", reading.Character, Stale.Age(at, now)), [], false, art);
+
+        return new HerePanel(map, reading.Character, Facts(reading.Line), true, art);
     }
 
     /// <summary>"Here: map chest waiting · Shadow Behemoth in 25 min" as one fact a line, the way

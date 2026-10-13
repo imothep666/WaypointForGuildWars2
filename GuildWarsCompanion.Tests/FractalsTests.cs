@@ -129,5 +129,36 @@ public class FractalsTests
         Assert.Equal("Aetherblade · Thaumanova Reactor · Uncategorized · scales 6, 28, 61", Fractals.Describe(Day));
     }
 
+    /// <summary>
+    /// A German phone: the fractal's name comes from the quoted name in the German requirement,
+    /// since the German achievement names ("Täglicher Abschluss: Ätherklingen, Rang 3") have no
+    /// shape worth reading, and the English one stays beside it for the guides.
+    /// </summary>
+    [Fact]
+    public void A_German_phone_names_the_fractal_in_German_with_the_English_beside_it()
+    {
+        var german = new Dictionary<int, Achievement>
+        {
+            [2948] = Required(2948, "Schließt das Fraktal \"Ätherklinge\" auf Schwierigkeitsgrad 76 oder höher ab."),
+            [2967] = Required(2967, "Schließt das Fraktal „Thaumanova-Reaktor“ auf Schwierigkeitsgrad 76 oder höher ab."),
+            [2229] = Required(2229, "Schließt  Fraktal des Schwierigkeitsgrads 6 in den Fraktalen der Nebel ab.")
+        };
+
+        var day = Fractals.Read(
+            [Named(2948, "Daily Tier 4 Aetherblade"), Named(2967, "Daily Tier 4 Thaumanova Reactor"),
+                Named(2939, "Daily Tier 4 Uncategorized"), Named(2229, "Daily Recommended Fractal—Scale 6")],
+            german);
+
+        var tasks = Fractals.Tasks(day, 80, new HashSet<int>());
+
+        Assert.Equal(["Ätherklinge", "Thaumanova-Reaktor", "Uncategorized"], tasks.Take(3).Select(task => task.Name));
+        Assert.Equal("Aetherblade · Tier 4 to do", tasks[0].Note);
+        Assert.Equal("Tier 4 to do", tasks[2].Note);
+        Assert.Equal("Ätherklinge · Thaumanova-Reaktor · Uncategorized · scales 6", Fractals.Describe(day));
+    }
+
+    private static Achievement Required(int id, string requirement) =>
+        new(id, "Täglicher Abschluss", null, requirement, null, ["Daily"], null);
+
     private static Achievement Named(int id, string name) => new(id, name, null, null, null, ["Daily"], null);
 }

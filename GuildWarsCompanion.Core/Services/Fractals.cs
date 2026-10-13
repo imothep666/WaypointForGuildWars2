@@ -5,7 +5,9 @@ using GuildWarsCompanion.Gw2;
 namespace GuildWarsCompanion.Services;
 
 /// <summary>One fractal's daily at one tier: "Daily Tier 4 Aetherblade".</summary>
-public sealed record FractalDaily(int Id, string Fractal, int Tier);
+/// <param name="Local">The fractal's name in the phone's language, when that is not English and
+/// the achievement's text names it: "Ätherklinge".</param>
+public sealed record FractalDaily(int Id, string Fractal, int Tier, string? Local = null);
 
 /// <summary>One recommended fractal: "Daily Recommended Fractal—Scale 28".</summary>
 public sealed record FractalScale(int Id, int Scale);
@@ -13,9 +15,15 @@ public sealed record FractalScale(int Id, int Scale);
 /// <summary>A day's fractal dailies, read out of their names.</summary>
 public sealed record FractalDay(IReadOnlyList<FractalDaily> Tiers, IReadOnlyList<FractalScale> Recommended)
 {
-    /// <summary>The day's fractals, each once, in alphabetical order.</summary>
-    public IReadOnlyList<string> Fractals { get; } =
-        [.. Tiers.Select(daily => daily.Fractal).Distinct().Order(StringComparer.Ordinal)];
+    /// <summary>The day's fractals by their English names, each once, in the order their shown
+    /// names sort in.</summary>
+    public IReadOnlyList<string> Fractals =>
+        [.. Tiers.Select(daily => daily.Fractal).Distinct().OrderBy(Shown, StringComparer.CurrentCulture)];
+
+    /// <summary>What a fractal is called on screen: in the phone's language where its achievements
+    /// say, in English otherwise.</summary>
+    public string Shown(string fractal) =>
+        Tiers.FirstOrDefault(daily => daily.Fractal == fractal && daily.Local is not null)?.Local ?? fractal;
 
     public bool IsEmpty => Tiers.Count == 0 && Recommended.Count == 0;
 }
@@ -47,8 +55,16 @@ public static partial class Fractals
     [GeneratedRegex(@"^Daily Recommended Fractal\W+Scale (?<scale>\d+)$")]
     private static partial Regex ScaleName();
 
+    /// <summary>The first quoted name in a text, in straight or German quotes.</summary>
+    [GeneratedRegex("[\"„“«»](?<name>[^\"„“«»]+)[\"„“«»]")]
+    private static partial Regex Quoted();
+
     /// <summary>The day, from the category's achievements as English names them.</summary>
-    public static FractalDay Read(IEnumerable<Achievement> english)
+    /// <param name="local">The same achievements in the phone's language, when that is not English.
+    /// Their names cannot be read the way the English ones are — "Täglicher Abschluss: Ätherklingen,
+    /// Rang 3" — but their requirement quotes the fractal: Schließt das Fraktal "Ätherklinge" ab.</param>
+    public static FractalDay Read(
+        IEnumerable<Achievement> english, IReadOnlyDictionary<int, Achievement>? local = null)
     {
         var tiers = new List<FractalDaily>();
         var scales = new List<FractalScale>();
@@ -59,13 +75,19 @@ public static partial class Fractals
 
             if (TierName().Match(name) is { Success: true } tier)
                 tiers.Add(new FractalDaily(
-                    achievement.Id, tier.Groups["fractal"].Value.Trim(), int.Parse(tier.Groups["tier"].Value)));
+                    achievement.Id, tier.Groups["fractal"].Value.Trim(), int.Parse(tier.Groups["tier"].Value),
+                    LocalName(local?.GetValueOrDefault(achievement.Id))));
             else if (ScaleName().Match(name) is { Success: true } scale)
                 scales.Add(new FractalScale(achievement.Id, int.Parse(scale.Groups["scale"].Value)));
         }
 
         return new FractalDay(tiers, [.. scales.OrderBy(scale => scale.Scale)]);
     }
+
+    private static string? LocalName(Achievement? local) =>
+        local?.Requirement is { } requirement && Quoted().Match(requirement) is { Success: true } quoted
+            ? quoted.Groups["name"].Value.Trim()
+            : null;
 
     /// <summary>
     /// The daily tier a fractal level reaches: a tier's daily asks for its fractal at scale 1, 26,
@@ -105,7 +127,11 @@ public static partial class Fractals
                 ? L.F("Tier {0} to do", aim.Tier)
                 : L.F("Tiers done: {0}", string.Join(", ", tiersDone));
 
-            tasks.Add(new FractalTask(fractal, done.Contains(aim.Id), note));
+            // The English name beside one in another language: guides and the wiki say "Aetherblade".
+            var shown = day.Shown(fractal);
+
+            tasks.Add(new FractalTask(
+                shown, done.Contains(aim.Id), shown == fractal ? note : $"{fractal} · {note}"));
         }
 
         foreach (var scale in day.Recommended)
@@ -124,7 +150,7 @@ public static partial class Fractals
     /// <summary>"Aetherblade · Thaumanova Reactor · Uncategorized · scales 6, 28, 61": a day in one line.</summary>
     public static string Describe(FractalDay day)
     {
-        var parts = new List<string>(day.Fractals);
+        var parts = new List<string>(day.Fractals.Select(day.Shown));
 
         if (day.Recommended.Count > 0)
             parts.Add(L.F("scales {0}", string.Join(", ", day.Recommended.Select(scale => scale.Scale))));

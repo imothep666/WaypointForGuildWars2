@@ -7,6 +7,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 
 using GuildWarsCompanion.Host;
+using GuildWarsCompanion.Services;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -84,9 +85,25 @@ public static class WikiArt
         ["Revenant"] = "Revenant 01 concept art.jpg"
     };
 
-    /// <summary>A map's loading screen; null where the wiki has none by the usual name.</summary>
+    /// <summary>A map's loading screen; null where the wiki has none by the usual name. Fetched and
+    /// kept by <see cref="MapArt"/> in Core, whose file the Here widget draws from too.</summary>
     public static Task<Bitmap?> ForMapAsync(string map) =>
-        Load(new Kind("mapart", map, [$"{map} loading screen.jpg", $"{map} loading screen.png"], Lift: false));
+        Loaded.GetOrAdd($"mapart/{map}", _ => LoadMapAsync(map));
+
+    private static async Task<Bitmap?> LoadMapAsync(string map)
+    {
+        try
+        {
+            if (await App.Services.GetRequiredService<MapArt>().FetchAsync(map) is { } file) return new Bitmap(file);
+        }
+        catch (Exception)
+        {
+            // As any other painting: the page stays on its wash.
+        }
+
+        Loaded.TryRemove($"mapart/{map}", out _);
+        return null;
+    }
 
     /// <summary>A Wizard's Vault reward's banner painting, whole: it is framed already, and opaque it
     /// hides the icon beneath. Null where there is none.</summary>

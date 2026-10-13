@@ -51,14 +51,39 @@ public sealed class FractalService(
             .Select(progress => progress.Id)
             .ToHashSet();
 
-        var day = Fractals.Read(named.Where(achievement => today.Contains(achievement.Id)));
-        var next = Fractals.Read(named.Where(achievement => tomorrow.Contains(achievement.Id)));
+        var local = await LocalAsync([.. today, .. tomorrow], ct);
+
+        var day = Fractals.Read(named.Where(achievement => today.Contains(achievement.Id)), local);
+        var next = Fractals.Read(named.Where(achievement => tomorrow.Contains(achievement.Id)), local);
 
         var wallet = withWallet ? await WalletAsync(ct) : [];
 
         return new FractalsView(
             level, Fractals.Tasks(day, level, done), next.IsEmpty ? null : Fractals.Describe(next), wallet,
             category.FetchedAt is { } at && at < Resets.LastDaily(DateTimeOffset.UtcNow));
+    }
+
+    /// <summary>
+    /// The same achievements in the phone's language, for the fractals' own names there. Null on an
+    /// English phone, and when they cannot be had: the English names are still right, only foreign.
+    /// </summary>
+    private async Task<IReadOnlyDictionary<int, Achievement>?> LocalAsync(
+        IReadOnlyList<int> ids, CancellationToken ct)
+    {
+        if (client.Language == Gw2Language.English) return null;
+
+        try
+        {
+            var local = (await offline.ReadAsync(
+                "fractals/daily/local", Gw2JsonContext.Default.ListAchievement,
+                token => client.GetAchievementsAsync(ids, token), ct)).Value;
+
+            return local.ToDictionary(achievement => achievement.Id);
+        }
+        catch (Gw2ApiException)
+        {
+            return null;
+        }
     }
 
     /// <summary>The three fractal currencies, in the wallet's own names and art. Nothing at all
@@ -69,7 +94,7 @@ public sealed class FractalService(
 
         try
         {
-            var rows = (await account.GetWalletAsync(ct)).Value;
+            var rows = (await account.GetWalletAsync(Fractals.Currencies, ct)).Value;
 
             return [.. Fractals.Currencies.SelectMany(id => rows.Where(row => row.CurrencyId == id))];
         }

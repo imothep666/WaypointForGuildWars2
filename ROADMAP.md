@@ -117,6 +117,14 @@ Nothing small is waiting just now; what is left needs the game or a device (belo
   because the load set the continent before fetching it and nothing redrew after the failure.
   The continent is now fetched before the screen is touched, and a failed load asks for a frame.
   Seen on the phone: Königintal's tiles stay, its name stays, and the error shows.
+- **The Here widget is painted with the map's loading screen**, as Today and the map are. The wiki
+  download moved into Core (`MapArt`), so the widget and the app's band share one kept file per
+  map; the Here reading now keeps the map's English name, which the wiki files paintings under.
+  The widget's poll fetches a painting it lacks before storing the reading; from Today it arrives
+  in the background and the widget is drawn again. Darkened in the bitmap itself, toward the left
+  and the top where the words are. Android's `LinearGradient` took plain int colours for its
+  64-bit colour longs and threw "Invalid ID: 27", silently leaving the wash, so the colours go in
+  as `Color`. Seen on the phone with MumbleSim in Queensdale: Königintal over its painting.
 - **Daily fractals on Today, with a page behind them.** The API has no fractal endpoint, but the
   "Daily Fractals" achievement category (88) names fifteen achievements a day and, with the pinned
   schema, tomorrow's fifteen. Their English names are the only place the fractal is written
@@ -125,8 +133,10 @@ Nothing small is waiting just now; what is left needs the game or a device (belo
   `fractal_level`: 1, 26, 51, 76) and the recommended scales it can enter; a scale above the level
   is shown but not counted, and an account with no fractal level has no row. The page lists the
   tiers done per fractal, tomorrow's fractals and scales, and Fractal Relics, Pristine Fractal
-  Relics and Unstable Fractal Essence from the wallet (a currency the account has none of is not in
-  the wallet answer, so not listed). Instabilities are not in the API and are left out. Offline
+  Relics and Unstable Fractal Essence from the wallet, at 0 when the account has none (the wallet
+  answer leaves such a currency out). On a German phone the fractals are named in German, from the
+  quoted name in each German requirement (Schließt das Fraktal "Ätherklinge" ab), with the English
+  name beside it on the page for the guides. Instabilities are not in the API and are left out. Offline
   with a list from before the reset, the row reads as unreadable and the page says it is
   yesterday's. Seen on the phone: level 5, tier 1, three fractals open, all three scales above
   level 5, tomorrow Chaos · Cliffside · Twilight Oasis, 32 relics and 4 pristine.

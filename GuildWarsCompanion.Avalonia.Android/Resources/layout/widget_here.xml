@@ -15,11 +15,21 @@
              android:clipToOutline="true">
 
     <ImageView
+        android:id="@+id/here_wash"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:alpha="0.45"
         android:src="@drawable/widget_wash_here" />
+
+    <!-- The map's loading screen in place of the wash, once it is kept: the same painting that
+         heads Today and the map, darkened where the words are. Gone until there is one. -->
+    <ImageView
+        android:id="@+id/here_art"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:visibility="gone" />
 
     <LinearLayout
         android:layout_width="match_parent"

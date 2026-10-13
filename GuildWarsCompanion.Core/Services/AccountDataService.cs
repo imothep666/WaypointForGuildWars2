@@ -59,7 +59,14 @@ public sealed class AccountDataService(
 
     // --- wallet ------------------------------------------------------------
 
-    public async Task<Fetched<IReadOnlyList<WalletRow>>> GetWalletAsync(CancellationToken ct = default)
+    public Task<Fetched<IReadOnlyList<WalletRow>>> GetWalletAsync(CancellationToken ct = default) =>
+        GetWalletAsync([], ct);
+
+    /// <param name="evenAtZero">Currencies to list even when the account holds none. The wallet
+    /// answer leaves a currency out at zero, and a page about fractals that silently lacks the
+    /// essence reads as broken rather than as empty.</param>
+    public async Task<Fetched<IReadOnlyList<WalletRow>>> GetWalletAsync(
+        IReadOnlyCollection<int> evenAtZero, CancellationToken ct = default)
     {
         await EnsureCacheFreshAsync(ct);
 
@@ -68,7 +75,10 @@ public sealed class AccountDataService(
 
         var currencies = await GetCurrenciesAsync(ct);
 
-        var rows = wallet.Value
+        var held = wallet.Value.Select(entry => entry.Id).ToHashSet();
+        var entries = wallet.Value.Concat(evenAtZero.Where(id => !held.Contains(id)).Select(id => new WalletEntry(id, 0)));
+
+        var rows = entries
             .Select(entry => (entry, currency: currencies.GetValueOrDefault(entry.Id)))
             .Where(x => x.currency is not null)
             .OrderBy(x => x.currency!.Order)

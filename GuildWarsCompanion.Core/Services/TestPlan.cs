@@ -79,6 +79,10 @@ public static class TestPlan
             "Tap the Daily fractals row.",
             "Each fractal with the tiers done, the scales, tomorrow's fractals, and your relics and essence as the wallet shows them."),
 
+        new("here-art", "Widgets",
+            "Play a map you have never opened in the app, with the Here widget on the home screen. Wait a quarter hour, or open Today.",
+            "The widget shows that map's loading screen behind its words, darkened where they are."),
+
         new("voe-access", "Account",
             "Visit a Visions of Eternity map, then pull Account › Standing down.",
             "Note whether Visions of Eternity is listed now.", Auto: true),

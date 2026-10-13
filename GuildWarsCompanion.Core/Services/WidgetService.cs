@@ -20,7 +20,7 @@ namespace GuildWarsCompanion.Services;
 /// </summary>
 public sealed class WidgetService(
     Gw2Client client, ApiKeySession session, SnapshotStore snapshots, BridgeClient bridge, HereService here,
-    LocalMapNames names, IWidgetRedraw? redraw = null)
+    LocalMapNames names, MapArt art, IWidgetRedraw? redraw = null)
 {
     private const string BossesKey = "widget/worldbosses";
     private const string HereKey = "widget/here";
@@ -109,6 +109,10 @@ public sealed class WidgetService(
             line = null;
         }
 
+        // The painting behind the widget, fetched here where the poll can wait for it: a map not
+        // seen in the app before has none kept yet.
+        if (report.MapName is { Length: > 0 } english) await art.FetchAsync(english, ct);
+
         await StoreHereAsync(report, line, ct);
     }
 
@@ -122,10 +126,19 @@ public sealed class WidgetService(
         if (report is not { IsLive: true, State: { CharacterName.Length: > 0 } state }) return;
 
         await snapshots.SaveAsync(
-            HereKey, new HereReading(state.CharacterName, report.LocalMapName ?? report.MapName, line),
+            HereKey, new HereReading(state.CharacterName, report.LocalMapName ?? report.MapName, line, report.MapName),
             Gw2JsonContext.Default.HereReading, ct);
 
         redraw?.Redraw();
+
+        // From Today the painting is not waited for: the page should not stand still for the
+        // wiki. The widget is drawn again once it has arrived.
+        if (report.MapName is { Length: > 0 } english && art.Held(english) is null) _ = PaintLaterAsync(english);
+    }
+
+    private async Task PaintLaterAsync(string english)
+    {
+        if (await art.FetchAsync(english) is not null) redraw?.Redraw();
     }
 
     /// <summary>
