@@ -64,6 +64,7 @@ public static class CompanionServices
         services.AddSingleton<FractalService>();
         services.AddSingleton<MapArt>();
         services.AddSingleton<Callings>();
+        services.AddSingleton<GuideService>();
         services.AddSingleton<HereService>();
         services.AddSingleton<MetaSource>();
         services.AddSingleton<MetaReminderStore>();

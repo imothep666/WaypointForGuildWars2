@@ -652,6 +652,14 @@ public sealed class Gw2Client(HttpClient http)
         }
     }
 
+    /// <summary>Every stat combination with its attributes, 191 of them. Unauthenticated and static.</summary>
+    public Task<List<ItemStat>> GetAllItemStatsAsync(CancellationToken ct = default, string? language = null) =>
+        GetAsync("itemstats?ids=all", Gw2JsonContext.Default.ListItemStat, ct, language);
+
+    /// <summary>The account's legendary armory. Needs "inventories" and "unlocks".</summary>
+    public Task<List<ArmoryEntry>> GetLegendaryArmoryAsync(CancellationToken ct = default) =>
+        GetAsync("account/legendaryarmory", Gw2JsonContext.Default.ListArmoryEntry, ct);
+
     /// <summary>Named stat combinations, e.g. Berserker's. Unauthenticated and static.</summary>
     public Task<List<ItemStat>> GetItemStatsAsync(IEnumerable<int> ids, CancellationToken ct = default) =>
         GetBulkAsync("itemstats", ids, Gw2JsonContext.Default.ListItemStat, ct);

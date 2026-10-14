@@ -70,6 +70,40 @@ Nothing small is waiting just now; what is left needs the game or a device (belo
 
 ## Done
 
+### On the phone, 2026-10-14: a guide held against a character
+
+- **A character's Guide tab compares it with a build guide.** Paste a build code (`[&D…]`) or a
+  MetaBattle link. The code is decoded by `BuildCode`: profession, three lines with a trait per
+  tier, ten skill palette ids and, since Secrets of the Obscure, the weapon types. Older codes, which
+  MetaBattle still prints, stop before the weapons. Palette ids become skills through
+  /v2/professions' `skills_by_palette`, and trait choices become traits by their place in the line.
+  Skills are compared in any order. A MetaBattle page is read through its wiki API as wikitext
+  (`MetaBattle`): `{{TemplateCode}}`, `{{Skill bar}}` and `{{PvE equipment}}` carry the code, the
+  hands and the gear as named fields. The skill bar decides the hands, because editors fill the
+  equipment's four weapon fields two ways; each sigil follows its weapon.
+- **Stats are matched by what they raise, with the weights.** /v2/itemstats in English resolves the
+  guide's "Berserker", and two combinations are equivalent when their attributes and multipliers
+  agree. Seen on the phone: matching names alone called Assassin's shoulders equivalent to
+  Berserker's, because both raise Power, Precision and Ferocity.
+- **What is missing is looked for on the account first.** A rune, sigil or relic is resolved from its
+  English name through the Guild Wars 2 Wiki's semantic data (the API has no search by name). Then
+  storage says where it is, the legendary armory counts as always to hand, and otherwise the
+  trading post gives the price. Gear with the wrong stats points at a piece of the right type,
+  weight and stats in storage, another equipment template or the armory. The guide last compared is
+  remembered per character and compared again on opening the tab. Not compared: infusions, PvP
+  gear, revenant legends and ranger pets. The API does not show a worn relic.
+- **Weapon stats are on their set's line, and sigils are named by weapon.** Compared hand by hand,
+  the stats were held against whatever was in that hand: a shortbow was "same" against the guide's
+  stats for a dagger. A set's line now reads "Rifle · Berserker's" on both sides, and the sigil
+  lines say "Sigil, Rifle" rather than two lines of "Sigil, set 1".
+- **The character list draws the stored roster at once.** The fresh roster is one large request,
+  and the screen stood empty for about twenty seconds waiting for it on the phone's connection.
+  The rows last read now show straight away, under the loading stroke, until the fresh ones replace
+  them. The bridge is asked alongside the roster rather than before it.
+- Seen on the phone with "Deadeye - Power DPS Rifle" against the player's thief: 14 of 30 as the
+  guide has them. The tab shows each tier's trait "instead of" the character's, the rune 6 of 6,
+  a missing Sigil of Force at 1g 04s, and the rifle and daggers found in the thief's own bags.
+
 ### On the phone, 2026-10-14: the widgets fill their space
 
 - **The Wizard's Vault widget lists today's dailies**, each with its count, in the vault screen's

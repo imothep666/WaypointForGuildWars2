@@ -3185,4 +3185,163 @@
   <data name="Map chest looted" xml:space="preserve">
     <value>Kartentruhe geöffnet</value>
   </data>
+  <data name="COMPARE WITH A GUIDE" xml:space="preserve">
+    <value>MIT EINEM GUIDE VERGLEICHEN</value>
+  </data>
+  <data name="Build code or MetaBattle link" xml:space="preserve">
+    <value>Build-Code oder MetaBattle-Link</value>
+  </data>
+  <data name="PASTE" xml:space="preserve">
+    <value>EINFÜGEN</value>
+  </data>
+  <data name="COMPARE" xml:space="preserve">
+    <value>VERGLEICHEN</value>
+  </data>
+  <data name="Comparing…" xml:space="preserve">
+    <value>Vergleiche …</value>
+  </data>
+  <data name="OPEN" xml:space="preserve">
+    <value>ÖFFNEN</value>
+  </data>
+  <data name="same" xml:space="preserve">
+    <value>gleich</value>
+  </data>
+  <data name="equivalent" xml:space="preserve">
+    <value>gleichwertig</value>
+  </data>
+  <data name="different" xml:space="preserve">
+    <value>anders</value>
+  </data>
+  <data name="not known" xml:space="preserve">
+    <value>unbekannt</value>
+  </data>
+  <data name="Guide: {0} · You: {1}" xml:space="preserve">
+    <value>Guide: {0} · Du: {1}</value>
+  </data>
+  <data name="SPECIALIZATIONS" xml:space="preserve">
+    <value>SPEZIALISIERUNGEN</value>
+  </data>
+  <data name="SKILLS" xml:space="preserve">
+    <value>FERTIGKEITEN</value>
+  </data>
+  <data name="WEAPONS" xml:space="preserve">
+    <value>WAFFEN</value>
+  </data>
+  <data name="STATS" xml:space="preserve">
+    <value>WERTE</value>
+  </data>
+  <data name="UPGRADES" xml:space="preserve">
+    <value>AUFWERTUNGEN</value>
+  </data>
+  <data name="{0} of {1} as the guide has them" xml:space="preserve">
+    <value>{0} von {1} wie im Guide</value>
+  </data>
+  <data name="not taken" xml:space="preserve">
+    <value>nicht gewählt</value>
+  </data>
+  <data name="Tier {0}: {1}" xml:space="preserve">
+    <value>Stufe {0}: {1}</value>
+  </data>
+  <data name="Heal" xml:space="preserve">
+    <value>Heilung</value>
+  </data>
+  <data name="Elite" xml:space="preserve">
+    <value>Elite</value>
+  </data>
+  <data name="Weapon set {0}" xml:space="preserve">
+    <value>Waffenset {0}</value>
+  </data>
+  <data name="No {0} on the account" xml:space="preserve">
+    <value>Kein(e) {0} auf dem Account</value>
+  </data>
+  <data name="&quot;{0}&quot; is not a stat combination the API knows." xml:space="preserve">
+    <value>„{0}“ ist keine Wertekombination, die die API kennt.</value>
+  </data>
+  <data name="Legendary: its stats can be changed out of combat." xml:space="preserve">
+    <value>Legendär: Die Werte lassen sich außerhalb des Kampfes ändern.</value>
+  </data>
+  <data name="Not on the account" xml:space="preserve">
+    <value>Nicht auf dem Account</value>
+  </data>
+  <data name="{0} · {1}, any stats" xml:space="preserve">
+    <value>{0} · {1}, beliebige Werte</value>
+  </data>
+  <data name="Sigil, {0}" xml:space="preserve">
+    <value>Sigill, {0}</value>
+  </data>
+  <data name="not shown by the API" xml:space="preserve">
+    <value>von der API nicht angezeigt</value>
+  </data>
+  <data name="&quot;{0}&quot; is not an item the app could find." xml:space="preserve">
+    <value>„{0}“ ist kein Gegenstand, den die App finden konnte.</value>
+  </data>
+  <data name="{0} to buy, {1}" xml:space="preserve">
+    <value>{0} zu kaufen, {1}</value>
+  </data>
+  <data name="{0} more needed, not on the trading post" xml:space="preserve">
+    <value>{0} fehlen noch, nicht im Handelsposten</value>
+  </data>
+  <data name="MetaBattle could not be reached." xml:space="preserve">
+    <value>MetaBattle ist nicht erreichbar.</value>
+  </data>
+  <data name="Build code" xml:space="preserve">
+    <value>Build-Code</value>
+  </data>
+  <data name="Paste a build code, [&amp;D…], or a link to a MetaBattle build." xml:space="preserve">
+    <value>Füge einen Build-Code, [&amp;D…], oder einen Link zu einem MetaBattle-Build ein.</value>
+  </data>
+  <data name="The guide has no build code to compare with." xml:space="preserve">
+    <value>Der Guide hat keinen Build-Code zum Vergleichen.</value>
+  </data>
+  <data name="This is a {0} build, and {1} is a {2}." xml:space="preserve">
+    <value>Das ist ein Build für {0}, und {1} ist {2}.</value>
+  </data>
+  <data name="A revenant&#x27;s skills come with its legends, which are not compared." xml:space="preserve">
+    <value>Die Fertigkeiten eines Widergängers kommen mit seinen Legenden, und die werden nicht verglichen.</value>
+  </data>
+  <data name="Pets are not compared." xml:space="preserve">
+    <value>Tiergefährten werden nicht verglichen.</value>
+  </data>
+  <data name="PvP gear is chosen in the PvP lobby and is not compared." xml:space="preserve">
+    <value>PvP-Ausrüstung wird in der PvP-Lobby gewählt und nicht verglichen.</value>
+  </data>
+  <data name="Infusions are not compared." xml:space="preserve">
+    <value>Infusionen werden nicht verglichen.</value>
+  </data>
+  <data name="A build code holds no gear. Paste the guide&#x27;s MetaBattle link to compare stats, runes and sigils too." xml:space="preserve">
+    <value>Ein Build-Code enthält keine Ausrüstung. Füge den MetaBattle-Link des Guides ein, um auch Werte, Runen und Sigille zu vergleichen.</value>
+  </data>
+  <data name="Specialization {0}" xml:space="preserve">
+    <value>Spezialisierung {0}</value>
+  </data>
+  <data name="Skill {0}" xml:space="preserve">
+    <value>Fertigkeit {0}</value>
+  </data>
+  <data name="Not searched: {0}." xml:space="preserve">
+    <value>Nicht durchsucht: {0}.</value>
+  </data>
+  <data name="The account&#x27;s storage could not be read, so only worn gear is known." xml:space="preserve">
+    <value>Das Lager des Accounts war nicht lesbar, also ist nur die getragene Ausrüstung bekannt.</value>
+  </data>
+  <data name="{0}, equipment {1}" xml:space="preserve">
+    <value>{0}, Ausrüstung {1}</value>
+  </data>
+  <data name="Legendary armory" xml:space="preserve">
+    <value>Legendäre Waffenkammer</value>
+  </data>
+  <data name="MetaBattle has no page called &quot;{0}&quot;." xml:space="preserve">
+    <value>MetaBattle hat keine Seite namens „{0}“.</value>
+  </data>
+  <data name="Guide" xml:space="preserve">
+    <value>Guide</value>
+  </data>
+  <data name="guide|missing" xml:space="preserve">
+    <value>fehlt</value>
+  </data>
+  <data name="guide|Utility" xml:space="preserve">
+    <value>Hilfsfertigkeit</value>
+  </data>
+  <data name="Tier {0}: {1} instead of {2}" xml:space="preserve">
+    <value>Stufe {0}: {1} statt {2}</value>
+  </data>
 </root>

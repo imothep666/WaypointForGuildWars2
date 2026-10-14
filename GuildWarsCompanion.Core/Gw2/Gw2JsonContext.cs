@@ -67,5 +67,6 @@ namespace GuildWarsCompanion.Gw2;
 [JsonSerializable(typeof(List<Legend>))]
 [JsonSerializable(typeof(MasteryPoints))]
 [JsonSerializable(typeof(List<ItemStat>))]
+[JsonSerializable(typeof(List<ArmoryEntry>))]
 [JsonSerializable(typeof(List<BackstoryAnswer>))]
 public partial class Gw2JsonContext : JsonSerializerContext;

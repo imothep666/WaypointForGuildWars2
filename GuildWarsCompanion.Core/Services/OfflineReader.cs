@@ -48,6 +48,14 @@ public sealed class OfflineReader(SnapshotStore store)
     }
 
     /// <summary>
+    /// The stored copy alone, never the network: for drawing a screen at once from what was last
+    /// read, while <see cref="ReadAsync{T}"/> asks for a fresh one. Null when nothing is kept.
+    /// </summary>
+    public async Task<T?> StoredAsync<T>(string key, JsonTypeInfo<T> typeInfo, CancellationToken ct = default)
+        where T : class =>
+        (await store.LoadAsync(key, typeInfo, ct))?.Value;
+
+    /// <summary>
     /// The same, for data a screen can manage without.
     ///
     /// <see cref="ReadAsync{T}"/> rethrows when there is nothing kept, because a wallet with

@@ -44,6 +44,9 @@ public class AvaloniaSystemActions(Shells shells) : ISystemActions
         if (Top.Clipboard is { } clipboard) await clipboard.SetTextAsync(text);
     }
 
+    public async Task<string?> PasteAsync() =>
+        Top.Clipboard is { } clipboard ? await clipboard.TryGetTextAsync() : null;
+
     public async Task OpenLinkAsync(string url) => await Top.Launcher.LaunchUriAsync(new Uri(url));
 }
 

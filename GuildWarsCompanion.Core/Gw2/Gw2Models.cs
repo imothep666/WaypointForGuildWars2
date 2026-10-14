@@ -262,7 +262,15 @@ public sealed record Profession(
     [property: JsonPropertyName("weapons")] Dictionary<string, ProfessionWeapon>? Weapons,
     // The id is always English; the name is in the language asked for.
     [property: JsonPropertyName("name")] string? Name = null,
-    [property: JsonPropertyName("icon_big")] string? IconBig = null);
+    [property: JsonPropertyName("icon_big")] string? IconBig = null,
+    // Pairs of [palette id, skill id]: how a build code's palette ids become skills.
+    [property: JsonPropertyName("skills_by_palette")] IReadOnlyList<IReadOnlyList<int>>? SkillsByPalette = null);
+
+/// <summary>GET /v2/account/legendaryarmory: a legendary unlocked for the whole account, and how many
+/// copies of it can be worn at once. Needs "inventories" and "unlocks".</summary>
+public sealed record ArmoryEntry(
+    [property: JsonPropertyName("id")] int Id,
+    [property: JsonPropertyName("count")] int Count);
 
 /// <summary>One skill line and the hero points put into it.</summary>
 public sealed record TrainingLine(
@@ -321,7 +329,9 @@ public sealed record InfixUpgrade([property: JsonPropertyName("id")] int Id);
 /// <summary>The weapon type of an equipped item, and the stat set it was made with.</summary>
 public sealed record WeaponDetails(
     [property: JsonPropertyName("type")] string? Type,
-    [property: JsonPropertyName("infix_upgrade")] InfixUpgrade? InfixUpgrade);
+    [property: JsonPropertyName("infix_upgrade")] InfixUpgrade? InfixUpgrade,
+    // Armour only: "Light", "Medium", "Heavy" or "Clothing".
+    [property: JsonPropertyName("weight_class")] string? WeightClass = null);
 
 /// <summary>
 /// GET /v2/itemstats — the names players use for stat combinations. This is what lets the app
@@ -329,7 +339,13 @@ public sealed record WeaponDetails(
 /// </summary>
 public sealed record ItemStat(
     [property: JsonPropertyName("id")] int Id,
-    [property: JsonPropertyName("name")] string Name);
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("attributes")] IReadOnlyList<ItemStatAttribute>? Attributes = null);
+
+/// <summary>One attribute a stat combination raises, "Power", and by how much relative to the others.</summary>
+public sealed record ItemStatAttribute(
+    [property: JsonPropertyName("attribute")] string Attribute,
+    [property: JsonPropertyName("multiplier")] double Multiplier);
 
 /// <summary>
 /// An equipped item with the details the cache does not keep: its level, and the sub-type
@@ -339,7 +355,10 @@ public sealed record WeaponItem(
     [property: JsonPropertyName("id")] int Id,
     [property: JsonPropertyName("name")] string? Name,
     [property: JsonPropertyName("level")] int Level,
-    [property: JsonPropertyName("details")] WeaponDetails? Details);
+    [property: JsonPropertyName("details")] WeaponDetails? Details,
+    // The item's own type, "Weapon", "Armor", "Trinket", "Back", "Relic", beside the details' sub-type.
+    [property: JsonPropertyName("type")] string? Type = null,
+    [property: JsonPropertyName("rarity")] string? Rarity = null);
 
 /// <summary>
 /// GET /v2/legends — a revenant's utility bar comes from the equipped legend rather than

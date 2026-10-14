@@ -37,13 +37,21 @@ public sealed partial class CharactersViewModel(
 
         Notice = null;
 
-        // Asked before the roster so the answer is in hand when the rows are built. A bridge
-        // that is unreachable answers Unknown and the roster falls back to its own inference;
-        // one that answers "nobody" is believed, which is not the same thing at all.
-        var live = await bridge.PlayingNowAsync(ct);
+        // What was read last time, at once: the fresh roster is one large request, and on the
+        // phone's connection the screen stood empty for twenty seconds waiting for it. The loading
+        // stroke runs over these rows until the fresh ones replace them.
+        if (await characters.GetStoredRosterAsync(ct) is { } kept)
+            foreach (var row in kept)
+                Characters.Add(row);
+
+        // Asked alongside the roster. A bridge that is unreachable answers Unknown and the roster
+        // falls back to its own inference; one that answers "nobody" is believed, which is not
+        // the same thing at all.
+        var live = bridge.PlayingNowAsync(ct);
 
         var roster = await characters.GetRosterAsync(live, ct);
 
+        Characters.Clear();
         foreach (var row in roster.Value)
             Characters.Add(row);
 

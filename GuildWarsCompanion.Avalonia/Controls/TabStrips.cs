@@ -86,7 +86,7 @@ internal static class StripLook
 }
 
 /// <summary>
-/// A page's own headings — Settings' four or five, a character's five, the compass's two. The page owns
+/// A page's own headings — Settings' four or five, a character's six, the compass's two. The page owns
 /// the tabs (a <see cref="PageTab"/> list on its view model) and decides what a tap does.
 /// </summary>
 public sealed class PageTabStrip : UserControl

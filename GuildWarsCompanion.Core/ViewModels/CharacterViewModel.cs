@@ -9,7 +9,7 @@ namespace GuildWarsCompanion.ViewModels;
 
 /// <summary>One character's detail, addressed by name through the Shell route.</summary>
 public sealed partial class CharacterViewModel(
-    CharacterService characters, StoryService stories, INavigator navigator)
+    CharacterService characters, StoryService stories, GuideService guides, ISystemActions system, INavigator navigator)
     : BaseViewModel, IQueryTarget
 {
     [ObservableProperty] private string _characterName = string.Empty;
@@ -79,6 +79,7 @@ public sealed partial class CharacterViewModel(
     [NotifyPropertyChangedFor(nameof(IsGear))]
     [NotifyPropertyChangedFor(nameof(IsCheck))]
     [NotifyPropertyChangedFor(nameof(IsStory))]
+    [NotifyPropertyChangedFor(nameof(IsGuide))]
     private int _selectedTab;
 
     public bool IsOverview => SelectedTab == 0;
@@ -86,21 +87,109 @@ public sealed partial class CharacterViewModel(
     public bool IsGear => SelectedTab == 2;
     public bool IsCheck => SelectedTab == 3;
     public bool IsStory => SelectedTab == 4;
+    public bool IsGuide => SelectedTab == 5;
 
     public bool HasStatPrefix => StatPrefix is not null;
     public bool HasShoppingNote => ShoppingNote is not null;
     public bool HasShoppingTotal => ShoppingTotal is not null;
 
     /// <summary>
-    /// Four views of one character, because seven sections on a phone is a scroll, not a
+    /// Six views of one character, because seven sections on a phone is a scroll, not a
     /// page. Same idea as the Account area's tabs, in the only place a pushed page can put
     /// them.
     /// </summary>
     public ObservableCollection<PageTab> Tabs { get; } =
     [
         new(L.T("Overview"), 0), new(L.T("Build"), 1), new(L.T("Gear"), 2), new(L.T("Check"), 3),
-        new(L.T("Story"), 4)
+        new(L.T("Story"), 4), new(L.T("Guide"), 5)
     ];
+
+    // --- a guide held against the character -----------------------------------------
+
+    /// <summary>What was pasted: a build code, or a MetaBattle link.</summary>
+    [ObservableProperty] private string _guideText = string.Empty;
+
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(HasGuide))] private string? _guideTitle;
+    [ObservableProperty] private string? _guideScore;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(HasGuideLink))] private string? _guideUrl;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(HasGuideProblem))] private string? _guideProblem;
+    [ObservableProperty] private bool _guideBusy;
+
+    public bool HasGuide => GuideTitle is not null;
+    public bool HasGuideLink => GuideUrl is not null;
+    public bool HasGuideProblem => GuideProblem is not null;
+
+    public ObservableCollection<GuideSection> GuideSections { get; } = [];
+    public ObservableCollection<string> GuideNotes { get; } = [];
+
+    private bool _guideRecalled;
+
+    [RelayCommand]
+    public async Task PasteGuideAsync()
+    {
+        if (await system.PasteAsync() is { Length: > 0 } text)
+        {
+            GuideText = text.Trim();
+            await CompareGuideAsync();
+        }
+    }
+
+    [RelayCommand]
+    public async Task CompareGuideAsync()
+    {
+        if (string.IsNullOrWhiteSpace(GuideText) || GuideBusy) return;
+
+        GuideBusy = true;
+        GuideProblem = null;
+
+        try
+        {
+            var guide = await GuideService.ReadAsync(GuideText);
+            var report = await guides.CompareAsync(guide, CharacterName);
+
+            GuideTitle = report.Title;
+            GuideScore = report.Score;
+            GuideUrl = report.Url;
+
+            GuideSections.Clear();
+            foreach (var section in report.Sections) GuideSections.Add(section);
+
+            GuideNotes.Clear();
+            foreach (var note in report.Notes) GuideNotes.Add(note);
+
+            await guides.RememberAsync(CharacterName, GuideText);
+        }
+        catch (ArgumentException ex)
+        {
+            GuideProblem = ex.Message;
+        }
+        catch (Gw2ApiException ex)
+        {
+            GuideProblem = Describe(ex);
+        }
+        finally
+        {
+            GuideBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    public async Task OpenGuideAsync()
+    {
+        if (GuideUrl is { } url) await system.OpenLinkAsync(url);
+    }
+
+    /// <summary>The guide this character was last held against, compared again on opening the tab.</summary>
+    private async Task RecallGuideAsync()
+    {
+        _guideRecalled = true;
+
+        if (await guides.RecallAsync(CharacterName) is { Length: > 0 } text && GuideText.Length == 0)
+        {
+            GuideText = text;
+            await CompareGuideAsync();
+        }
+    }
 
     public ObservableCollection<BackstoryRow> Backstory { get; } = [];
     public ObservableCollection<ShoppingRow> Shopping { get; } = [];
@@ -125,6 +214,16 @@ public sealed partial class CharacterViewModel(
         Select(Tabs[0]);
 
         if (RouteQuery.Text(query, "name") is not { } name) return;
+
+        if (name != CharacterName)
+        {
+            GuideText = string.Empty;
+            GuideTitle = null;
+            GuideProblem = null;
+            GuideSections.Clear();
+            GuideNotes.Clear();
+            _guideRecalled = false;
+        }
 
         CharacterName = name;
         _ = LoadAsync();
@@ -165,7 +264,7 @@ public sealed partial class CharacterViewModel(
             L.T("Close"));
     }
 
-    /// <summary>Switches which of the five views is on screen.</summary>
+    /// <summary>Switches which of the six views is on screen.</summary>
     public void Select(PageTab tab)
     {
         SelectedTab = tab.Index;
@@ -177,6 +276,9 @@ public sealed partial class CharacterViewModel(
         // fetched when it is first asked for rather than with the character.
         if (IsStory && !StoryLoaded)
             _ = LoadStoryAsync();
+
+        if (IsGuide && !_guideRecalled)
+            _ = RecallGuideAsync();
     }
 
     private Task LoadStoryAsync() => RunAsync(async ct =>

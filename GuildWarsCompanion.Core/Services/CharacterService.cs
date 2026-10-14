@@ -252,13 +252,20 @@ public sealed class CharacterService(
     /// Left alone it is <see cref="LiveReading.Unknown"/>, which is what anyone without a
     /// bridge has, and the playtime comparison below is then the only answer there is.
     /// </param>
+    /// <param name="playing">
+    /// The bridge's answer, still on its way: asked alongside the roster rather than before it,
+    /// because a PC that is off can take the bridge seconds to give up on, and the roster's own
+    /// request is the slow part of the screen.
+    /// </param>
     public async Task<Fetched<IReadOnlyList<CharacterRow>>> GetRosterAsync(
-        LiveReading live = default, CancellationToken ct = default)
+        Task<LiveReading>? playing = null, CancellationToken ct = default)
     {
         // The whole roster in one payload, which is also what the detail screen reads from —
         // so an offline copy covers both the list and tapping into a character.
         var roster = await offline.ReadAsync(
             "characters", Gw2JsonContext.Default.ListCharacter, client.GetCharactersAsync, ct);
+
+        var live = playing is null ? default : await playing;
 
         _characters = roster.Value;
 
@@ -276,38 +283,63 @@ public sealed class CharacterService(
         await activity.SavePlaytimeAsync(
             _characters.Select(c => (c.Name, c.AgeSeconds)).ToList(), ct);
 
-        var elites = await ReadElitesAsync(ct);
-        var mastery = await ReadMasteryPointsAsync(ct);
+        var rows = await RowsAsync(_characters, live, grown?.Name, stored: false, ct);
+
+        return new Fetched<IReadOnlyList<CharacterRow>>(rows, roster.FetchedAt);
+    }
+
+    /// <summary>
+    /// The roster as last read, without the network: drawn the moment the screen opens, while
+    /// <see cref="GetRosterAsync"/> asks for a fresh one. Null when nothing has been stored yet.
+    /// Nothing is recorded from it - the playtime it carries is old, and comparing it would
+    /// name the wrong character as the one being played.
+    /// </summary>
+    public async Task<IReadOnlyList<CharacterRow>?> GetStoredRosterAsync(CancellationToken ct = default)
+    {
+        if (await offline.StoredAsync("characters", Gw2JsonContext.Default.ListCharacter, ct) is not { Count: > 0 } kept)
+            return null;
+
+        if (_characters.Count == 0) _characters = kept;
+
+        return await RowsAsync(kept, default, null, stored: true, ct);
+    }
+
+    /// <param name="stored">Read only what is kept, for the rows drawn before the fresh roster.</param>
+    private async Task<List<CharacterRow>> RowsAsync(
+        List<Character> roster, LiveReading live, string? grown, bool stored, CancellationToken ct)
+    {
+        var elites = await ReadElitesAsync(roster, stored, ct);
+        var mastery = await ReadMasteryPointsAsync(ct, stored);
 
         // One request covers every profession on the roster. Professions only change with a
         // game build, so the last set answers perfectly well with no connection.
-        var professions = await offline.ReadAsync(
-            "roster/professions", Gw2JsonContext.Default.ListProfession,
-            token => client.GetProfessionsAsync(_characters.Select(c => c.Profession), token), ct);
+        var professions = stored
+            ? await offline.StoredAsync("roster/professions", Gw2JsonContext.Default.ListProfession, ct) ?? []
+            : (await offline.ReadAsync(
+                "roster/professions", Gw2JsonContext.Default.ListProfession,
+                token => client.GetProfessionsAsync(roster.Select(c => c.Profession), token), ct)).Value;
 
-        var icons = professions.Value
+        var icons = professions
             .Where(p => p.Icon is not null)
             .ToDictionary(p => p.Id, p => p.Icon!);
         var active = await activity.LoadActiveAsync(ct);
         var detected = active is null ? default((string, DateTimeOffset)?) : (active.Name, active.DetectedAt);
         var now = DateTimeOffset.UtcNow;
 
-        var rows = _characters
+        return roster
             .OrderByDescending(c => c.AgeSeconds)
             .Select(c => new CharacterRow(
                 c.Name,
                 Describe(c, mastery),
                 FormatPlaytime(c.AgeSeconds),
                 c.Profession,
-                PlayedNow.Describe(c.Name, live, grown?.Name, detected, now),
+                PlayedNow.Describe(c.Name, live, grown, detected, now),
                 elites.TryGetValue(c.Name, out var elite) ? elite.Name : null,
                 // The elite emblem when there is one, the profession badge otherwise.
                 (elites.TryGetValue(c.Name, out var badge) ? badge.Icon : null)
                     ?? icons.GetValueOrDefault(c.Profession),
                 PlayedNow.Matches(c.Name, live.Name)))
             .ToList();
-
-        return new Fetched<IReadOnlyList<CharacterRow>>(rows, roster.FetchedAt);
     }
 
     /// <summary>
@@ -317,9 +349,9 @@ public sealed class CharacterService(
     /// its own that says more than the generic profession badge.
     /// </summary>
     private async Task<Dictionary<string, (string Name, string? Icon)>> ReadElitesAsync(
-        CancellationToken ct)
+        List<Character> roster, bool stored, CancellationToken ct)
     {
-        var chosen = _characters
+        var chosen = roster
             .SelectMany(c => ChosenSpecializations(c).Select(spec => spec.Id))
             .OfType<int>()
             .Distinct()
@@ -327,17 +359,33 @@ public sealed class CharacterService(
 
         if (chosen.Count == 0) return [];
 
-        var specs = (await offline.ReadAsync(
-                "roster/specializations", Gw2JsonContext.Default.ListSpecialization,
-                token => client.GetSpecializationsAsync(chosen, token), ct))
-            .Value.ToDictionary(s => s.Id);
+        var specs = (stored
+                ? await offline.StoredAsync("roster/specializations", Gw2JsonContext.Default.ListSpecialization, ct) ?? []
+                : (await offline.ReadAsync(
+                    "roster/specializations", Gw2JsonContext.Default.ListSpecialization,
+                    token => client.GetSpecializationsAsync(chosen, token), ct)).Value)
+            .ToDictionary(s => s.Id);
 
-        return _characters
+        return roster
             .Select(c => (c.Name, Elite: ChosenSpecializations(c)
                 .Select(choice => choice.Id is { } id ? specs.GetValueOrDefault(id) : null)
                 .FirstOrDefault(spec => spec?.Elite == true)))
             .Where(pair => pair.Elite is not null)
             .ToDictionary(pair => pair.Name, pair => (pair.Elite!.Name, pair.Elite.Icon));
+    }
+
+    /// <summary>
+    /// Every character as the API gives them, from the roster already held when there is one: for
+    /// a comparison that needs the raw build and every equipment template, not the screen's rows.
+    /// </summary>
+    public async Task<IReadOnlyList<Character>> AllAsync(CancellationToken ct = default)
+    {
+        if (_characters.Count == 0)
+            _characters = (await offline.ReadAsync(
+                "characters", Gw2JsonContext.Default.ListCharacter,
+                client.GetCharactersAsync, ct)).Value;
+
+        return _characters;
     }
 
     private static IReadOnlyList<SpecializationChoice> ChosenSpecializations(Character character) =>
@@ -1031,9 +1079,13 @@ public sealed class CharacterService(
     /// so an offline roster without it would read as though the characters had lost their
     /// progress — but a roster is still a roster without it, so it never fails the screen.
     /// </summary>
-    private async Task<int?> ReadMasteryPointsAsync(CancellationToken ct)
+    private async Task<int?> ReadMasteryPointsAsync(CancellationToken ct, bool stored = false)
     {
         if (!session.HasPermission(Gw2Permissions.Progression)) return null;
+
+        if (stored)
+            return (await offline.StoredAsync("account/mastery/points", Gw2JsonContext.Default.MasteryPoints, ct))
+                ?.Totals?.Sum(t => t.Earned);
 
         var points = await offline.ReadOptionalAsync(
             "account/mastery/points", Gw2JsonContext.Default.MasteryPoints,

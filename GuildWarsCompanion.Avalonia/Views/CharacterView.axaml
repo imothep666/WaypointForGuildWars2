@@ -10,488 +10,568 @@
                 PageTitle="{Binding CharacterName}"
                 ShowsWash="True">
 
-    <ScrollViewer>
-        <StackPanel Margin="20,0,20,32" Spacing="14">
+    <!-- The masthead and the tabs stay where they are; only the tab's own content scrolls, so
+         the way to another tab is never scrolled away. -->
+    <Grid RowDefinitions="Auto,Auto,*">
 
-            <!-- The masthead: who this is, beside the painting of their specialization, which
-                 the shell draws in the space above the tabs. -->
-            <Grid Height="128">
-                <TextBlock Text="{Binding Subtitle}" FontSize="14" MaxWidth="200" TextWrapping="Wrap"
-                           HorizontalAlignment="Left" VerticalAlignment="Bottom" />
-            </Grid>
+        <!-- The masthead: who this is, beside the painting of their specialization, which
+             the shell draws in the space above the tabs. -->
+        <Grid Height="128" Margin="20,0,20,14">
+            <TextBlock Text="{Binding Subtitle}" FontSize="14" MaxWidth="200" TextWrapping="Wrap"
+                       HorizontalAlignment="Left" VerticalAlignment="Bottom" />
+        </Grid>
 
-            <!-- The page's own tab strip: a brass rule under the live one, the same mark the
-                 menu uses for the selected area. This is a pushed page, not an area. -->
-            <controls:PageTabStrip x:Name="Strip" Tabs="{Binding Tabs}" />
+        <!-- The page's own tab strip: a brass rule under the live one, the same mark the
+             menu uses for the selected area. This is a pushed page, not an area. -->
+        <controls:PageTabStrip Grid.Row="1" x:Name="Strip" Tabs="{Binding Tabs}" Margin="20,0,20,0" />
+
+        <ScrollViewer Grid.Row="2" x:Name="Scroller">
+            <StackPanel Margin="20,14,20,32" Spacing="14">
 
 
-            <StackPanel IsVisible="{Binding IsOverview}" Spacing="14">
+                <StackPanel IsVisible="{Binding IsOverview}" Spacing="14">
 
-                <!-- Four numbers a player recognises their character by. Hero points are the
-                     character's own; mastery, when it stands in for the level, is not. -->
-                <Border Classes="card">
-                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,14,Auto">
-                        <StackPanel Spacing="3">
-                            <TextBlock Text="{ui:T 'PLAYED'}" Classes="heading small" />
-                            <TextBlock Text="{Binding Playtime}" Classes="figure" FontSize="18" />
-                        </StackPanel>
-                        <StackPanel Grid.Column="1" Spacing="3" IsVisible="{Binding HasHeroChallenges}">
-                            <TextBlock Text="{ui:T 'HERO CHALLENGES'}" Classes="heading small" />
-                            <TextBlock Text="{Binding HeroChallenges}" Classes="figure" FontSize="18" />
-                        </StackPanel>
-                        <StackPanel Grid.Row="2" Spacing="3">
-                            <TextBlock Text="{ui:T 'DEATHS'}" Classes="heading small" />
-                            <TextBlock Text="{Binding Deaths}" Classes="figure" FontSize="18" />
-                        </StackPanel>
-                        <StackPanel Grid.Row="2" Grid.Column="1" Spacing="3">
-                            <TextBlock Text="{ui:T 'BORN'}" Classes="heading small" />
-                            <TextBlock Text="{Binding Created}" Classes="figure" FontSize="15" />
-                        </StackPanel>
-                    </Grid>
-                </Border>
-
-                <TextBlock Text="{Binding MasteryNote}" IsVisible="{Binding HasMasteryNote}"
-                           Classes="caption small" />
-
-                <!-- Who the character said they were at creation. The journal line is short
-                     enough to list; the full answer is a tap away. -->
-                <TextBlock Text="{ui:T 'BACKSTORY'}" Classes="heading" Margin="0,6,0,0" />
-
-                <ItemsControl ItemsSource="{Binding Backstory}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="services:BackstoryRow">
-                            <Button Classes="row" Click="OnBackstoryClicked" Margin="0,0,0,10">
-                                <Grid ColumnDefinitions="4,14,*">
-                                    <Border Background="{StaticResource BrassDimBrush}" />
-                                    <StackPanel Grid.Column="2" Spacing="2">
-                                        <TextBlock Text="{Binding Title}" FontFamily="{StaticResource BarlowMedium}"
-                                                   TextWrapping="Wrap" />
-                                        <TextBlock Text="{Binding Journal}" Classes="caption" />
-                                    </StackPanel>
-                                </Grid>
-                            </Button>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
-
-            <StackPanel IsVisible="{Binding IsBuild}" Spacing="14">
-                <TextBlock Text="{ui:T 'BUILD'}" Classes="heading" Margin="0,6,0,0" />
-                <TextBlock Text="{Binding TemplateName}" IsVisible="{Binding HasTemplateName}" Classes="caption" />
-                <TextBlock Text="{Binding BuildNotice}" IsVisible="{Binding HasBuildNotice}" Classes="caption" />
-
-                <!-- Both halves of the bar: the weapon slots the profession gives you for what is
-                     in hand, then the heal/utility/elite you chose. -->
-                <ItemsControl ItemsSource="{Binding SkillRows}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="services:SkillRow">
-                            <StackPanel Spacing="5" Margin="0,0,0,12">
-                                <TextBlock Text="{Binding Label}" Classes="caption" />
-                                <ItemsControl ItemsSource="{Binding Tiles}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <WrapPanel />
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate x:DataType="services:SkillTile">
-                                            <!-- Handled in code-behind: the tile is the sender's own
-                                                 DataContext, which two nested templates cannot
-                                                 confuse. -->
-                                            <Button Classes="row" Click="OnSkillClicked" Margin="0,0,8,8"
-                                                    Width="46" Height="46">
-                                                <Border Background="{StaticResource ObsidianBrush}"
-                                                        BorderBrush="{Binding EdgeColor, Converter={x:Static ui:Paint.Brush}}"
-                                                        BorderThickness="1.5" CornerRadius="2" Padding="3">
-                                                    <Image ui:WebImage.Url="{Binding IconUrl}" />
-                                                </Border>
-                                            </Button>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                                <TextBlock Text="{Binding Note}" Classes="caption small" />
-                                <TextBlock Text="{ui:T 'Tap a skill to read what it does.'}" Classes="caption"
-                                           FontSize="10.5" IsVisible="{Binding IsUtilityRow}" />
+                    <!-- Four numbers a player recognises their character by. Hero points are the
+                         character's own; mastery, when it stands in for the level, is not. -->
+                    <Border Classes="card">
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,14,Auto">
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="{ui:T 'PLAYED'}" Classes="heading small" />
+                                <TextBlock Text="{Binding Playtime}" Classes="figure" FontSize="18" />
                             </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                            <StackPanel Grid.Column="1" Spacing="3" IsVisible="{Binding HasHeroChallenges}">
+                                <TextBlock Text="{ui:T 'HERO CHALLENGES'}" Classes="heading small" />
+                                <TextBlock Text="{Binding HeroChallenges}" Classes="figure" FontSize="18" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Spacing="3">
+                                <TextBlock Text="{ui:T 'DEATHS'}" Classes="heading small" />
+                                <TextBlock Text="{Binding Deaths}" Classes="figure" FontSize="18" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="2" Grid.Column="1" Spacing="3">
+                                <TextBlock Text="{ui:T 'BORN'}" Classes="heading small" />
+                                <TextBlock Text="{Binding Created}" Classes="figure" FontSize="15" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
 
-                <!--
-                    The specialization grid, laid out as the game lays it out: the line's own art
-                    behind, then three tiers, each a minor trait beside the three majors that
-                    compete for it. What was taken is lit and what was not stays dim, because three
-                    of nine lit IS the shape of a build - a list of three names is not.
-                -->
-                <ItemsControl ItemsSource="{Binding TraitGrid}" Margin="0,4,0,0">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="services:SpecializationPanel">
-                            <Border Background="{StaticResource SlateDeepBrush}"
-                                    BorderBrush="{StaticResource BrassDimBrush}" BorderThickness="1"
-                                    CornerRadius="2" Margin="0,0,0,12" ClipToBounds="True">
-                                <Grid RowDefinitions="Auto,Auto">
-                                    <!-- The header: which line, and what was taken in it. -->
-                                    <Grid ColumnDefinitions="Auto,10,*" Margin="12,10,12,8">
-                                        <Image ui:WebImage.Url="{Binding IconUrl}" Width="30" Height="30"
-                                               VerticalAlignment="Center" />
-                                        <StackPanel Grid.Column="2" Spacing="1" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Name}" FontFamily="{StaticResource BarlowMedium}" />
-                                            <TextBlock Text="{Binding Taken}" IsVisible="{Binding HasTaken}"
-                                                       Classes="caption small" />
-                                        </StackPanel>
-                                    </Grid>
+                    <TextBlock Text="{Binding MasteryNote}" IsVisible="{Binding HasMasteryNote}"
+                               Classes="caption small" />
 
-                                    <!--
-                                        The banner, at the ratio it was drawn: uniform across the
-                                        full width makes the row exactly as tall as the art says.
-                                        Nothing is stretched, nothing is cropped.
+                    <!-- Who the character said they were at creation. The journal line is short
+                         enough to list; the full answer is a tap away. -->
+                    <TextBlock Text="{ui:T 'BACKSTORY'}" Classes="heading" Margin="0,6,0,0" />
 
-                                        The traits sit on the banner rather than beside it, which is
-                                        what leaves room for it: three tiers of a minor and its three
-                                        majors, sized to the band they sit in.
-                                    -->
-                                    <Grid Grid.Row="1">
-                                        <!-- Cut to its painted region before shipping, so it fills
-                                             the row rather than fading into half a box. -->
-                                        <Image ui:AppImage.Source="{Binding BannerSource}" Stretch="Uniform"
-                                               HorizontalAlignment="Stretch" VerticalAlignment="Top" />
-
-                                        <!-- The banners were all cut with the character at the
-                                             left, so the traits start past it: a proportional share
-                                             rather than a fixed inset. -->
-                                        <Grid ColumnDefinitions="34*,66*" Margin="0,0,10,0">
-                                            <!-- Spread across the rest of the banner rather than
-                                                 packed against one end: the three tiers divide the
-                                                 width the way they do in the game. -->
-                                            <ItemsControl Grid.Column="1" ItemsSource="{Binding Tiers}"
-                                                          VerticalAlignment="Center">
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <ui:SpreadPanel />
-                                                    </ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate x:DataType="services:TraitTier">
-                                                        <StackPanel Orientation="Horizontal" Spacing="4">
-                                                            <!-- Granted, never chosen, so never dim. -->
-                                                            <Button Classes="row" Click="OnTraitClicked"
-                                                                    VerticalAlignment="Center">
-                                                                <Border Background="{StaticResource ObsidianBrush}"
-                                                                        BorderBrush="{StaticResource BrassDimBrush}"
-                                                                        BorderThickness="1" CornerRadius="13"
-                                                                        Width="26" Height="26">
-                                                                    <Image ui:WebImage.Url="{Binding Minor.IconUrl}"
-                                                                           Margin="2" />
-                                                                </Border>
-                                                            </Button>
-
-                                                            <ItemsControl ItemsSource="{Binding Majors}">
-                                                                <ItemsControl.ItemTemplate>
-                                                                    <DataTemplate x:DataType="services:TraitTile">
-                                                                        <Button Classes="row" Click="OnTraitClicked"
-                                                                                Margin="0,0,0,3">
-                                                                            <Border Background="{StaticResource ObsidianBrush}"
-                                                                                    BorderBrush="{Binding Edge, Converter={x:Static ui:Paint.Brush}}"
-                                                                                    BorderThickness="2" CornerRadius="2"
-                                                                                    Width="26" Height="26"
-                                                                                    Opacity="{Binding Fade}">
-                                                                                <Image ui:WebImage.Url="{Binding IconUrl}"
-                                                                                       Margin="2" />
-                                                                            </Border>
-                                                                        </Button>
-                                                                    </DataTemplate>
-                                                                </ItemsControl.ItemTemplate>
-                                                            </ItemsControl>
-                                                        </StackPanel>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
-                                        </Grid>
-                                    </Grid>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
-
-            <StackPanel IsVisible="{Binding IsGear}" Spacing="14">
-                <TextBlock Text="{ui:T 'LOADOUT'}" Classes="heading" Margin="0,6,0,0" />
-
-                <!-- A character keeps several equipment templates and wears one. Without this
-                     strip the other sets were invisible: the API's top-level equipment array is
-                     every template run together, which is why it needs filtering. -->
-                <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled"
-                              IsVisible="{Binding HasLoadouts}">
-                    <ItemsControl ItemsSource="{Binding LoadoutTabs}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal" Spacing="8" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
+                    <ItemsControl ItemsSource="{Binding Backstory}">
                         <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="services:LoadoutOption">
-                                <Button Classes="row" Click="OnLoadoutClicked">
-                                    <Grid ColumnDefinitions="3,Auto" MinHeight="38">
-                                        <Border Background="{Binding EdgeColor, Converter={x:Static ui:Paint.Brush}}" />
-                                        <StackPanel Grid.Column="1" Margin="12,6,14,6" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Label}" FontSize="13" />
-                                            <TextBlock Text="{Binding Caption}" IsVisible="{Binding HasCaption}"
-                                                       Classes="caption" FontSize="10" />
+                            <DataTemplate x:DataType="services:BackstoryRow">
+                                <Button Classes="row" Click="OnBackstoryClicked" Margin="0,0,0,10">
+                                    <Grid ColumnDefinitions="4,14,*">
+                                        <Border Background="{StaticResource BrassDimBrush}" />
+                                        <StackPanel Grid.Column="2" Spacing="2">
+                                            <TextBlock Text="{Binding Title}" FontFamily="{StaticResource BarlowMedium}"
+                                                       TextWrapping="Wrap" />
+                                            <TextBlock Text="{Binding Journal}" Classes="caption" />
                                         </StackPanel>
                                     </Grid>
                                 </Button>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                </ScrollViewer>
+                </StackPanel>
 
-                <!--
-                    The paper doll. The API has no character render, so the figure is a papercut
-                    silhouette of the race's build and the icons are the real equipped items — a
-                    flat cut-out rather than an outlined mannequin, because outlines competed with
-                    the rarity borders on the tiles. Tile positions are proportional, so it holds
-                    together at any width.
-                -->
-                <Border Background="{StaticResource SlateDeepBrush}" BorderBrush="{StaticResource BrassDimBrush}"
-                        BorderThickness="1" CornerRadius="2" Padding="8,14">
-                    <!-- Fixed box, centred: slot positions are fractions of THIS, so they stay
-                         pinned to the figure instead of drifting to the panel edges on a wide
-                         screen. -->
-                    <Grid Height="430" Width="320" HorizontalAlignment="Center">
-                        <Image ui:AppImage.Source="{Binding BodyImage}" Stretch="Uniform"
-                               HorizontalAlignment="Center" Margin="0,6" />
+                <StackPanel IsVisible="{Binding IsBuild}" Spacing="14">
+                    <TextBlock Text="{ui:T 'BUILD'}" Classes="heading" Margin="0,6,0,0" />
+                    <TextBlock Text="{Binding TemplateName}" IsVisible="{Binding HasTemplateName}" Classes="caption" />
+                    <TextBlock Text="{Binding BuildNotice}" IsVisible="{Binding HasBuildNotice}" Classes="caption" />
 
-                        <ItemsControl ItemsSource="{Binding Doll}">
+                    <!-- Both halves of the bar: the weapon slots the profession gives you for what is
+                         in hand, then the heal/utility/elite you chose. -->
+                    <ItemsControl ItemsSource="{Binding SkillRows}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:SkillRow">
+                                <StackPanel Spacing="5" Margin="0,0,0,12">
+                                    <TextBlock Text="{Binding Label}" Classes="caption" />
+                                    <ItemsControl ItemsSource="{Binding Tiles}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="services:SkillTile">
+                                                <!-- Handled in code-behind: the tile is the sender's own
+                                                     DataContext, which two nested templates cannot
+                                                     confuse. -->
+                                                <Button Classes="row" Click="OnSkillClicked" Margin="0,0,8,8"
+                                                        Width="46" Height="46">
+                                                    <Border Background="{StaticResource ObsidianBrush}"
+                                                            BorderBrush="{Binding EdgeColor, Converter={x:Static ui:Paint.Brush}}"
+                                                            BorderThickness="1.5" CornerRadius="2" Padding="3">
+                                                        <Image ui:WebImage.Url="{Binding IconUrl}" />
+                                                    </Border>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <TextBlock Text="{Binding Note}" Classes="caption small" />
+                                    <TextBlock Text="{ui:T 'Tap a skill to read what it does.'}" Classes="caption"
+                                               FontSize="10.5" IsVisible="{Binding IsUtilityRow}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!--
+                        The specialization grid, laid out as the game lays it out: the line's own art
+                        behind, then three tiers, each a minor trait beside the three majors that
+                        compete for it. What was taken is lit and what was not stays dim, because three
+                        of nine lit IS the shape of a build - a list of three names is not.
+                    -->
+                    <ItemsControl ItemsSource="{Binding TraitGrid}" Margin="0,4,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:SpecializationPanel">
+                                <Border Background="{StaticResource SlateDeepBrush}"
+                                        BorderBrush="{StaticResource BrassDimBrush}" BorderThickness="1"
+                                        CornerRadius="2" Margin="0,0,0,12" ClipToBounds="True">
+                                    <Grid RowDefinitions="Auto,Auto">
+                                        <!-- The header: which line, and what was taken in it. -->
+                                        <Grid ColumnDefinitions="Auto,10,*" Margin="12,10,12,8">
+                                            <Image ui:WebImage.Url="{Binding IconUrl}" Width="30" Height="30"
+                                                   VerticalAlignment="Center" />
+                                            <StackPanel Grid.Column="2" Spacing="1" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}" FontFamily="{StaticResource BarlowMedium}" />
+                                                <TextBlock Text="{Binding Taken}" IsVisible="{Binding HasTaken}"
+                                                           Classes="caption small" />
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <!--
+                                            The banner, at the ratio it was drawn: uniform across the
+                                            full width makes the row exactly as tall as the art says.
+                                            Nothing is stretched, nothing is cropped.
+
+                                            The traits sit on the banner rather than beside it, which is
+                                            what leaves room for it: three tiers of a minor and its three
+                                            majors, sized to the band they sit in.
+                                        -->
+                                        <Grid Grid.Row="1">
+                                            <!-- Cut to its painted region before shipping, so it fills
+                                                 the row rather than fading into half a box. -->
+                                            <Image ui:AppImage.Source="{Binding BannerSource}" Stretch="Uniform"
+                                                   HorizontalAlignment="Stretch" VerticalAlignment="Top" />
+
+                                            <!-- The banners were all cut with the character at the
+                                                 left, so the traits start past it: a proportional share
+                                                 rather than a fixed inset. -->
+                                            <Grid ColumnDefinitions="34*,66*" Margin="0,0,10,0">
+                                                <!-- Spread across the rest of the banner rather than
+                                                     packed against one end: the three tiers divide the
+                                                     width the way they do in the game. -->
+                                                <ItemsControl Grid.Column="1" ItemsSource="{Binding Tiers}"
+                                                              VerticalAlignment="Center">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <ui:SpreadPanel />
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate x:DataType="services:TraitTier">
+                                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                                <!-- Granted, never chosen, so never dim. -->
+                                                                <Button Classes="row" Click="OnTraitClicked"
+                                                                        VerticalAlignment="Center">
+                                                                    <Border Background="{StaticResource ObsidianBrush}"
+                                                                            BorderBrush="{StaticResource BrassDimBrush}"
+                                                                            BorderThickness="1" CornerRadius="13"
+                                                                            Width="26" Height="26">
+                                                                        <Image ui:WebImage.Url="{Binding Minor.IconUrl}"
+                                                                               Margin="2" />
+                                                                    </Border>
+                                                                </Button>
+
+                                                                <ItemsControl ItemsSource="{Binding Majors}">
+                                                                    <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate x:DataType="services:TraitTile">
+                                                                            <Button Classes="row" Click="OnTraitClicked"
+                                                                                    Margin="0,0,0,3">
+                                                                                <Border Background="{StaticResource ObsidianBrush}"
+                                                                                        BorderBrush="{Binding Edge, Converter={x:Static ui:Paint.Brush}}"
+                                                                                        BorderThickness="2" CornerRadius="2"
+                                                                                        Width="26" Height="26"
+                                                                                        Opacity="{Binding Fade}">
+                                                                                    <Image ui:WebImage.Url="{Binding IconUrl}"
+                                                                                           Margin="2" />
+                                                                                </Border>
+                                                                            </Button>
+                                                                        </DataTemplate>
+                                                                    </ItemsControl.ItemTemplate>
+                                                                </ItemsControl>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <StackPanel IsVisible="{Binding IsGear}" Spacing="14">
+                    <TextBlock Text="{ui:T 'LOADOUT'}" Classes="heading" Margin="0,6,0,0" />
+
+                    <!-- A character keeps several equipment templates and wears one. Without this
+                         strip the other sets were invisible: the API's top-level equipment array is
+                         every template run together, which is why it needs filtering. -->
+                    <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled"
+                                  IsVisible="{Binding HasLoadouts}">
+                        <ItemsControl ItemsSource="{Binding LoadoutTabs}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <ui:DollPanel />
+                                    <StackPanel Orientation="Horizontal" Spacing="8" />
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="services:LoadoutSlot">
-                                    <Button Classes="row" Click="OnGearClicked">
-                                        <Border Background="{StaticResource ObsidianBrush}"
-                                                BorderBrush="{Binding EdgeColor, Converter={x:Static ui:Paint.Brush}}"
-                                                BorderThickness="1.5" CornerRadius="2" Padding="3">
-                                            <Image ui:WebImage.Url="{Binding IconUrl}" />
-                                        </Border>
+                                <DataTemplate x:DataType="services:LoadoutOption">
+                                    <Button Classes="row" Click="OnLoadoutClicked">
+                                        <Grid ColumnDefinitions="3,Auto" MinHeight="38">
+                                            <Border Background="{Binding EdgeColor, Converter={x:Static ui:Paint.Brush}}" />
+                                            <StackPanel Grid.Column="1" Margin="12,6,14,6" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Label}" FontSize="13" />
+                                                <TextBlock Text="{Binding Caption}" IsVisible="{Binding HasCaption}"
+                                                           Classes="caption" FontSize="10" />
+                                            </StackPanel>
+                                        </Grid>
                                     </Button>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                    </Grid>
-                </Border>
-
-                <!-- The colours actually on the character. The same dye is a different colour on
-                     cloth, leather and metal, so these are mixed for this profession's armour
-                     weight rather than shown as the dye's own swatch. -->
-                <StackPanel IsVisible="{Binding HasDyes}" Spacing="8">
-                    <TextBlock Text="{ui:T 'DYES'}" Classes="heading small" />
-
-                    <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
-                        <ItemsControl ItemsSource="{Binding Dyes}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal" Spacing="14" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="services:DyeSwatch">
-                                    <StackPanel Spacing="4" Width="86">
-                                        <Border Background="{Binding Paint, Converter={x:Static ui:Paint.Brush}}"
-                                                BorderBrush="{StaticResource BrassDimBrush}" BorderThickness="1"
-                                                CornerRadius="2" Height="38" />
-                                        <TextBlock Text="{Binding Name}" Classes="caption" FontSize="10"
-                                                   TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
-                                        <!-- How many pieces wear it: the character's colour against
-                                             a one-off trim. -->
-                                        <TextBlock Text="{Binding UsesText}" IsVisible="{Binding IsRepeated}"
-                                                   Classes="caption" FontSize="10"
-                                                   Foreground="{StaticResource BrassBrush}" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
                     </ScrollViewer>
-                </StackPanel>
 
-                <!-- Trinkets have no place on a body outline, so they get their own row. -->
-                <TextBlock Text="{ui:T 'TRINKETS'}" Classes="heading small" Margin="0,4,0,0" />
-                <ItemsControl ItemsSource="{Binding Trinkets}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="services:LoadoutSlot">
-                            <Button Classes="row" Click="OnGearClicked" Width="44" Height="44" Margin="0,0,10,10">
-                                <Border Background="{StaticResource ObsidianBrush}"
-                                        BorderBrush="{Binding EdgeColor, Converter={x:Static ui:Paint.Brush}}"
-                                        BorderThickness="1.5" CornerRadius="2" Padding="3">
-                                    <Image ui:WebImage.Url="{Binding IconUrl}" />
-                                </Border>
-                            </Button>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    <!--
+                        The paper doll. The API has no character render, so the figure is a papercut
+                        silhouette of the race's build and the icons are the real equipped items — a
+                        flat cut-out rather than an outlined mannequin, because outlines competed with
+                        the rarity borders on the tiles. Tile positions are proportional, so it holds
+                        together at any width.
+                    -->
+                    <Border Background="{StaticResource SlateDeepBrush}" BorderBrush="{StaticResource BrassDimBrush}"
+                            BorderThickness="1" CornerRadius="2" Padding="8,14">
+                        <!-- Fixed box, centred: slot positions are fractions of THIS, so they stay
+                             pinned to the figure instead of drifting to the panel edges on a wide
+                             screen. -->
+                        <Grid Height="430" Width="320" HorizontalAlignment="Center">
+                            <Image ui:AppImage.Source="{Binding BodyImage}" Stretch="Uniform"
+                                   HorizontalAlignment="Center" Margin="0,6" />
 
-                <Border Classes="rule" Margin="0,10,0,0" />
-                <TextBlock Text="{ui:T 'EQUIPMENT'}" Classes="heading" Margin="0,4,0,0" />
-                <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
-                <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+                            <ItemsControl ItemsSource="{Binding Doll}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <ui:DollPanel />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="services:LoadoutSlot">
+                                        <Button Classes="row" Click="OnGearClicked">
+                                            <Border Background="{StaticResource ObsidianBrush}"
+                                                    BorderBrush="{Binding EdgeColor, Converter={x:Static ui:Paint.Brush}}"
+                                                    BorderThickness="1.5" CornerRadius="2" Padding="3">
+                                                <Image ui:WebImage.Url="{Binding IconUrl}" />
+                                            </Border>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </Border>
 
-                <!-- The names, which the icons alone cannot give. -->
-                <ItemsControl ItemsSource="{Binding Equipment}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="services:EquipmentRow">
-                            <Button Classes="row" Click="OnGearClicked">
-                                <Grid ColumnDefinitions="4,110,*,Auto" MinHeight="42">
+                    <!-- The colours actually on the character. The same dye is a different colour on
+                         cloth, leather and metal, so these are mixed for this profession's armour
+                         weight rather than shown as the dye's own swatch. -->
+                    <StackPanel IsVisible="{Binding HasDyes}" Spacing="8">
+                        <TextBlock Text="{ui:T 'DYES'}" Classes="heading small" />
+
+                        <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
+                            <ItemsControl ItemsSource="{Binding Dyes}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="14" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="services:DyeSwatch">
+                                        <StackPanel Spacing="4" Width="86">
+                                            <Border Background="{Binding Paint, Converter={x:Static ui:Paint.Brush}}"
+                                                    BorderBrush="{StaticResource BrassDimBrush}" BorderThickness="1"
+                                                    CornerRadius="2" Height="38" />
+                                            <TextBlock Text="{Binding Name}" Classes="caption" FontSize="10"
+                                                       TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
+                                            <!-- How many pieces wear it: the character's colour against
+                                                 a one-off trim. -->
+                                            <TextBlock Text="{Binding UsesText}" IsVisible="{Binding IsRepeated}"
+                                                       Classes="caption" FontSize="10"
+                                                       Foreground="{StaticResource BrassBrush}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </StackPanel>
+
+                    <!-- Trinkets have no place on a body outline, so they get their own row. -->
+                    <TextBlock Text="{ui:T 'TRINKETS'}" Classes="heading small" Margin="0,4,0,0" />
+                    <ItemsControl ItemsSource="{Binding Trinkets}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:LoadoutSlot">
+                                <Button Classes="row" Click="OnGearClicked" Width="44" Height="44" Margin="0,0,10,10">
+                                    <Border Background="{StaticResource ObsidianBrush}"
+                                            BorderBrush="{Binding EdgeColor, Converter={x:Static ui:Paint.Brush}}"
+                                            BorderThickness="1.5" CornerRadius="2" Padding="3">
+                                        <Image ui:WebImage.Url="{Binding IconUrl}" />
+                                    </Border>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Border Classes="rule" Margin="0,10,0,0" />
+                    <TextBlock Text="{ui:T 'EQUIPMENT'}" Classes="heading" Margin="0,4,0,0" />
+                    <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
+                    <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+
+                    <!-- The names, which the icons alone cannot give. -->
+                    <ItemsControl ItemsSource="{Binding Equipment}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:EquipmentRow">
+                                <Button Classes="row" Click="OnGearClicked">
+                                    <Grid ColumnDefinitions="4,110,*,Auto" MinHeight="42">
+                                        <Border Background="{Binding RarityColor, Converter={x:Static ui:Paint.Brush}}" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Slot}" Classes="caption"
+                                                   Margin="16,0,10,0" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="2" Text="{Binding ItemName}" VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Grid.Column="3" Classes="chevron" FontSize="18"
+                                                   IsVisible="{Binding CanOpen}" VerticalAlignment="Center"
+                                                   Margin="8,0,0,0" />
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- PvP gear is a separate id space and only reachable through the template, so
+                         this is the first screen that can show it at all. -->
+                    <Border Classes="rule" Margin="0,10,0,0" />
+                    <TextBlock Text="{ui:T 'PVP'}" Classes="heading" Margin="0,4,0,0" />
+                    <TextBlock Text="{Binding PvpNotice}" IsVisible="{Binding HasPvpNotice}" Classes="caption" />
+
+                    <ItemsControl ItemsSource="{Binding PvpGear}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:EquipmentRow">
+                                <Grid ColumnDefinitions="4,110,*" MinHeight="42">
                                     <Border Background="{Binding RarityColor, Converter={x:Static ui:Paint.Brush}}" />
                                     <TextBlock Grid.Column="1" Text="{Binding Slot}" Classes="caption"
                                                Margin="16,0,10,0" VerticalAlignment="Center" />
                                     <TextBlock Grid.Column="2" Text="{Binding ItemName}" VerticalAlignment="Center"
                                                TextTrimming="CharacterEllipsis" />
-                                    <TextBlock Grid.Column="3" Classes="chevron" FontSize="18"
-                                               IsVisible="{Binding CanOpen}" VerticalAlignment="Center"
-                                               Margin="8,0,0,0" />
                                 </Grid>
-                            </Button>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
 
-                <!-- PvP gear is a separate id space and only reachable through the template, so
-                     this is the first screen that can show it at all. -->
-                <Border Classes="rule" Margin="0,10,0,0" />
-                <TextBlock Text="{ui:T 'PVP'}" Classes="heading" Margin="0,4,0,0" />
-                <TextBlock Text="{Binding PvpNotice}" IsVisible="{Binding HasPvpNotice}" Classes="caption" />
+                <StackPanel IsVisible="{Binding IsCheck}" Spacing="14">
+                    <!-- Completeness, not taste: every finding is a fact with a fix. -->
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
+                        <TextBlock Text="{ui:T 'BUILD CHECK'}" Classes="heading" />
+                        <TextBlock Grid.Column="1" Text="{Binding CheckScore}" Classes="figure"
+                                   Foreground="{StaticResource BrassBrush}" />
+                    </Grid>
 
-                <ItemsControl ItemsSource="{Binding PvpGear}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="services:EquipmentRow">
-                            <Grid ColumnDefinitions="4,110,*" MinHeight="42">
-                                <Border Background="{Binding RarityColor, Converter={x:Static ui:Paint.Brush}}" />
-                                <TextBlock Grid.Column="1" Text="{Binding Slot}" Classes="caption"
-                                           Margin="16,0,10,0" VerticalAlignment="Center" />
-                                <TextBlock Grid.Column="2" Text="{Binding ItemName}" VerticalAlignment="Center"
-                                           TextTrimming="CharacterEllipsis" />
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
+                    <TextBlock Text="{Binding AllClear}" IsVisible="{Binding HasAllClear}" Classes="caption" />
 
-            <StackPanel IsVisible="{Binding IsCheck}" Spacing="14">
-                <!-- Completeness, not taste: every finding is a fact with a fix. -->
-                <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
-                    <TextBlock Text="{ui:T 'BUILD CHECK'}" Classes="heading" />
-                    <TextBlock Grid.Column="1" Text="{Binding CheckScore}" Classes="figure"
+                    <ItemsControl ItemsSource="{Binding Findings}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:CheckFinding">
+                                <Grid ColumnDefinitions="4,14,*" Margin="0,0,0,10">
+                                    <!-- Every finding is something missing, so they all read alike. -->
+                                    <Border Background="{StaticResource BrassBrush}" />
+                                    <StackPanel Grid.Column="2" Spacing="2">
+                                        <TextBlock Text="{Binding Title}" FontFamily="{StaticResource BarlowMedium}"
+                                                   TextWrapping="Wrap" />
+                                        <TextBlock Text="{Binding Detail}" Classes="caption" />
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Text="{Binding StatPrefix}" IsVisible="{Binding HasStatPrefix}" Classes="caption" />
+                    <TextBlock Text="{Binding CheckCaveat}" Classes="caption small" />
+
+                    <Border Classes="rule" Margin="0,10,0,0" />
+
+                    <!-- Prices for finishing what the gear already started. Never a suggestion about
+                         which rune or sigil to run: the API has no view on that. -->
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
+                        <TextBlock Text="{ui:T 'TO COMPLETE'}" Classes="heading" />
+                        <TextBlock Grid.Column="1" Text="{Binding ShoppingTotal}" Classes="figure"
+                                   Foreground="{StaticResource MetalGoldBrush}" />
+                    </Grid>
+
+                    <TextBlock Text="{Binding ShoppingNote}" IsVisible="{Binding HasShoppingNote}" Classes="caption" />
+
+                    <ItemsControl ItemsSource="{Binding Shopping}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:ShoppingRow">
+                                <Grid ColumnDefinitions="4,14,*,Auto" RowDefinitions="Auto,Auto" Margin="0,0,0,8">
+                                    <Border Grid.RowSpan="2" Background="{StaticResource BrassBrush}" />
+                                    <TextBlock Grid.Column="2" Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Grid.Column="3" Text="{Binding Total}" Classes="figure" />
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Quantity}" Classes="caption" />
+                                    <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding UnitPrice}" Classes="caption" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Text="{Binding ShoppingCaveat}" Classes="caption small" />
+                </StackPanel>
+
+                <!--
+                    A guide held against the character: a build code, or a MetaBattle link for the gear
+                    too. The guide is the authority; the tab only says where the character differs, and
+                    where on the account the missing pieces already are.
+                -->
+                <StackPanel IsVisible="{Binding IsGuide}" Spacing="14">
+                    <TextBlock Text="{ui:T 'COMPARE WITH A GUIDE'}" Classes="heading" Margin="0,6,0,0" />
+
+                    <TextBox Text="{Binding GuideText}" PlaceholderText="{ui:T 'Build code or MetaBattle link'}"
+                             TextWrapping="Wrap" AcceptsReturn="False" />
+
+                    <WrapPanel>
+                        <Button Content="{ui:T 'PASTE'}" Command="{Binding PasteGuideCommand}" Margin="0,0,10,10" />
+                        <Button Content="{ui:T 'COMPARE'}" Command="{Binding CompareGuideCommand}" Classes="quiet"
+                                Margin="0,0,10,10" />
+                    </WrapPanel>
+
+                    <TextBlock Text="{ui:T 'Comparing…'}" IsVisible="{Binding GuideBusy}" Classes="caption" />
+                    <TextBlock Text="{Binding GuideProblem}" IsVisible="{Binding HasGuideProblem}" Classes="caption"
                                Foreground="{StaticResource BrassBrush}" />
-                </Grid>
 
-                <TextBlock Text="{Binding AllClear}" IsVisible="{Binding HasAllClear}" Classes="caption" />
+                    <StackPanel IsVisible="{Binding HasGuide}" Spacing="14">
+                        <Border Classes="rule" />
 
-                <ItemsControl ItemsSource="{Binding Findings}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="services:CheckFinding">
-                            <Grid ColumnDefinitions="4,14,*" Margin="0,0,0,10">
-                                <!-- Every finding is something missing, so they all read alike. -->
-                                <Border Background="{StaticResource BrassBrush}" />
-                                <StackPanel Grid.Column="2" Spacing="2">
-                                    <TextBlock Text="{Binding Title}" FontFamily="{StaticResource BarlowMedium}"
-                                               TextWrapping="Wrap" />
-                                    <TextBlock Text="{Binding Detail}" Classes="caption" />
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Text="{Binding GuideTitle}" FontFamily="{StaticResource BarlowMedium}"
+                                       TextWrapping="Wrap" />
+                            <Button Grid.Column="1" Content="{ui:T 'OPEN'}" Command="{Binding OpenGuideCommand}"
+                                    IsVisible="{Binding HasGuideLink}" Classes="quiet" Padding="12,6" />
+                        </Grid>
+
+                        <TextBlock Text="{Binding GuideScore}" Classes="caption" />
+
+                        <ItemsControl ItemsSource="{Binding GuideSections}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="services:GuideSection">
+                                    <StackPanel Spacing="8" Margin="0,4,0,10">
+                                        <TextBlock Text="{Binding Heading}" Classes="heading small" />
+                                        <ItemsControl ItemsSource="{Binding Lines}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="services:GuideLine">
+                                                    <!-- Brass where there is something to do, dim where it is
+                                                         already as the guide has it. -->
+                                                    <Grid ColumnDefinitions="4,14,*,Auto" Margin="0,0,0,10">
+                                                        <Border Background="{Binding Spine, Converter={x:Static ui:Paint.Brush}}" />
+                                                        <StackPanel Grid.Column="2" Spacing="2">
+                                                            <TextBlock Text="{Binding Label}"
+                                                                       FontFamily="{StaticResource BarlowMedium}" />
+                                                            <TextBlock Text="{Binding Detail}" Classes="caption"
+                                                                       TextWrapping="Wrap" />
+                                                            <TextBlock Text="{Binding Note}" IsVisible="{Binding HasNote}"
+                                                                       Classes="caption" TextWrapping="Wrap"
+                                                                       Foreground="{StaticResource BrassBrush}" />
+                                                        </StackPanel>
+                                                        <TextBlock Grid.Column="3" Text="{Binding MarkText}"
+                                                                   Classes="caption" Margin="10,0,0,0" />
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <ItemsControl ItemsSource="{Binding GuideNotes}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="x:String">
+                                    <TextBlock Text="{Binding}" Classes="caption small" TextWrapping="Wrap" Margin="0,0,0,4" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </StackPanel>
+
+                <!--
+                    The story as this character lived it. No completion bar on purpose: a story's
+                    quest list covers every branch, so a denominator would be meaningless. What was
+                    completed IS the record of the decisions taken.
+                -->
+                <StackPanel IsVisible="{Binding IsStory}" Spacing="14">
+                    <TextBlock Text="{ui:T 'PERSONAL STORY'}" Classes="heading" Margin="0,6,0,0" />
+
+                    <TextBlock Text="{ui:T 'Reading this character\'s story…'}" IsVisible="{Binding IsBusy}" Classes="caption" />
+
+                    <!-- A screen that fetches has to be able to say why it did not. -->
+                    <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+                    <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
+
+                    <ItemsControl ItemsSource="{Binding Story}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:StoryArc">
+                                <StackPanel Spacing="8" Margin="0,0,0,18">
+                                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                        <TextBlock Text="{Binding Name}" Classes="heading small"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Summary}" Classes="caption small"
+                                                   VerticalAlignment="Bottom" />
+                                        <Border Grid.Row="1" Grid.ColumnSpan="2" Classes="rule" Margin="0,6,0,0" />
+                                    </Grid>
+
+                                    <!-- Each step, tappable for the account the game wrote. -->
+                                    <ItemsControl ItemsSource="{Binding}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="services:StoryStep">
+                                                <Button Classes="row" Click="OnStoryStepClicked" Margin="0,0,0,2">
+                                                    <Grid ColumnDefinitions="4,*,Auto" MinHeight="38">
+                                                        <Border Background="{StaticResource BrassDimBrush}" />
+                                                        <TextBlock Grid.Column="1" Text="{Binding Name}"
+                                                                   Margin="16,0,10,0" VerticalAlignment="Center"
+                                                                   TextTrimming="CharacterEllipsis" />
+                                                        <TextBlock Grid.Column="2" Text="{Binding LevelText}"
+                                                                   Classes="caption small"
+                                                                   VerticalAlignment="Center" />
+                                                    </Grid>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                                 </StackPanel>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
-                <TextBlock Text="{Binding StatPrefix}" IsVisible="{Binding HasStatPrefix}" Classes="caption" />
-                <TextBlock Text="{Binding CheckCaveat}" Classes="caption small" />
-
-                <Border Classes="rule" Margin="0,10,0,0" />
-
-                <!-- Prices for finishing what the gear already started. Never a suggestion about
-                     which rune or sigil to run: the API has no view on that. -->
-                <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
-                    <TextBlock Text="{ui:T 'TO COMPLETE'}" Classes="heading" />
-                    <TextBlock Grid.Column="1" Text="{Binding ShoppingTotal}" Classes="figure"
-                               Foreground="{StaticResource MetalGoldBrush}" />
-                </Grid>
-
-                <TextBlock Text="{Binding ShoppingNote}" IsVisible="{Binding HasShoppingNote}" Classes="caption" />
-
-                <ItemsControl ItemsSource="{Binding Shopping}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="services:ShoppingRow">
-                            <Grid ColumnDefinitions="4,14,*,Auto" RowDefinitions="Auto,Auto" Margin="0,0,0,8">
-                                <Border Grid.RowSpan="2" Background="{StaticResource BrassBrush}" />
-                                <TextBlock Grid.Column="2" Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
-                                <TextBlock Grid.Column="3" Text="{Binding Total}" Classes="figure" />
-                                <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Quantity}" Classes="caption" />
-                                <TextBlock Grid.Row="1" Grid.Column="3" Text="{Binding UnitPrice}" Classes="caption" />
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-
-                <TextBlock Text="{Binding ShoppingCaveat}" Classes="caption small" />
+                    <TextBlock Text="{Binding StoryNote}" Classes="caption small" Margin="0,6,0,0" />
+                </StackPanel>
             </StackPanel>
-
-            <!--
-                The story as this character lived it. No completion bar on purpose: a story's
-                quest list covers every branch, so a denominator would be meaningless. What was
-                completed IS the record of the decisions taken.
-            -->
-            <StackPanel IsVisible="{Binding IsStory}" Spacing="14">
-                <TextBlock Text="{ui:T 'PERSONAL STORY'}" Classes="heading" Margin="0,6,0,0" />
-
-                <TextBlock Text="{ui:T 'Reading this character\'s story…'}" IsVisible="{Binding IsBusy}" Classes="caption" />
-
-                <!-- A screen that fetches has to be able to say why it did not. -->
-                <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
-                <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
-
-                <ItemsControl ItemsSource="{Binding Story}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="services:StoryArc">
-                            <StackPanel Spacing="8" Margin="0,0,0,18">
-                                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
-                                    <TextBlock Text="{Binding Name}" Classes="heading small"
-                                               TextTrimming="CharacterEllipsis" />
-                                    <TextBlock Grid.Column="1" Text="{Binding Summary}" Classes="caption small"
-                                               VerticalAlignment="Bottom" />
-                                    <Border Grid.Row="1" Grid.ColumnSpan="2" Classes="rule" Margin="0,6,0,0" />
-                                </Grid>
-
-                                <!-- Each step, tappable for the account the game wrote. -->
-                                <ItemsControl ItemsSource="{Binding}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate x:DataType="services:StoryStep">
-                                            <Button Classes="row" Click="OnStoryStepClicked" Margin="0,0,0,2">
-                                                <Grid ColumnDefinitions="4,*,Auto" MinHeight="38">
-                                                    <Border Background="{StaticResource BrassDimBrush}" />
-                                                    <TextBlock Grid.Column="1" Text="{Binding Name}"
-                                                               Margin="16,0,10,0" VerticalAlignment="Center"
-                                                               TextTrimming="CharacterEllipsis" />
-                                                    <TextBlock Grid.Column="2" Text="{Binding LevelText}"
-                                                               Classes="caption small"
-                                                               VerticalAlignment="Center" />
-                                                </Grid>
-                                            </Button>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-
-                <TextBlock Text="{Binding StoryNote}" Classes="caption small" Margin="0,6,0,0" />
-            </StackPanel>
-        </StackPanel>
-    </ScrollViewer>
+        </ScrollViewer>
+    </Grid>
 </shell:PageView>

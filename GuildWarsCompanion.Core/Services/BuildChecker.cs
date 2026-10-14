@@ -219,7 +219,7 @@ public sealed class BuildChecker
     };
 
     /// <summary>A weapon type id from the API, as the game names it in the phone's language.</summary>
-    private static string WeaponTypeName(string type) => type switch
+    internal static string WeaponTypeName(string type) => type switch
     {
         "Axe" => L.T("Axe"),
         "Dagger" => L.T("Dagger"),
@@ -233,9 +233,10 @@ public sealed class BuildChecker
         "Warhorn" => L.T("Warhorn"),
         "Greatsword" => L.T("Greatsword"),
         "Hammer" => L.T("Hammer"),
-        "Longbow" => L.T("Longbow"),
+        // The API spells the bows "LongBow" and "ShortBow" on an item.
+        "Longbow" or "LongBow" => L.T("Longbow"),
         "Rifle" => L.T("Rifle"),
-        "Shortbow" => L.T("Shortbow"),
+        "Shortbow" or "ShortBow" => L.T("Shortbow"),
         "Staff" => L.T("Staff"),
         "Spear" => L.T("Spear"),
         "Trident" => L.T("Trident"),

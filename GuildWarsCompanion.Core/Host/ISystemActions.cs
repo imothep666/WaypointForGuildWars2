@@ -16,5 +16,8 @@ public interface ISystemActions
 
     Task CopyAsync(string text);
 
+    /// <summary>The clipboard's text, or null when it holds none.</summary>
+    Task<string?> PasteAsync();
+
     Task OpenLinkAsync(string url);
 }

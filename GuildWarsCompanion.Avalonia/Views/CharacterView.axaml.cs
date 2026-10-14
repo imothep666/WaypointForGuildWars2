@@ -17,7 +17,14 @@ public partial class CharacterView : PageView
     {
         InitializeComponent();
 
-        Strip.Selected += tab => ViewModel.Select(tab);
+        Strip.Selected += tab =>
+        {
+            ViewModel.Select(tab);
+
+            // Each tab starts at its top: the tabs no longer scroll, so the content left where the
+            // last one was read would open another tab somewhere in its middle.
+            Scroller.Offset = default;
+        };
 
         DataContextChanged += (_, _) =>
         {
