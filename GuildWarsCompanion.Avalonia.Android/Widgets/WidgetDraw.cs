@@ -128,6 +128,11 @@ internal static class WidgetDraw
 
         views.SetImageViewBitmap(R.Id.vault_heading, Carved(context, L.T("Wizard's Vault")));
 
+        // In the app's language, which can be set apart from the phone's; the layout's own labels
+        // are Android's, read in the phone's language, and only stand until this draws.
+        views.SetTextViewText(R.Id.vault_daily_label, L.T("DAILY"));
+        views.SetTextViewText(R.Id.vault_weekly_label, L.T("WEEKLY"));
+
         views.SetTextViewText(R.Id.vault_daily, panel.Daily);
         views.SetTextViewText(R.Id.vault_weekly, panel.Weekly);
         views.SetTextViewText(R.Id.vault_reset, panel.Reset);

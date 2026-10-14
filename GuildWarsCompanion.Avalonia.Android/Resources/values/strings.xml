@@ -3,7 +3,9 @@
     The few words Android itself shows for the app: the widget names in the launcher's picker,
     and the labels a widget layout draws before the app has filled anything in. Everything else
     goes through Localization/L in Core; these cannot, because the system reads them without
-    running any of the app's code. German beside them in values-de.
+    running any of the app's code. They are in the phone's language even when the app has been
+    given another, so the widget sets its labels again from L when it draws. German beside them
+    in values-de.
 -->
 <resources>
     <string name="widget_bosses">World Bosses</string>

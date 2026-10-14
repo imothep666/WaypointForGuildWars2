@@ -54,7 +54,7 @@ public static class BossAlerts
             .OrderBy(boss => boss.Next)
             .Take(MostAtOnce)
             .Select(boss => new BossCall(
-                boss.Name,
+                GameNames.Boss(boss.Name),
                 boss.ApiId,
                 boss.Location,
                 boss.Next,

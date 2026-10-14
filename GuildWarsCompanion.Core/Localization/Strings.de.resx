@@ -3368,4 +3368,124 @@
   <data name="The Ruined City of Arah" xml:space="preserve">
     <value>Die Ruinenstadt Arah</value>
   </data>
+  <data name="boss|Admiral Taidha Covington" xml:space="preserve">
+    <value>Admiral Taidha Covington</value>
+  </data>
+  <data name="boss|The Shatterer" xml:space="preserve">
+    <value>Der Zerschmetterer</value>
+  </data>
+  <data name="boss|Inquest Golem Mark II" xml:space="preserve">
+    <value>Inquestur-Golem Typ II</value>
+  </data>
+  <data name="boss|Svanir Shaman Chief" xml:space="preserve">
+    <value>Schamanenoberhaupt der Svanir</value>
+  </data>
+  <data name="boss|Great Jungle Wurm" xml:space="preserve">
+    <value>Großer Dschungelwurm</value>
+  </data>
+  <data name="boss|Megadestroyer" xml:space="preserve">
+    <value>Mega-Zerstörer</value>
+  </data>
+  <data name="boss|Modniir Ulgoth" xml:space="preserve">
+    <value>Modniir Ulgoth</value>
+  </data>
+  <data name="boss|Claw of Jormag" xml:space="preserve">
+    <value>Klaue von Jormag</value>
+  </data>
+  <data name="boss|Fire Elemental" xml:space="preserve">
+    <value>Feuer-Elementar</value>
+  </data>
+  <data name="boss|Shadow Behemoth" xml:space="preserve">
+    <value>Schatten-Behemoth</value>
+  </data>
+  <data name="boss|Karka Queen" xml:space="preserve">
+    <value>Karka-Königin</value>
+  </data>
+  <data name="boss|Tequatl the Sunless" xml:space="preserve">
+    <value>Tequatl der Sonnenlose</value>
+  </data>
+  <data name="boss|Triple Trouble Wurm" xml:space="preserve">
+    <value>Dreifacher Ärger</value>
+  </data>
+  <data name="boss|Drakkar" xml:space="preserve">
+    <value>Drakkar</value>
+  </data>
+  <data name="raid|Vale Guardian" xml:space="preserve">
+    <value>Tal-Wächter</value>
+  </data>
+  <data name="raid|Slothasor" xml:space="preserve">
+    <value>Faultierion</value>
+  </data>
+  <data name="raid|Bandit Trio" xml:space="preserve">
+    <value>Banditen-Trio</value>
+  </data>
+  <data name="raid|Siege the Stronghold" xml:space="preserve">
+    <value>Belagert die Festung</value>
+  </data>
+  <data name="raid|Keep Construct" xml:space="preserve">
+    <value>Festenkonstrukt</value>
+  </data>
+  <data name="raid|Mursaat Overseer" xml:space="preserve">
+    <value>Mursaat-Aufseher</value>
+  </data>
+  <data name="raid|Soulless Horror" xml:space="preserve">
+    <value>Seelenloser Schrecken</value>
+  </data>
+  <data name="raid|River of Souls" xml:space="preserve">
+    <value>Fluss der Seelen</value>
+  </data>
+  <data name="raid|Statues of Grenth" xml:space="preserve">
+    <value>Statuen des Grenth</value>
+  </data>
+  <data name="raid|Conjured Amalgamate" xml:space="preserve">
+    <value>Beschworene Verschmelzung</value>
+  </data>
+  <data name="raid|Twin Largos" xml:space="preserve">
+    <value>Zwillings-Largos</value>
+  </data>
+  <data name="raid|Qadim the Peerless" xml:space="preserve">
+    <value>Qadim der Unvergleichliche</value>
+  </data>
+  <data name="raid|Gorseval" xml:space="preserve">
+    <value>Gorseval</value>
+  </data>
+  <data name="raid|Sabetha" xml:space="preserve">
+    <value>Sabetha</value>
+  </data>
+  <data name="raid|Matthias" xml:space="preserve">
+    <value>Matthias</value>
+  </data>
+  <data name="raid|Xera" xml:space="preserve">
+    <value>Xera</value>
+  </data>
+  <data name="raid|Cairn" xml:space="preserve">
+    <value>Cairn</value>
+  </data>
+  <data name="raid|Samarog" xml:space="preserve">
+    <value>Samarog</value>
+  </data>
+  <data name="raid|Deimos" xml:space="preserve">
+    <value>Deimos</value>
+  </data>
+  <data name="raid|Dhuum" xml:space="preserve">
+    <value>Dhuum</value>
+  </data>
+  <data name="raid|Qadim" xml:space="preserve">
+    <value>Qadim</value>
+  </data>
+  <data name="raid|Adina" xml:space="preserve">
+    <value>Adina</value>
+  </data>
+  <data name="raid|Sabir" xml:space="preserve">
+    <value>Sabir</value>
+  </data>
+  <data name="raid|Greer" xml:space="preserve">
+    <value>Greer</value>
+  </data>
+  <data name="raid|Decima" xml:space="preserve">
+    <value>Decima</value>
+  </data>
+  <data name="raid|Ura" xml:space="preserve">
+    <value>Ura</value>
+  </data>
 </root>

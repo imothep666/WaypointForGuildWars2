@@ -68,7 +68,7 @@ public static class WidgetContent
         var calls = appearances
             .OrderBy(boss => boss.Next)
             .Select(boss => new BossLine(
-                boss.Name, boss.Location, boss.Next,
+                GameNames.Boss(boss.Name), boss.Location, boss.Next,
                 trusted is null ? null : !trusted.Contains(boss.ApiId)))
             .ToList();
 

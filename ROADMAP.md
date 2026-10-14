@@ -19,10 +19,6 @@ Nothing small is waiting just now; what is left needs the game or a device (belo
 
 ### Smaller things, carried rather than forgotten
 
-- **`Gw2TilesTests.A_tile_lost_to_the_network_is_asked_for_again_after_the_wait` fails now and
-  then.** It failed once on 2026-10-05, nameless then, and again on 2026-10-14, when the console
-  named it; three runs straight after passed. It waits on a redraw signal with a five-second
-  timeout around a released gate, which is where a timing race would sit. Not looked into yet.
 - **Karka Queen keeps the map centre**, and should. v1 publishes four events with her exact name on
   Southsun Cove, all with different centres; she is fought at whichever settlement she attacks. A
   precise answer to a question with four answers would be worse than the hollow needle.
@@ -97,6 +93,22 @@ Nothing small is waiting just now; what is left needs the game or a device (belo
   the stats were held against whatever was in that hand: a shortbow was "same" against the guide's
   stats for a dagger. A set's line now reads "Rifle · Berserker's" on both sides, and the sigil
   lines say "Sigil, Rifle" rather than two lines of "Sigil, set 1".
+- **World bosses and raid encounters in German.** `GameNames` names them on Today, both widgets,
+  the timetable, the compass, the More sheet and the boss alerts: "Klaue von Jormag", "Tal-Wächter",
+  "Belagert die Festung" for the escort. The API names neither, so the German came from the game
+  where it has it (raid mentor achievements and minis asked of the API in German, e.g. "Mini
+  Faultierion") and from the German wiki's raid and world boss pages for the rest. Apart from
+  EventSchedule because the Bridge compiles that file. `GameNamesTests` fails for a boss or raid
+  added without its German. Still English: the bosses' map names and the wiki's meta names.
+- **The vault widget's labels follow the app's language.** Android reads a layout's own texts in
+  the phone's language even when the app has been given another; seen as "TÄGLICH" on an English
+  app. The widget now sets them from L when it draws.
+- **The test that failed now and then was its cleanup.** `Gw2TilesTests` deleted its cache folder
+  while the tile service was still writing the tile it had just announced: the service tells the
+  screen before it writes to disk, and the test ended on that signal. Under the whole suite's load
+  the write was sometimes slower, and "The process cannot access the file '1-1-3-4-5.jpg'" failed
+  a test that had passed. Caught by running the suite in a loop (the first run failed); the cleanup
+  now waits for the file, and thirty runs after it passed.
 - **A release carries only the packages that changed.** `tools/changed_packages.py` reads each
   package's project for what it is made of - its folder, and every file and project it reaches by
   a path out of it, followed through references - and compares that with the commit the last

@@ -132,7 +132,7 @@ public sealed class HereService(
 
         return due
             .Where(boss => !done.Contains(boss.ApiId, StringComparer.OrdinalIgnoreCase))
-            .Select(boss => (boss.Name, boss.Next - now))
+            .Select(boss => (GameNames.Boss(boss.Name), boss.Next - now))
             .ToList();
     }
 

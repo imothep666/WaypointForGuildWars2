@@ -122,7 +122,7 @@ public sealed class CompassTargets(Gw2Client api, MarkerStore markers, Gw2Cache 
                 var at = MapSpace.ToContinent(arena.MapX, arena.MapY, area, continent);
 
                 found.Add(new CompassTarget(
-                    boss.Name, TargetKind.WorldBoss, map.Id, map.Name, at.X, at.Y,
+                    GameNames.Boss(boss.Name), TargetKind.WorldBoss, map.Id, map.Name, at.X, at.Y,
                     Note: note, Id: boss.ApiId));
 
                 continue;
@@ -133,7 +133,7 @@ public sealed class CompassTargets(Gw2Client api, MarkerStore markers, Gw2Cache 
             if (map.Centre is not { } centre) continue;
 
             found.Add(new CompassTarget(
-                boss.Name, TargetKind.WorldBoss, map.Id, map.Name, centre.X, centre.Y,
+                GameNames.Boss(boss.Name), TargetKind.WorldBoss, map.Id, map.Name, centre.X, centre.Y,
                 Precise: false, Note: note, Id: boss.ApiId));
         }
 

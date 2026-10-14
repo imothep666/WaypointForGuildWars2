@@ -154,8 +154,8 @@ public static class HereWidget
 
             foreach (var boss in bosses)
                 facts.Add(day.BossesKilled?.Contains(boss.ApiId) == true
-                    ? new HereFact(L.F("{0} · done today", boss.Name), HereTone.Done)
-                    : new HereFact(L.F("{0} at {1:HH:mm}", boss.Name, boss.Next.ToLocalTime())));
+                    ? new HereFact(L.F("{0} · done today", GameNames.Boss(boss.Name)), HereTone.Done)
+                    : new HereFact(L.F("{0} at {1:HH:mm}", GameNames.Boss(boss.Name), boss.Next.ToLocalTime())));
         }
 
         return facts.Take(MostLines).ToList();

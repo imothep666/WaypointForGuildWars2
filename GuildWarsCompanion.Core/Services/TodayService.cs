@@ -79,7 +79,7 @@ public sealed class TodayService(
 
         daily.Add(await TrackAsync(L.T("World bosses"),
             client.GetWorldBossIdsAsync, client.GetCompletedWorldBossesAsync, ct, "//events",
-            "worldbosses"));
+            "worldbosses", GameNames.BossById));
 
         daily.Add(await TrackAsync(L.T("Map bonus chests"),
             client.GetMapChestIdsAsync, client.GetCompletedMapChestsAsync, ct,
@@ -236,7 +236,7 @@ public sealed class TodayService(
                 .Where(e => e.IsBoss)
                 .Select(e => e.Id);
 
-            var count = ResetProgress.Of(bosses, done);
+            var count = ResetProgress.Of(bosses, done, GameNames.Raid);
 
             return new TodayRow(L.T("Raid encounters"), count.Done, count.Total, Join(count.Remaining));
         }

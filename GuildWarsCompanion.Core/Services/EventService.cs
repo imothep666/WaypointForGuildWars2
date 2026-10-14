@@ -91,7 +91,7 @@ public sealed class EventService(Gw2Client client, ApiKeySession session, Activi
 
         var rows = EventSchedule.NextAppearances(now)
             .Select(boss => new EventRow(
-                boss.Name, boss.Location, boss.Level, boss.Next,
+                GameNames.Boss(boss.Name), boss.Location, boss.Level, boss.Next,
                 done.Contains(boss.ApiId), active?.Level))
             .ToList();
 

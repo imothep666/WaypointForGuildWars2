@@ -23,9 +23,25 @@ public sealed class Gw2TilesTests : IDisposable
     private readonly string _cache =
         Path.Combine(Path.GetTempPath(), "gw2tiles-tests-" + Guid.NewGuid().ToString("N"));
 
+    /// <summary>
+    /// Removes the test's cache, waiting for a write still under way. The service tells the screen
+    /// about a tile before it writes the tile to disk, so a test that ends on that signal can reach
+    /// here while the file is still open. Under the whole suite's load that happened now and then,
+    /// and the cleanup's "The process cannot access the file" failed a test that had passed.
+    /// </summary>
     public void Dispose()
     {
-        if (Directory.Exists(_cache)) Directory.Delete(_cache, recursive: true);
+        for (var attempt = 0; attempt < 20 && Directory.Exists(_cache); attempt++)
+        {
+            try
+            {
+                Directory.Delete(_cache, recursive: true);
+            }
+            catch (IOException)
+            {
+                Thread.Sleep(50);
+            }
+        }
     }
 
     [Theory]

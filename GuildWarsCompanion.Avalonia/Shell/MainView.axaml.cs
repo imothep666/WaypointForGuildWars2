@@ -490,8 +490,8 @@ public partial class MainView : UserControl
         var wait = next.Next - now;
 
         return wait < TimeSpan.FromHours(1)
-            ? L.F("{0} in {1} min", next.Name, Math.Max(1, (int)Math.Ceiling(wait.TotalMinutes)))
-            : L.F("{0} at {1:HH:mm}", next.Name, next.Next.ToLocalTime());
+            ? L.F("{0} in {1} min", GameNames.Boss(next.Name), Math.Max(1, (int)Math.Ceiling(wait.TotalMinutes)))
+            : L.F("{0} at {1:HH:mm}", GameNames.Boss(next.Name), next.Next.ToLocalTime());
     }
 
     private static string? Beaten()
