@@ -195,7 +195,15 @@ public sealed partial class TodayViewModel(
 
         Notice = null;
 
-        foreach (var section in await today.GetAsync(ct))
+        // What was read last time, at once, under the loading stroke; today's replaces it below.
+        if (await today.GetStoredAsync(ct) is { } kept)
+            foreach (var section in kept)
+                Sections.Add(section);
+
+        var fresh = await today.GetAsync(ct);
+
+        Sections.Clear();
+        foreach (var section in fresh)
             Sections.Add(section);
 
         if (await GoalsAsync(ct) is { } pinned) Sections.Add(pinned);

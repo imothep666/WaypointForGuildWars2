@@ -22,12 +22,43 @@ public sealed record Fetched<T>(T Value, DateTimeOffset? FetchedAt)
 /// </summary>
 public sealed class OfflineReader(SnapshotStore store)
 {
+    /// <summary>Whether reads on this async flow answer from the stored copy alone.</summary>
+    private static readonly AsyncLocal<bool> KeptOnly = new();
+
+    /// <summary>
+    /// Until disposed, every read on the calling async flow answers from what is stored, never the
+    /// network - through whatever services it passes on the way. For drawing a screen at once from
+    /// what was read last time, by running the screen's own service inside this, and then again
+    /// outside it for the fresh answer. A read with nothing stored fails as an offline read with
+    /// nothing kept does, so the service's own handling of that applies.
+    /// </summary>
+    /// <remarks>To be opened in an async method: the scope then ends with that method's flow and
+    /// cannot leak into its caller's.</remarks>
+    public static IDisposable StoredOnly()
+    {
+        KeptOnly.Value = true;
+        return new Scope();
+    }
+
+    private sealed class Scope : IDisposable
+    {
+        public void Dispose() => KeptOnly.Value = false;
+    }
+
+    private static Gw2ApiException NothingKept() =>
+        new("Nothing stored yet.", Gw2ErrorKind.Network);
+
     public async Task<Fetched<T>> ReadAsync<T>(
         string key,
         JsonTypeInfo<T> typeInfo,
         Func<CancellationToken, Task<T>> fetch,
         CancellationToken ct = default)
     {
+        if (KeptOnly.Value)
+            return await store.LoadAsync(key, typeInfo, ct) is { } kept
+                ? new Fetched<T>(kept.Value, kept.FetchedAt)
+                : throw NothingKept();
+
         try
         {
             var fresh = await fetch(ct);
@@ -72,6 +103,11 @@ public sealed class OfflineReader(SnapshotStore store)
         CancellationToken ct = default)
         where T : class
     {
+        if (KeptOnly.Value)
+            return await store.LoadAsync(key, typeInfo, ct) is { } kept
+                ? new Fetched<T?>(kept.Value, kept.FetchedAt)
+                : new Fetched<T?>(null, null);
+
         try
         {
             var fresh = await fetch(ct);

@@ -66,7 +66,17 @@ public sealed partial class VaultViewModel(VaultService vault, ApiKeySession ses
 
         Notice = null;
 
-        var view = await vault.GetAsync(ct);
+        // What was read last time, at once, under the loading stroke; the current vault replaces it.
+        if (await vault.GetStoredAsync(ct) is { } kept) Show(kept);
+
+        Show(await vault.GetAsync(ct));
+    });
+
+    private void Show(VaultView view)
+    {
+        Sections.Clear();
+        Shop.Clear();
+
         SeasonLine = view.SeasonLine;
         AcclaimText = view.AcclaimText;
         HasAcclaim = view.HasAcclaim;
@@ -78,5 +88,5 @@ public sealed partial class VaultViewModel(VaultService vault, ApiKeySession ses
             Shop.Add(section);
 
         ShopNote = view.ShopNote;
-    });
+    }
 }

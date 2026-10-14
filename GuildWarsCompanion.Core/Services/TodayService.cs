@@ -12,11 +12,25 @@ namespace GuildWarsCompanion.Services;
 /// </summary>
 public sealed class TodayService(
     Gw2Client client, SnapshotStore snapshots, OfflineReader offline, VaultSignal vaultSignal,
-    FractalService fractals, TestEvidence evidence)
+    FractalService fractals, TestEvidence evidence, Gw2Cache cache, ItemLookup items)
 {
     /// <summary>Dailies roll over at 00:00 UTC; the weekly vault at Monday 07:30 UTC.</summary>
     public static DateTimeOffset NextDailyReset(DateTimeOffset utcNow) =>
         Resets.NextDaily(utcNow);
+
+    /// <summary>
+    /// The trackers from what was stored by the last read, without the network, for the page to
+    /// show at once while <see cref="GetAsync"/> asks for today's. Null when too little is stored to
+    /// be worth showing - a first run would otherwise flash a page of unread rows.
+    /// </summary>
+    public async Task<IReadOnlyList<TodaySection>?> GetStoredAsync(CancellationToken ct = default)
+    {
+        using var _ = OfflineReader.StoredOnly();
+
+        var sections = await GetAsync(ct);
+
+        return sections.Any(section => section.Any(row => !row.Unread)) ? sections : null;
+    }
 
     public async Task<IReadOnlyList<TodaySection>> GetAsync(CancellationToken ct = default)
     {
@@ -69,11 +83,11 @@ public sealed class TodayService(
 
         daily.Add(await TrackAsync(L.T("Map bonus chests"),
             client.GetMapChestIdsAsync, client.GetCompletedMapChestsAsync, ct,
-            key: "mapchests"));
+            key: "mapchests", label: await ChestNamesAsync(ct)));
 
         daily.Add(await TrackAsync(L.T("Time-gated crafting"),
             client.GetDailyCraftingIdsAsync, client.GetCompletedDailyCraftingAsync, ct,
-            key: "dailycrafting"));
+            key: "dailycrafting", label: await CraftingNamesAsync(ct)));
 
         daily.Add(await DungeonsAsync(ct));
 
@@ -108,7 +122,8 @@ public sealed class TodayService(
         Func<CancellationToken, Task<List<string>>> completed,
         CancellationToken ct,
         string? route = null,
-        string? key = null)
+        string? key = null,
+        Func<string, string>? label = null)
     {
         try
         {
@@ -123,7 +138,7 @@ public sealed class TodayService(
                 : (await offline.ReadAsync($"today/{key}/done", Gw2JsonContext.Default.ListString,
                     completed, ct)).Value;
 
-            var count = ResetProgress.Of(everything, done);
+            var count = ResetProgress.Of(everything, done, label);
 
             return new TodayRow(
                 name, count.Done, count.Total, Join(count.Remaining), false, route);
@@ -158,7 +173,7 @@ public sealed class TodayService(
 
             var unfinished = dungeons
                 .Where(d => (d.Paths ?? []).Any(p => !done.Contains(p.Id)))
-                .Select(d => Ids.ToDisplayName(d.Id))
+                .Select(d => DungeonName(d.Id))
                 .ToList();
 
             return new TodayRow(L.T("Dungeon paths"), count.Done, count.Total, Join(unfinished));
@@ -230,6 +245,95 @@ public sealed class TodayService(
             return new TodayRow(L.T("Raid encounters"), 0, 0, null, Unread: true);
         }
     }
+
+    /// <summary>The map whose chest it is, by name; see <see cref="ChestNamesAsync"/>.</summary>
+    private IReadOnlyDictionary<string, string>? _chestMaps;
+
+    /// <summary>
+    /// A map chest by its map's name in the phone's language - "Goldene Senke", not "Auric Basin
+    /// Heros Choice Chest". The API names chests by nothing but an id made from the map's English
+    /// name, so the map is found by that name in the map store the picker and the compass fill.
+    /// A chest whose map the store does not hold yet keeps the id's own words, less the "heros
+    /// choice chest" every one of them ends in.
+    /// </summary>
+    private async Task<Func<string, string>> ChestNamesAsync(CancellationToken ct)
+    {
+        if (_chestMaps is null or { Count: 0 })
+        {
+            try
+            {
+                var english = await cache.GetEnglishMapNamesAsync(ct);
+                var byName = new Dictionary<string, string>();
+
+                foreach (var map in await cache.GetMapsAsync(ct))
+                    byName.TryAdd(HereLine.Slug(english.GetValueOrDefault(map.Id, map.Name)), map.Name);
+
+                _chestMaps = byName;
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                _chestMaps = new Dictionary<string, string>();
+            }
+        }
+
+        return id =>
+        {
+            var map = id.EndsWith(ChestSuffix, StringComparison.Ordinal) ? id[..^ChestSuffix.Length] : id;
+
+            return _chestMaps.GetValueOrDefault(map) ?? Ids.ToDisplayName(map);
+        };
+    }
+
+    private const string ChestSuffix = "_heros_choice_chest";
+
+    /// <summary>
+    /// The time-gated materials as items, which the API names in the phone's language. The ids
+    /// of /v2/dailycrafting are names, not items, so the five are listed here; one added by a later
+    /// release keeps the id's own words until it is listed too.
+    /// </summary>
+    private static readonly Dictionary<string, int> CraftedItems = new()
+    {
+        ["charged_quartz_crystal"] = 43772,
+        ["glob_of_elder_spirit_residue"] = 46744,
+        ["lump_of_mithrilium"] = 46742,
+        ["spool_of_silk_weaving_thread"] = 46740,
+        ["spool_of_thick_elonian_cord"] = 46745
+    };
+
+    private async Task<Func<string, string>> CraftingNamesAsync(CancellationToken ct)
+    {
+        IReadOnlyDictionary<int, Item> known;
+
+        try
+        {
+            known = await items.ResolveAsync(CraftedItems.Values.ToList(), ct);
+        }
+        catch (Gw2ApiException)
+        {
+            known = new Dictionary<int, Item>();
+        }
+
+        return id => CraftedItems.TryGetValue(id, out var item) && known.GetValueOrDefault(item) is { } named
+            ? named.Name
+            : Ids.ToDisplayName(id);
+    }
+
+    /// <summary>
+    /// A dungeon as the game names it. /v2/dungeons has ids and paths but no names, and the id
+    /// loses the apostrophe ("Caudecus Manor"), so the eight are written out and translated.
+    /// </summary>
+    private static string DungeonName(string id) => id switch
+    {
+        "ascalonian_catacombs" => L.T("Ascalonian Catacombs"),
+        "caudecus_manor" => L.T("Caudecus's Manor"),
+        "twilight_arbor" => L.T("Twilight Arbor"),
+        "sorrows_embrace" => L.T("Sorrow's Embrace"),
+        "citadel_of_flame" => L.T("Citadel of Flame"),
+        "honor_of_the_waves" => L.T("Honor of the Waves"),
+        "crucible_of_eternity" => L.T("Crucible of Eternity"),
+        "ruined_city_of_arah" => L.T("The Ruined City of Arah"),
+        _ => Ids.ToDisplayName(id)
+    };
 
     /// <summary>A few names are useful; a wall of thirty is not.</summary>
     private static string? Join(IReadOnlyList<string> remaining) => remaining.Count switch

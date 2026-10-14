@@ -52,7 +52,7 @@ public static class HereLine
 
     /// <summary>"Dragon's Stand" → "dragons_stand": apostrophes dropped, anything else between words
     /// an underscore.</summary>
-    private static string Slug(string name)
+    public static string Slug(string name)
     {
         var letters = name.ToLowerInvariant()
             .Where(c => c != '\'' && c != '’')

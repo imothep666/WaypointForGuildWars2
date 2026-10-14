@@ -419,7 +419,32 @@ public sealed class CharacterService(
                 tab.Tab, Loadouts.Label(tab), tab.Tab == shown?.Tab, tab.IsActive))
             .ToList();
 
-        var items = await lookup.ResolveAsync(worn.Select(e => e.Id).ToList(), ct);
+        // The reads below do not depend on one another, so they are all started here and waited
+        // for together. One after another they were about ten round trips, and on the phone's
+        // connection the page took seconds to open.
+        var detailIds = worn.Select(e => e.Id)
+            .Concat(worn.SelectMany(e => e.Upgrades ?? []))
+            .Distinct()
+            .ToList();
+
+        var itemsRead = lookup.ResolveAsync(worn.Select(e => e.Id).ToList(), ct);
+        var pvpRead = PvpFor(shown, ct);
+        var dyesRead = DyesFor(worn, character.Profession, ct);
+        var buildRead = BuildFor(character, ct);
+        var masteryRead = ReadMasteryPointsAsync(ct);
+        var backstoryRead = ReadBackstoryAsync(character, ct);
+        var challengesRead = ReadHeroChallengesAsync(character.Name, ct);
+
+        // One request covers every equipped item and every rune and sigil in them: the
+        // checker needs levels and sub-types, which the item cache does not keep.
+        var detailsRead = detailIds.Count > 0
+            ? client.GetWeaponItemsAsync(detailIds, ct)
+            : Task.FromResult(new List<WeaponItem>());
+
+        await Task.WhenAll(itemsRead, pvpRead, dyesRead, buildRead, masteryRead, backstoryRead,
+            challengesRead, detailsRead);
+
+        var items = await itemsRead;
 
         var equipment = worn
             .OrderBy(e => Array.IndexOf(SlotOrder, e.Slot) is var i && i >= 0 ? i : int.MaxValue)
@@ -444,22 +469,11 @@ public sealed class CharacterService(
             .Select((slot, index) => BuildStripSlot(slot, index, bySlot, items))
             .ToList();
 
-        var (pvpGear, pvpNotice) = await PvpFor(shown, ct);
-        var dyes = await DyesFor(worn, character.Profession, ct);
-
-        var build = await BuildFor(character, ct);
-        var mastery = await ReadMasteryPointsAsync(ct);
-
-        // One request covers every equipped item and every rune and sigil in them: the
-        // checker needs levels and sub-types, which the item cache does not keep.
-        var detailIds = worn.Select(e => e.Id)
-            .Concat(worn.SelectMany(e => e.Upgrades ?? []))
-            .Distinct()
-            .ToList();
-
-        var details = detailIds.Count > 0
-            ? (await client.GetWeaponItemsAsync(detailIds, ct)).ToDictionary(w => w.Id)
-            : [];
+        var (pvpGear, pvpNotice) = await pvpRead;
+        var dyes = await dyesRead;
+        var build = await buildRead;
+        var mastery = await masteryRead;
+        var details = (await detailsRead).ToDictionary(w => w.Id);
 
         var check = checker.Run(
             character,
@@ -468,9 +482,14 @@ public sealed class CharacterService(
             character.ActiveBuild?.Skills,
             character.Profession.Equals("Revenant", StringComparison.OrdinalIgnoreCase));
 
-        var shopping = await advisor.BuildAsync(character, details, ct);
-        var backstory = await ReadBackstoryAsync(character, ct);
-        var statPrefix = await DescribeStatPrefixAsync(character, details, ct);
+        // These two need the details, and not each other.
+        var shoppingRead = advisor.BuildAsync(character, details, ct);
+        var statPrefixRead = DescribeStatPrefixAsync(character, details, ct);
+        await Task.WhenAll(shoppingRead, statPrefixRead);
+
+        var shopping = await shoppingRead;
+        var backstory = await backstoryRead;
+        var statPrefix = await statPrefixRead;
 
         return new CharacterDetail(
             character.Name,
@@ -478,7 +497,7 @@ public sealed class CharacterService(
             FormatPlaytime(character.AgeSeconds),
             character.Deaths.ToString("N0"),
             character.Created.ToString("d MMM yyyy"),
-            await ReadHeroChallengesAsync(character.Name, ct),
+            await challengesRead,
             character.Level >= MaxLevel && mastery is not null
                 ? L.T("Mastery points are account-wide, not per character.")
                 : null,

@@ -3344,4 +3344,28 @@
   <data name="Tier {0}: {1} instead of {2}" xml:space="preserve">
     <value>Stufe {0}: {1} statt {2}</value>
   </data>
+  <data name="Ascalonian Catacombs" xml:space="preserve">
+    <value>Katakomben von Ascalon</value>
+  </data>
+  <data name="Caudecus&#x27;s Manor" xml:space="preserve">
+    <value>Caudecus' Anwesen</value>
+  </data>
+  <data name="Twilight Arbor" xml:space="preserve">
+    <value>Zwielichtgarten</value>
+  </data>
+  <data name="Sorrow&#x27;s Embrace" xml:space="preserve">
+    <value>Umarmung der Betrübnis</value>
+  </data>
+  <data name="Citadel of Flame" xml:space="preserve">
+    <value>Flammenzitadelle</value>
+  </data>
+  <data name="Honor of the Waves" xml:space="preserve">
+    <value>Zierde der Wogen</value>
+  </data>
+  <data name="Crucible of Eternity" xml:space="preserve">
+    <value>Schmelztiegel der Ewigkeit</value>
+  </data>
+  <data name="The Ruined City of Arah" xml:space="preserve">
+    <value>Die Ruinenstadt Arah</value>
+  </data>
 </root>

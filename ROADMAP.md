@@ -19,9 +19,10 @@ Nothing small is waiting just now; what is left needs the game or a device (belo
 
 ### Smaller things, carried rather than forgotten
 
-- **A test failed once on 2026-10-05 and has not failed since.** One run reported one failure out
-  of 1199; fifteen runs after it passed, and which test it was is not known. If it comes back, run
-  with `--logger trx` straight away — the name is in the .trx file, not in the quiet console.
+- **`Gw2TilesTests.A_tile_lost_to_the_network_is_asked_for_again_after_the_wait` fails now and
+  then.** It failed once on 2026-10-05, nameless then, and again on 2026-10-14, when the console
+  named it; three runs straight after passed. It waits on a redraw signal with a five-second
+  timeout around a released gate, which is where a timing race would sit. Not looked into yet.
 - **Karka Queen keeps the map centre**, and should. v1 publishes four events with her exact name on
   Southsun Cove, all with different centres; she is fought at whichever settlement she attacks. A
   precise answer to a question with four answers would be worse than the hollow needle.
@@ -96,6 +97,22 @@ Nothing small is waiting just now; what is left needs the game or a device (belo
   the stats were held against whatever was in that hand: a shortbow was "same" against the guide's
   stats for a dagger. A set's line now reads "Rifle · Berserker's" on both sides, and the sigil
   lines say "Sigil, Rifle" rather than two lines of "Sigil, set 1".
+- **Today and the vault draw what was read last time, at once.** `OfflineReader.StoredOnly()`
+  opens a scope in which every read on that async flow answers from the stored copy and never the
+  network, through whatever services it passes (Today's fractals row goes through
+  `FractalService`). Each screen runs its own service once inside the scope and once outside it,
+  so no service needed a second, stored-only path. A scope opened in an async method ends with it
+  (`OfflineReaderTests`). Seen on the phone: both screens full within two seconds of opening,
+  under the loading stroke.
+- **A character page asks for its parts together.** Items, weapon details, build, dyes, PvP gear,
+  mastery, backstory and hero challenges were about ten round trips one after another; they are
+  started together now, and the shopping list and stat prefix, which need the details, after them.
+- **Today names things in the phone's language.** Map chests by their map, from the map store
+  ("Güldener Talkessel", not "Auric Basin Heros Choice Chest"). A map the store does not hold yet
+  keeps the id's words, so "Amnytas" and "Citadel of Zakiros" stayed English on the phone. Timed
+  crafting by its five items, named by the API. Dungeons from a table checked against the German
+  wiki ("Zierde der Wogen" for Honor of the Waves), because /v2/dungeons has no names. World
+  bosses and raid encounters are still English.
 - **The character list draws the stored roster at once.** The fresh roster is one large request,
   and the screen stood empty for about twenty seconds waiting for it on the phone's connection.
   The rows last read now show straight away, under the loading stroke, until the fresh ones replace

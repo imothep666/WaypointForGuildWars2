@@ -65,6 +65,24 @@ public sealed class VaultService(
 
     private VaultSeason? _season;
 
+    /// <summary>
+    /// The vault from what was stored by the last read, without the network, for the page to show
+    /// at once while <see cref="GetAsync"/> asks for the current one. Null when nothing is stored.
+    /// </summary>
+    public async Task<VaultView?> GetStoredAsync(CancellationToken ct = default)
+    {
+        using var _ = OfflineReader.StoredOnly();
+
+        try
+        {
+            return await GetAsync(ct);
+        }
+        catch (Gw2ApiException)
+        {
+            return null;
+        }
+    }
+
     public async Task<VaultView> GetAsync(CancellationToken ct = default)
     {
         // The season only turns over a few times a year — once per app run is plenty.
