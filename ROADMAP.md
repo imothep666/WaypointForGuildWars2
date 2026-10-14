@@ -97,6 +97,15 @@ Nothing small is waiting just now; what is left needs the game or a device (belo
   the stats were held against whatever was in that hand: a shortbow was "same" against the guide's
   stats for a dagger. A set's line now reads "Rifle · Berserker's" on both sides, and the sigil
   lines say "Sigil, Rifle" rather than two lines of "Sigil, set 1".
+- **A release carries only the packages that changed.** `tools/changed_packages.py` reads each
+  package's project for what it is made of - its folder, and every file and project it reaches by
+  a path out of it, followed through references - and compares that with the commit the last
+  release was built from. The bridge compiles six files from Core and the desktop app by link,
+  which is why a folder check would not do. An unchanged package is left out; its installs still
+  find it, because Velopack gathers a channel's feed from all recent releases (`GitBase.GetReleaseFeed`).
+  Nothing changed at all, nothing is released. "Build every package" on a run started by hand packs
+  all four, for a change to how they are packed. Run against the release built from aa58223: the
+  desktop app is built, the bridge skipped. Not yet seen on Azure.
 - **Today and the vault draw what was read last time, at once.** `OfflineReader.StoredOnly()`
   opens a scope in which every read on that async flow answers from the stored copy and never the
   network, through whatever services it passes (Today's fractals row goes through

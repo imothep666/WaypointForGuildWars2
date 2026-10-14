@@ -20,6 +20,12 @@
 #   - by hand, whenever wanted (Pipelines > Run pipeline);
 #   - nightly at 02:00 UTC, only when main has moved and its newest commit is not released yet.
 # A release lists every commit since the one before it, so nothing is lost by releasing less often.
+#
+# Only the packages that changed. tools/changed_packages.py compares what each project is made of
+# with the commit the last release was built from, and a package with nothing new is left out of
+# the release; its installs keep updating from the release that last carried it, because Velopack
+# reads each channel's feed from all recent releases. "Build every package", when starting a run by
+# hand, packs all of them, for a change to how they are packed.
 
 trigger: none
 
@@ -39,6 +45,11 @@ pool:
   vmImage: ubuntu-latest
 
 parameters:
+  - name: everything
+    displayName: Build every package, changed or not
+    type: boolean
+    default: false
+
   # channel: Velopack's, and the name in the feed file; unique across the whole release.
   # exe: the file vpk treats as the program. directive: vpk's cross-packing switch, [win] for a
   # Setup.exe made on this Linux agent. extra: options only one kind of package takes.
@@ -118,6 +129,15 @@ steps:
       GITHUB_TOKEN: $(GitHubToken)
       BUILD_REASON: $(Build.Reason)
 
+  # Which packages have anything new since that commit; the rest are skipped below.
+  - bash: python3 tools/changed_packages.py
+    displayName: What changed?
+    condition: and(succeeded(), ne(variables['Released'], 'true'))
+    env:
+      PACKAGES: ${{ convertToJson(parameters.packages) }}
+      LAST_RELEASE: $(LastRelease)
+      EVERYTHING: ${{ parameters.everything }}
+
   - task: UseDotNet@2
     displayName: .NET 10 SDK
     condition: and(succeeded(), ne(variables['Released'], 'true'))
@@ -185,7 +205,7 @@ steps:
           --runtime ${{ p.rid }} --channel ${{ p.channel }} --icon "${{ p.icon }}" ${{ p.extra }} \
           --releaseNotes "$(Agent.TempDirectory)/notes.md" --outputDir "$out"
       displayName: Pack ${{ p.channel }}
-      condition: and(succeeded(), ne(variables['Released'], 'true'))
+      condition: and(succeeded(), ne(variables['Released'], 'true'), ne(variables['Skip_${{ replace(p.channel, '-', '_') }}'], 'true'))
       env:
         RELEASES_REPO: $(ReleasesRepo)
         GITHUB_TOKEN: $(GitHubToken)
@@ -206,7 +226,7 @@ steps:
           --releaseName "Waypoint $(Version)" --tag "v$(Version)"
       displayName: Release ${{ p.channel }}
       # Main only: a run started by hand on another branch builds the artifact and stops.
-      condition: and(succeeded(), ne(variables['Released'], 'true'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+      condition: and(succeeded(), ne(variables['Released'], 'true'), ne(variables['Skip_${{ replace(p.channel, '-', '_') }}'], 'true'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
       env:
         RELEASES_REPO: $(ReleasesRepo)
         GITHUB_TOKEN: $(GitHubToken)
