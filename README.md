@@ -14,6 +14,16 @@ a map and a compass that points at the next marker.
 It reads your account through the official Guild Wars 2 API with an API key you create yourself.
 The key stays on the device.
 
+## Screenshots
+
+| Today | Wizard's Vault | Map |
+|:---:|:---:|:---:|
+| <img src="docs/screenshots/today.jpg" width="240" alt="Today: what is left before the daily and weekly reset"> | <img src="docs/screenshots/vault.jpg" width="240" alt="The Wizard's Vault objectives and Astral Acclaim"> | <img src="docs/screenshots/map.jpg" width="240" alt="The map of Auric Basin with its markers"> |
+| **Characters** | **Build** | **Compare with a guide** |
+| <img src="docs/screenshots/characters.jpg" width="240" alt="The account's characters"> | <img src="docs/screenshots/build.jpg" width="240" alt="A character's skills and traits"> | <img src="docs/screenshots/guide.jpg" width="240" alt="A character held against a MetaBattle build guide"> |
+
+Character names are blurred.
+
 ## Download
 
 Linux builds are on the [releases page](https://github.com/imothep666/WaypointForGuildWars2/releases):
