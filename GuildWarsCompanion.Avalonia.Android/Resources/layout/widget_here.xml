@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    The Here widget: the map being played, who is there, and what is left on it - the map chest,
-    its meta, a boss due - one fact a line. The same words as Today's "Here:" line.
+    The Here widget: the map being played, who is there and as what, the map's meta counting down,
+    and what is left on it - the map chest, its world bosses - one fact a line. All of it is about
+    the map rather than the moment, so it still holds once the game is closed.
 
     Laid out as every widget is: the area's painted wash behind, the heading in the app's carved
     capitals over a dry-brush stroke of the area's tint, and only views RemoteViews will inflate
@@ -56,17 +57,91 @@
             android:src="@drawable/widget_stroke"
             android:tint="@color/widgetCompass" />
 
-        <TextView
-            android:id="@+id/here_who"
+        <!-- Who, with the calling's emblem before the name: the white one the game shows over a
+             character's head. Gone until it has been fetched. -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:textColor="@color/widgetMist"
-            android:textSize="12sp"
-            android:maxLines="1"
-            android:ellipsize="end" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <!-- Weighted, so a short widget loses the facts from the bottom rather than the map. -->
+            <ImageView
+                android:id="@+id/here_emblem"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginEnd="5dp"
+                android:scaleType="fitCenter"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/here_who"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/widgetMist"
+                android:textSize="12sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+        <!-- The map's meta, the widget's main line: its name and a countdown the launcher ticks
+             itself, as the boss widget's does, or "on now" in its place while it runs. Under it
+             the wall-clock times, which stay true between redraws. Gone for a map without one. -->
+        <LinearLayout
+            android:id="@+id/here_meta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/here_meta_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/widgetVellum"
+                    android:textSize="17sp"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+                <Chronometer
+                    android:id="@+id/here_meta_countdown"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textColor="@color/widgetBrass"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/here_meta_on"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textColor="@color/widgetBrass"
+                    android:textSize="15sp"
+                    android:maxLines="1"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/here_meta_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/widgetMist"
+                android:textSize="12sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+        <!-- Weighted, so a short widget loses the facts from the bottom rather than the map.
+             Coloured from code: brass for a chest waiting, grey for what is done. -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"

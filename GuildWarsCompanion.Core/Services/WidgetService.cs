@@ -20,9 +20,11 @@ namespace GuildWarsCompanion.Services;
 /// </summary>
 public sealed class WidgetService(
     Gw2Client client, ApiKeySession session, SnapshotStore snapshots, BridgeClient bridge, HereService here,
-    LocalMapNames names, MapArt art, IWidgetRedraw? redraw = null)
+    LocalMapNames names, MapArt art, MetaSource metas, Callings callings, IWidgetRedraw? redraw = null)
 {
     private const string BossesKey = "widget/worldbosses";
+    private const string ChestsKey = "widget/mapchests";
+    private const string ChestsLootedKey = "widget/mapchests/done";
     private const string HereKey = "widget/here";
     private const string DailyKey = "widget/vault/daily";
     private const string WeeklyKey = "widget/vault/weekly";
@@ -63,6 +65,12 @@ public sealed class WidgetService(
 
         await TryStoreAsync(BossesKey, Gw2JsonContext.Default.ListString,
             client.GetCompletedWorldBossesAsync, ct);
+
+        // The Here widget's map chest: which there are, which are looted today.
+        await TryStoreAsync(ChestsKey, Gw2JsonContext.Default.ListString, client.GetMapChestIdsAsync, ct);
+
+        await TryStoreAsync(ChestsLootedKey, Gw2JsonContext.Default.ListString,
+            client.GetCompletedMapChestsAsync, ct);
 
         await TryStoreAsync(DailyKey, Gw2JsonContext.Default.VaultTrack,
             token => client.GetVaultTrackAsync("daily", token), ct);
@@ -113,6 +121,9 @@ public sealed class WidgetService(
         // seen in the app before has none kept yet.
         if (report.MapName is { Length: > 0 } english) await art.FetchAsync(english, ct);
 
+        // And what the character is playing as, so the reading below can name it.
+        if (report.State is { } playing) await callings.ResolveAsync(playing.ProfessionId, playing.SpecializationId, ct);
+
         await StoreHereAsync(report, line, ct);
     }
 
@@ -125,15 +136,47 @@ public sealed class WidgetService(
     {
         if (report is not { IsLive: true, State: { CharacterName.Length: > 0 } state }) return;
 
+        var calling = callings.Known(state.ProfessionId, state.SpecializationId);
+
         await snapshots.SaveAsync(
-            HereKey, new HereReading(state.CharacterName, report.LocalMapName ?? report.MapName, line, report.MapName),
+            HereKey,
+            new HereReading(state.CharacterName, report.LocalMapName ?? report.MapName, line, report.MapName,
+                state.MapId, calling?.Name, calling?.Emblem),
             Gw2JsonContext.Default.HereReading, ct);
 
         redraw?.Redraw();
 
+        // Nor for the API's name for the calling: the reading is named once it is known.
+        if (calling is null) _ = NameLaterAsync(state);
+
         // From Today the painting is not waited for: the page should not stand still for the
         // wiki. The widget is drawn again once it has arrived.
         if (report.MapName is { Length: > 0 } english && art.Held(english) is null) _ = PaintLaterAsync(english);
+    }
+
+    /// <summary>
+    /// Adds the calling to the reading just stored, if it is still about the same character and
+    /// nothing newer has named it. A newer reading is not overwritten with this older one.
+    /// </summary>
+    private async Task NameLaterAsync(GameState state)
+    {
+        try
+        {
+            if (await callings.ResolveAsync(state.ProfessionId, state.SpecializationId) is not { } calling) return;
+
+            var stored = await snapshots.LoadAsync(HereKey, Gw2JsonContext.Default.HereReading);
+
+            if (stored?.Value is not { Calling: null } reading || reading.Character != state.CharacterName) return;
+
+            await snapshots.SaveAsync(HereKey, reading with { Calling = calling.Name, Emblem = calling.Emblem },
+                Gw2JsonContext.Default.HereReading);
+
+            redraw?.Redraw();
+        }
+        catch (Exception)
+        {
+            // Unobserved: the next reading names it instead.
+        }
     }
 
     private async Task PaintLaterAsync(string english)
@@ -165,12 +208,57 @@ public sealed class WidgetService(
 
         // Both tracks are read together, so either timestamp dates the pair.
         var vault = WidgetContent.Vault(
-            Counts(daily?.Value), Counts(weekly?.Value), daily?.FetchedAt ?? weekly?.FetchedAt, now);
+            Counts(daily?.Value), Counts(weekly?.Value), daily?.FetchedAt ?? weekly?.FetchedAt, now,
+            daily?.Value.Objectives);
 
         var reading = await snapshots.LoadAsync(HereKey, Gw2JsonContext.Default.HereReading, ct);
 
-        return (bosses, vault, HereWidget.Panel(reading?.Value, reading?.FetchedAt, now));
+        var day = reading?.Value.English is { Length: > 0 } english
+            ? await DayAsync(english, done, now, ct)
+            : null;
+
+        return (bosses, vault, HereWidget.Panel(reading?.Value, reading?.FetchedAt, now, day));
     }
+
+    /// <summary>
+    /// What is true of a map today, from what is kept: the timetable as last fetched, and the
+    /// lists of chests and kills only when read since the reset. Today keeps its own copies of
+    /// those lists, so whichever was read later is used — opening Today should not have to wait for
+    /// the widget's hourly poll to be believed.
+    /// </summary>
+    private async Task<HereDay> DayAsync(
+        string english, (List<string> Value, DateTimeOffset FetchedAt)? widgetBosses, DateTimeOffset now, CancellationToken ct)
+    {
+        var meta = (await metas.HeldAsync(ct))
+            .FirstOrDefault(map => string.Equals(map.Name, english, StringComparison.OrdinalIgnoreCase));
+
+        var chests = await LatestAsync([ChestsKey, "today/mapchests"], DateTimeOffset.MinValue, ct);
+        var looted = await LatestAsync([ChestsLootedKey, "today/mapchests/done"], Resets.LastDaily(now), ct);
+
+        var killed = Newer(widgetBosses, await snapshots.LoadAsync("today/worldbosses/done", Gw2JsonContext.Default.ListString, ct));
+
+        return new HereDay(
+            meta,
+            chests,
+            looted is null ? null : new HashSet<string>(looted, StringComparer.OrdinalIgnoreCase),
+            killed is { } kills && kills.FetchedAt >= Resets.LastDaily(now)
+                ? new HashSet<string>(kills.Value, StringComparer.OrdinalIgnoreCase)
+                : null);
+    }
+
+    /// <summary>The newest of several kept lists, if it was read after <paramref name="since"/>.</summary>
+    private async Task<List<string>?> LatestAsync(string[] keys, DateTimeOffset since, CancellationToken ct)
+    {
+        (List<string> Value, DateTimeOffset FetchedAt)? latest = null;
+
+        foreach (var key in keys)
+            latest = Newer(latest, await snapshots.LoadAsync(key, Gw2JsonContext.Default.ListString, ct));
+
+        return latest is { } kept && kept.FetchedAt >= since ? kept.Value : null;
+    }
+
+    private static (List<string> Value, DateTimeOffset FetchedAt)? Newer((List<string> Value, DateTimeOffset FetchedAt)? one, (List<string> Value, DateTimeOffset FetchedAt)? other) =>
+        one is not { } a ? other : other is not { } b ? one : b.FetchedAt > a.FetchedAt ? other : one;
 
     private static TrackCounts? Counts(VaultTrack? track) =>
         track is null

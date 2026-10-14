@@ -1,3 +1,5 @@
+using GuildWarsCompanion.Gw2;
+
 namespace GuildWarsCompanion.Services;
 
 /// <summary>One boss appearance, as a widget line.</summary>
@@ -23,9 +25,14 @@ public sealed record TrackCounts(int MetaCurrent, int MetaComplete, int Unclaime
     public bool IsComplete => MetaComplete > 0 && MetaCurrent >= MetaComplete;
 }
 
+/// <summary>One daily objective, as a widget line: its title and how far along it is.</summary>
+/// <param name="Done">Finished, claimed or not. The line is drawn dimmed, with a tick for a count.</param>
+public sealed record TaskLine(string Title, string Progress, bool Done);
+
 /// <summary>What the Wizard's Vault widget draws.</summary>
 public sealed record VaultPanel(
-    string Daily, string Weekly, string Claim, string Reset, string? Age, bool HasClaim);
+    string Daily, string Weekly, string Claim, string Reset, string? Age, bool HasClaim,
+    IReadOnlyList<TaskLine> Tasks);
 
 /// <summary>
 /// The two home screen widgets, worked out away from Android.
@@ -85,8 +92,14 @@ public static class WidgetContent
     /// enough to matter: a widget refreshed a quarter of an hour ago saying so is noise, and
     /// one showing yesterday's dailies in silence is a lie.
     /// </param>
+    /// <param name="tasks">
+    /// The daily objectives, as read alongside the figures. Dropped when read before the last
+    /// reset: the figures can stand with an age beside them, but a list of yesterday's tasks
+    /// reads as today's to-do, and those are different tasks.
+    /// </param>
     public static VaultPanel Vault(
-        TrackCounts? daily, TrackCounts? weekly, DateTimeOffset? readAt, DateTimeOffset now)
+        TrackCounts? daily, TrackCounts? weekly, DateTimeOffset? readAt, DateTimeOffset now,
+        IReadOnlyList<VaultObjective>? tasks = null)
     {
         var claimable = (daily?.Claimable ?? 0) + (weekly?.Claimable ?? 0);
 
@@ -96,8 +109,25 @@ public static class WidgetContent
             claimable > 0 ? L.F("{0} to claim", claimable) : string.Empty,
             L.F("Resets in {0}", Until(Resets.NextDaily(now) - now)),
             readAt is { } at && now - at >= StaleAfter ? Stale.Age(at, now) : null,
-            claimable > 0);
+            claimable > 0,
+            readAt is { } read && read >= Resets.LastDaily(now) ? Tasks(tasks) : []);
     }
+
+    /// <summary>
+    /// In the vault screen's order: waiting to be claimed, then still open, furthest along
+    /// first, then claimed. A widget too short for all of them loses the claimed ones first.
+    /// </summary>
+    private static IReadOnlyList<TaskLine> Tasks(IReadOnlyList<VaultObjective>? tasks) =>
+        tasks is null
+            ? []
+            : tasks
+                .OrderByDescending(task => task.IsUnclaimedCompletion)
+                .ThenBy(task => task.Claimed)
+                .ThenByDescending(task => (double)task.ProgressCurrent / task.ProgressComplete)
+                .Select(task => task.ProgressCurrent >= task.ProgressComplete
+                    ? new TaskLine(task.Title, "✓", true)
+                    : new TaskLine(task.Title, $"{task.ProgressCurrent}/{task.ProgressComplete}", false))
+                .ToList();
 
     /// <summary>Anything older than this gets its age printed on the widget.</summary>
     private static readonly TimeSpan StaleAfter = TimeSpan.FromHours(2);

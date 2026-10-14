@@ -1,3 +1,4 @@
+using GuildWarsCompanion.Gw2;
 using GuildWarsCompanion.Services;
 using Xunit;
 
@@ -142,6 +143,40 @@ public class WidgetContentTests
         // dailies in silence is not.
         Assert.Null(fresh.Age);
         Assert.Equal("5 hours ago", old.Age);
+    }
+
+    private static VaultObjective Task(string title, int current, int complete, bool claimed = false) =>
+        new(0, title, "Daily", 10, current, complete, claimed);
+
+    [Fact]
+    public void The_daily_tasks_are_listed_waiting_then_open_then_claimed()
+    {
+        var panel = WidgetContent.Vault(null, null, Noon, Noon,
+        [
+            Task("Gather 10 resources", 10, 10, claimed: true),
+            Task("Kill 15 enemies", 3, 15),
+            Task("Complete an event", 1, 1),
+            Task("Salvage 5 items", 4, 5)
+        ]);
+
+        Assert.Equal(
+            [
+                new TaskLine("Complete an event", "✓", true),
+                new TaskLine("Salvage 5 items", "4/5", false),
+                new TaskLine("Kill 15 enemies", "3/15", false),
+                new TaskLine("Gather 10 resources", "✓", true)
+            ],
+            panel.Tasks);
+    }
+
+    [Fact]
+    public void Tasks_read_before_the_reset_are_not_shown_as_today()
+    {
+        var yesterday = WidgetContent.Vault(null, null, Noon.AddDays(-1), Noon, [Task("Kill 15 enemies", 3, 15)]);
+        var never = WidgetContent.Vault(null, null, null, Noon, [Task("Kill 15 enemies", 3, 15)]);
+
+        Assert.Empty(yesterday.Tasks);
+        Assert.Empty(never.Tasks);
     }
 
     [Fact]

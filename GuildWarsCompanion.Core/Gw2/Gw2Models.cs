@@ -212,7 +212,10 @@ public sealed record Specialization(
     [property: JsonPropertyName("minor_traits")] IReadOnlyList<int>? MinorTraits = null,
     // Nine, in tier order: three for tier one, then tier two, then tier three.
     [property: JsonPropertyName("major_traits")] IReadOnlyList<int>? MajorTraits = null,
-    [property: JsonPropertyName("background")] string? Background = null);
+    [property: JsonPropertyName("background")] string? Background = null,
+    // The profession's English id, "Mesmer", and, on an elite, its emblem in the profession's place.
+    [property: JsonPropertyName("profession")] string? Profession = null,
+    [property: JsonPropertyName("profession_icon_big")] string? ProfessionIconBig = null);
 
 /// <summary>
 /// GET /v2/backstory/answers — a character creation choice. `journal` is the one-line
@@ -256,7 +259,10 @@ public sealed record ProfessionWeapon(
 public sealed record Profession(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("icon")] string? Icon,
-    [property: JsonPropertyName("weapons")] Dictionary<string, ProfessionWeapon>? Weapons);
+    [property: JsonPropertyName("weapons")] Dictionary<string, ProfessionWeapon>? Weapons,
+    // The id is always English; the name is in the language asked for.
+    [property: JsonPropertyName("name")] string? Name = null,
+    [property: JsonPropertyName("icon_big")] string? IconBig = null);
 
 /// <summary>One skill line and the hero points put into it.</summary>
 public sealed record TrainingLine(

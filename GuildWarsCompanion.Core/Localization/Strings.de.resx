@@ -3167,4 +3167,22 @@
   <data name="The day's instabilities are not in the API, so they are not shown here." xml:space="preserve">
     <value>Die Instabilitäten des Tages stehen nicht in der API, deshalb fehlen sie hier.</value>
   </data>
+  <data name="on now" xml:space="preserve">
+    <value>läuft</value>
+  </data>
+  <data name="until {0:HH:mm} · then {1}" xml:space="preserve">
+    <value>bis {0:HH:mm} · danach {1}</value>
+  </data>
+  <data name="until {0:HH:mm} · again at {1:HH:mm}" xml:space="preserve">
+    <value>bis {0:HH:mm} · wieder um {1:HH:mm}</value>
+  </data>
+  <data name="until {0:HH:mm}" xml:space="preserve">
+    <value>bis {0:HH:mm}</value>
+  </data>
+  <data name="starts at {0:HH:mm}" xml:space="preserve">
+    <value>beginnt um {0:HH:mm}</value>
+  </data>
+  <data name="Map chest looted" xml:space="preserve">
+    <value>Kartentruhe geöffnet</value>
+  </data>
 </root>

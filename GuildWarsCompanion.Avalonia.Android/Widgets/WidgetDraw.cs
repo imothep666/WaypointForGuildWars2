@@ -40,7 +40,12 @@ internal static class WidgetDraw
             try
             {
                 using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-                return widgets.ReadAsync(timeout.Token).GetAwaiter().GetResult();
+
+                // On the pool, not here: a broadcast arrives on the main thread, which may carry the
+                // app's synchronization context, and a read that really is asynchronous - the meta
+                // timetable's file - would post its continuation back to the thread blocked waiting
+                // for it. That froze the app into an ANR on the first redraw that read the file.
+                return Task.Run(() => widgets.ReadAsync(timeout.Token), timeout.Token).GetAwaiter().GetResult();
             }
             catch (Exception)
             {
@@ -133,9 +138,41 @@ internal static class WidgetDraw
         views.SetTextViewText(R.Id.vault_age, panel.Age ?? string.Empty);
         views.SetViewVisibility(R.Id.vault_age, panel.Age is null ? ViewStates.Gone : ViewStates.Visible);
 
+        (int Row, int Title, int Count)[] tasks =
+        [
+            (R.Id.vault_task_one, R.Id.vault_task_one_title, R.Id.vault_task_one_count),
+            (R.Id.vault_task_two, R.Id.vault_task_two_title, R.Id.vault_task_two_count),
+            (R.Id.vault_task_three, R.Id.vault_task_three_title, R.Id.vault_task_three_count),
+            (R.Id.vault_task_four, R.Id.vault_task_four_title, R.Id.vault_task_four_count),
+            (R.Id.vault_task_five, R.Id.vault_task_five_title, R.Id.vault_task_five_count),
+            (R.Id.vault_task_six, R.Id.vault_task_six_title, R.Id.vault_task_six_count)
+        ];
+
+        for (var i = 0; i < tasks.Length; i++)
+        {
+            var (row, title, count) = tasks[i];
+            var task = i < panel.Tasks.Count ? panel.Tasks[i] : null;
+
+            views.SetViewVisibility(row, task is null ? ViewStates.Gone : ViewStates.Visible);
+            if (task is null) continue;
+
+            // Done reads as done: the title steps back to the muted grey, the count becomes a
+            // tick in the vault's own astral.
+            views.SetTextViewText(title, task.Title);
+            views.SetTextColor(title, task.Done ? Mist : Vellum);
+            views.SetTextViewText(count, task.Progress);
+            views.SetTextColor(count, task.Done ? Astral : Mist);
+        }
+
         OpenApp(context, views, R.Id.vault_root);
         return views;
     }
+
+    // The widget palette, Resources/values/widget_colors.xml, for lines coloured from code.
+    private static readonly Color Vellum = new(0xE6, 0xDE, 0xCB);
+    private static readonly Color Mist = new(0x7E, 0x8B, 0x9B);
+    private static readonly Color Astral = new(0x46, 0xB7, 0xAE);
+    private static readonly Color Brass = new(0xC8, 0xA3, 0x4E);
 
     public static RemoteViews Here(Context context, HerePanel panel)
     {
@@ -150,14 +187,42 @@ internal static class WidgetDraw
         views.SetImageViewBitmap(R.Id.here_map, Carved(context, panel.Map, 17));
         views.SetTextViewText(R.Id.here_who, panel.Who);
 
+        var emblem = HostServices.Get<Callings>()?.Held(panel.Emblem) is { } file ? BitmapFactory.DecodeFile(file) : null;
+
+        if (emblem is not null) views.SetImageViewBitmap(R.Id.here_emblem, emblem);
+        views.SetViewVisibility(R.Id.here_emblem, emblem is null ? ViewStates.Gone : ViewStates.Visible);
+
+        views.SetViewVisibility(R.Id.here_meta, panel.Meta is null ? ViewStates.Gone : ViewStates.Visible);
+
+        if (panel.Meta is { } meta)
+        {
+            views.SetTextViewText(R.Id.here_meta_name, meta.Name);
+            views.SetTextViewText(R.Id.here_meta_note, meta.Note);
+            views.SetTextViewText(R.Id.here_meta_on, L.T("on now"));
+
+            // Counted as the boss widget counts: on the elapsed-realtime clock, by the launcher.
+            var untilMs = meta.StartsAt is { } start ? (long)(start - DateTimeOffset.UtcNow).TotalMilliseconds : 0;
+            views.SetChronometer(R.Id.here_meta_countdown, SystemClock.ElapsedRealtime() + untilMs, null, !meta.IsOn);
+            views.SetChronometerCountDown(R.Id.here_meta_countdown, true);
+
+            views.SetViewVisibility(R.Id.here_meta_countdown, meta.IsOn ? ViewStates.Gone : ViewStates.Visible);
+            views.SetViewVisibility(R.Id.here_meta_on, meta.IsOn ? ViewStates.Visible : ViewStates.Gone);
+        }
+
         int[] lines = [R.Id.here_one, R.Id.here_two, R.Id.here_three];
 
         for (var i = 0; i < lines.Length; i++)
         {
-            var text = i < panel.Lines.Count ? panel.Lines[i] : null;
+            var fact = i < panel.Lines.Count ? panel.Lines[i] : null;
 
-            views.SetTextViewText(lines[i], text ?? string.Empty);
-            views.SetViewVisibility(lines[i], text is null ? ViewStates.Gone : ViewStates.Visible);
+            views.SetTextViewText(lines[i], fact?.Text ?? string.Empty);
+            views.SetTextColor(lines[i], fact?.Tone switch
+            {
+                HereTone.Waiting => Brass,
+                HereTone.Done => Mist,
+                _ => Vellum
+            });
+            views.SetViewVisibility(lines[i], fact is null ? ViewStates.Gone : ViewStates.Visible);
         }
 
         OpenApp(context, views, R.Id.here_root);

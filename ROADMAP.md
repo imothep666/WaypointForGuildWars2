@@ -54,6 +54,10 @@ Nothing small is waiting just now; what is left needs the game or a device (belo
   `/characters/:id/core`'s `age`. If it rises while playing, Today says "This session · … so far";
   if it only moves at logout, a session appears in one step after it, which the recap handles but
   the "playing now" wording never gets to show. Only a real evening settles which.
+- **The Here widget's calling, chest and boss lines.** The meta line is seen on the phone; the
+  rest needs a play session. The stored reading predates the calling, and Desert Highlands, where
+  it was taken, has neither a hero's choice chest nor a world boss. The test plan has
+  `here-calling`, `here-chest` and `here-boss`.
 
 ### Paused
 
@@ -65,6 +69,34 @@ Nothing small is waiting just now; what is left needs the game or a device (belo
 ---
 
 ## Done
+
+### On the phone, 2026-10-14: the widgets fill their space
+
+- **The Wizard's Vault widget lists today's dailies**, each with its count, in the vault screen's
+  order: waiting to be claimed, then open, furthest along first, then claimed. A finished one is
+  greyed with a tick. The widget already kept the whole daily track, so this costs no request. A
+  list read before the last reset is dropped: the figures can stand with their age beside them,
+  but yesterday's tasks would read as today's. The widget asks for 4x3 now. A shorter one loses
+  tasks from the bottom, claimed ones first, and keeps the figures and the reset clock. Seen on the
+  phone: five German dailies, one open at 0/1 and four ticked.
+- **The Here widget says what is true of the map, not of the moment.** Its main line is the map's
+  meta from the kept timetable (`MetaSource.HeldAsync`, never fetched on a draw): a countdown the
+  launcher ticks, or "on now" with until when and what follows, or "again at" for a map that
+  repeats one meta, as Desert Highlands does. Under it the map chest and the map's world bosses,
+  waiting in brass and done in grey, from whichever of Today's and the widget's lists was read
+  later. The poll now keeps the map chest lists too. All of it is worked out on each draw, so it
+  still holds hours after the game closed, and a part not read since the reset is left out. The
+  reading keeps the map id for the bosses. Hero points are not on it: the endpoint has answered
+  [] since End of Dragons.
+- **The Here widget names the calling.** MumbleLink gives the profession and the third
+  specialization as numbers; `Callings` asks the API for the elite's name in the phone's language,
+  or the profession's without one, and keeps the white emblem as a file for the widget. While
+  playing the line reads "name · Chronomancer"; last seen, the emblem stays and the line keeps
+  its age.
+- **The SignalR client is past GHSA-334f-vvp4-7g6p.** `Microsoft.AspNetCore.SignalR.Common` 10.0.0
+  to 10.0.12 carry a high-severity denial of service (CVE-2026-70159). The client went to 10.0.13
+  and the DI packages followed, or restore fails with NU1605. The bridge gets its ASP.NET Core
+  from the runtime, which is 10.0.13 here.
 
 ### Confirmed, 2026-10-13: the game, the vault and the Switch
 
@@ -2048,6 +2080,12 @@ splits in two: `RefreshAsync` talks to the API from a WorkManager job every 15 m
 the bosses actually keep — and `ReadAsync` only ever reads the store. Its keys are its own
 (`widget/…`) rather than the screens', because the screens' snapshots are written when somebody
 opens a page and these are written whether the app is opened or not.
+
+**And the read runs on the pool.** A broadcast arrives on the main thread, and `WidgetDraw` waits
+for `ReadAsync` there. That held while every read finished synchronously. The Here widget's
+first read of the meta timetable's file did not: it posted its continuation back to the blocked
+thread, the redraw never finished, and Android reported an ANR with all three widgets blank.
+`Task.Run` takes the read off that thread.
 
 That job is separate from the alerts poll on purpose: someone can want a widget without wanting
 notifications, and switching reminders off must not silently freeze their home screen. A one-shot

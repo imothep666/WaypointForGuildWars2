@@ -55,6 +55,25 @@ public sealed class MetaSource(AppEnvironment environment)
         return _maps;
     }
 
+    /// <summary>
+    /// The timetable as kept, never fetched: for the Here widget, which is drawn when the launcher
+    /// asks and must not wait on the wiki. Empty when no copy has been kept yet.
+    /// </summary>
+    public async Task<IReadOnlyList<MetaMap>> HeldAsync(CancellationToken ct = default)
+    {
+        if (_maps is not null) return _maps;
+        if (!File.Exists(FilePath)) return [];
+
+        try
+        {
+            return MetaSchedule.Parse(await File.ReadAllTextAsync(FilePath, ct));
+        }
+        catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException or IOException)
+        {
+            return [];
+        }
+    }
+
     private async Task DownloadAsync(CancellationToken ct)
     {
         try

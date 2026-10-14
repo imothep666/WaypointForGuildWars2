@@ -6,19 +6,56 @@ namespace GuildWarsCompanion.Services;
 /// the game - by Today when it is opened, and by the widget's own poll - and never cleared when
 /// the game closes, so the widget can say where they were last.
 /// </summary>
-/// <param name="English">The map's English name, which the wiki files its loading screen under;
-/// null in a reading stored before the widget showed the painting.</param>
-public sealed record HereReading(string Character, string? Map, string? Line, string? English = null);
+/// <param name="English">The map's English name, which the wiki files its loading screen and meta
+/// timetable under, and the map chest's id is made from; null in a reading stored before the
+/// widget showed the painting.</param>
+/// <param name="MapId">The map's id, which places its world bosses; 0 in an older reading.</param>
+/// <param name="Calling">"Chronomancer", or the profession without an elite; null until the API
+/// has named it.</param>
+/// <param name="Emblem">The key <see cref="Callings"/> keeps the calling's emblem under.</param>
+public sealed record HereReading(
+    string Character, string? Map, string? Line, string? English = null,
+    int MapId = 0, string? Calling = null, string? Emblem = null);
+
+/// <summary>
+/// What is true of today, read each time the widget is drawn rather than kept in the reading:
+/// a map's meta, chest and bosses are about the map, not about when someone stood in it, so they
+/// are as true an evening later as they were then. Each part is null when it was not read since
+/// the last reset, and is then left out rather than guessed.
+/// </summary>
+/// <param name="Meta">The reading's map in the wiki's meta timetable.</param>
+/// <param name="Chests">Every map chest id the API knows.</param>
+/// <param name="ChestsLooted">The chests looted since the reset.</param>
+/// <param name="BossesKilled">The world bosses killed since the reset.</param>
+public sealed record HereDay(
+    MetaMap? Meta, IReadOnlyList<string>? Chests, IReadOnlySet<string>? ChestsLooted,
+    IReadOnlySet<string>? BossesKilled);
+
+/// <summary>How a fact line is coloured: brass for something waiting to be taken, grey for done.</summary>
+public enum HereTone { Plain, Waiting, Done }
+
+public sealed record HereFact(string Text, HereTone Tone = HereTone.Plain);
+
+/// <summary>The map's meta, as the widget's main line says it.</summary>
+/// <param name="StartsAt">When it starts, for the launcher to count down to; null while it is on.</param>
+/// <param name="Note">The line under it: when it starts, or until when it runs and what follows.</param>
+public sealed record HereMetaLine(string Name, DateTimeOffset? StartsAt, string Note)
+{
+    public bool IsOn => StartsAt is null;
+}
 
 /// <summary>What the Here widget draws.</summary>
 /// <param name="Map">The heading: the map, or what to do to get one.</param>
 /// <param name="Who">Who is there, or when they were last.</param>
-/// <param name="Lines">What is left on the map, one fact a line, at most three; empty when the
-/// reading is too old to be about now.</param>
+/// <param name="Lines">What is left on the map, one fact a line, at most three.</param>
 /// <param name="IsLive">Whether the reading is recent enough to be about now.</param>
 /// <param name="Art">The map whose loading screen goes behind it, by English name; null for none.
 /// Kept when the reading is old: it is still the place they were last.</param>
-public sealed record HerePanel(string Map, string Who, IReadOnlyList<string> Lines, bool IsLive, string? Art = null);
+/// <param name="Meta">The map's meta, on now or next; null for a map without one.</param>
+/// <param name="Emblem">The calling's emblem key, for <see cref="Callings.Held"/>.</param>
+public sealed record HerePanel(
+    string Map, string Who, IReadOnlyList<HereFact> Lines, bool IsLive, string? Art = null,
+    HereMetaLine? Meta = null, string? Emblem = null);
 
 public static class HereWidget
 {
@@ -31,11 +68,16 @@ public static class HereWidget
     private const int MostLines = 3;
 
     /// <summary>
-    /// The panel for a stored reading. What is left on a map is only said while the reading is
-    /// live: its boss times and its "map chest waiting" were about then, and a widget repeating
-    /// them an evening later would be stating old news as today's.
+    /// The panel for a stored reading, and what is true of its map today.
+    ///
+    /// With <paramref name="day"/> the map's meta, chest and bosses are worked out now, from the
+    /// timetable and today's lists, so they hold however old the reading is. Without it - a reading
+    /// stored before the widget knew the map's English name, or a cold draw with no services -
+    /// only the reading's own line is said, and only while it is live: its boss times and its
+    /// "map chest waiting" were about then, and a widget repeating them an evening later would be
+    /// stating old news as today's.
     /// </summary>
-    public static HerePanel Panel(HereReading? reading, DateTimeOffset? readAt, DateTimeOffset now)
+    public static HerePanel Panel(HereReading? reading, DateTimeOffset? readAt, DateTimeOffset now, HereDay? day = null)
     {
         if (reading is null || readAt is not { } at)
             return new HerePanel(L.T("Not in the game"), L.T("Play with the bridge running on your PC"), [], false);
@@ -44,10 +86,79 @@ public static class HereWidget
 
         var art = reading.English is { Length: > 0 } english ? english : null;
 
-        if (now - at > LiveFor)
-            return new HerePanel(map, L.F("{0} · last seen {1}", reading.Character, Stale.Age(at, now)), [], false, art);
+        var live = now - at <= LiveFor;
 
-        return new HerePanel(map, reading.Character, Facts(reading.Line), true, art);
+        // The calling only while live: last seen, the line has the age to say, and the emblem
+        // beside it still says what they were playing.
+        var who = !live
+            ? L.F("{0} · last seen {1}", reading.Character, Stale.Age(at, now))
+            : reading.Calling is { Length: > 0 } calling
+                ? $"{reading.Character} · {calling}"
+                : reading.Character;
+
+        if (day is null || art is null)
+        {
+            var facts = live ? Facts(reading.Line).Select(fact => new HereFact(fact)).ToList() : [];
+
+            return new HerePanel(map, who, facts, live, art, null, reading.Emblem);
+        }
+
+        return new HerePanel(map, who, Today(reading, art, day, now), live, art, Meta(day.Meta, now), reading.Emblem);
+    }
+
+    /// <summary>The map's meta on now, or the next to start.</summary>
+    public static HereMetaLine? Meta(MetaMap? map, DateTimeOffset now)
+    {
+        if (map is null) return null;
+
+        var next = MetaSchedule.Next(map, now);
+
+        if (MetaSchedule.Current(map, now) is { } on)
+        {
+            var until = on.End.ToLocalTime();
+
+            // A map that runs one meta over and over - Desert Highlands' Buried Treasure - says when
+            // it comes round again, rather than naming the same event twice.
+            return new HereMetaLine(on.Name, null, next switch
+            {
+                { } again when again.Name == on.Name => L.F("until {0:HH:mm} · again at {1:HH:mm}", until, again.Start.ToLocalTime()),
+                { } then => L.F("until {0:HH:mm} · then {1}", until, then.Name),
+                null => L.F("until {0:HH:mm}", until)
+            });
+        }
+
+        return next is { } coming
+            ? new HereMetaLine(coming.Name, coming.Start, L.F("starts at {0:HH:mm}", coming.Start.ToLocalTime()))
+            : null;
+    }
+
+    /// <summary>
+    /// The map chest, then the map's world bosses by their next appearance. A boss killed today
+    /// says so, rather than dropping out, so a map whose bosses are all done does not look like
+    /// a map that has none.
+    /// </summary>
+    private static List<HereFact> Today(HereReading reading, string english, HereDay day, DateTimeOffset now)
+    {
+        var facts = new List<HereFact>();
+
+        if (day is { Chests: { } chests, ChestsLooted: { } looted } && HereLine.ChestFor(english, chests) is { } chest)
+            facts.Add(looted.Contains(chest)
+                ? new HereFact(L.T("Map chest looted"), HereTone.Done)
+                : new HereFact(L.T("Map chest waiting"), HereTone.Waiting));
+
+        if (reading.MapId > 0)
+        {
+            var bosses = EventSchedule.NextAppearances(now)
+                .Where(boss => BossMaps.For(boss.Location) == reading.MapId)
+                .OrderBy(boss => boss.Next);
+
+            foreach (var boss in bosses)
+                facts.Add(day.BossesKilled?.Contains(boss.ApiId) == true
+                    ? new HereFact(L.F("{0} · done today", boss.Name), HereTone.Done)
+                    : new HereFact(L.F("{0} at {1:HH:mm}", boss.Name, boss.Next.ToLocalTime())));
+        }
+
+        return facts.Take(MostLines).ToList();
     }
 
     /// <summary>"Here: map chest waiting · Shadow Behemoth in 25 min" as one fact a line, the way

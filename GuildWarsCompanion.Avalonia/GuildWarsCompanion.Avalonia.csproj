@@ -36,7 +36,7 @@
              Controls/DrawableView. -->
         <PackageReference Include="Avalonia.Skia" Version="12.1.2" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.13" />
         <!-- Decodes tiles and icons into the IImage the map and compass draw. Skia, because
              Avalonia already renders with it. -->
         <PackageReference Include="Microsoft.Maui.Graphics.Skia" Version="10.0.20" />
