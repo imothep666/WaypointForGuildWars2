@@ -75,8 +75,22 @@ public sealed partial class WatchViewModel(WatchService watches, TestEvidence ev
     public ObservableCollection<WatchRow> Watches { get; } = [];
     public ObservableCollection<WatchCandidate> Results { get; } = [];
 
+    /// <summary>Watches whose price has arrived.</summary>
+    public int Met => Watches.Count(watch => watch.IsMet);
+
+    public string MetLabel => Watches.Count == 1
+        ? L.T("of 1 watched price reached")
+        : L.F("of {0} watched prices reached", Watches.Count);
+
     protected override string DefaultEmptyMessage =>
         L.T("No watches yet. Find an item below and name the price you are waiting for.");
+
+    private void CountWatches()
+    {
+        HasNoWatches = Watches.Count == 0;
+        OnPropertyChanged(nameof(Met));
+        OnPropertyChanged(nameof(MetLabel));
+    }
 
     [RelayCommand]
     public Task RefreshAsync() => RunAsync(async ct =>
@@ -87,7 +101,7 @@ public sealed partial class WatchViewModel(WatchService watches, TestEvidence ev
         foreach (var row in await watches.ListAsync(ct))
             Watches.Add(row);
 
-        HasNoWatches = Watches.Count == 0;
+        CountWatches();
     });
 
     /// <summary>
@@ -163,7 +177,7 @@ public sealed partial class WatchViewModel(WatchService watches, TestEvidence ev
             if (Watches.All(w => w.Id != row.Id))
                 Watches.Add(row);
 
-        HasNoWatches = Watches.Count == 0;
+        CountWatches();
         Notice = L.T("Watching. You will be told when the price gets there.");
     });
 
@@ -177,6 +191,6 @@ public sealed partial class WatchViewModel(WatchService watches, TestEvidence ev
             foreach (var existing in Watches.Where(w => w.Id == row.Id).ToList())
                 Watches.Remove(existing);
 
-            HasNoWatches = Watches.Count == 0;
+            CountWatches();
         });
 }

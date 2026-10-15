@@ -10,142 +10,159 @@
                 ShowsWash="True">
 
 
-    <RefreshContainer RefreshRequested="OnPullRefresh">
-        <ScrollViewer>
-            <StackPanel>
-                <controls:AreaTabStrip Area="account" Current="wallet" />
+    <!-- The masthead and the tabs stay where they are; only the page below them scrolls, so
+         the way to the area's other pages is never scrolled away. -->
+    <Grid RowDefinitions="Auto,Auto,*">
+        <!-- Coin first, in its three metals at headline size, on the gold wash: the number a
+             player actually came for. A fortune too wide for the screen is drawn smaller rather
+             than cut off. -->
+        <Border Classes="masthead">
+            <Viewbox StretchDirection="DownOnly" HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                     IsVisible="{Binding HasCoin}" Margin="0,0,0,2">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <TextBlock Text="{Binding Coin.Gold}" FontFamily="{StaticResource BarlowSemiBold}"
+                               FontSize="54" Foreground="{StaticResource MetalGoldBrush}" />
+                    <TextBlock Text="g" FontSize="18" Foreground="{StaticResource MetalGoldBrush}"
+                               VerticalAlignment="Bottom" Margin="-9,0,0,11" />
+                    <TextBlock Text="{Binding Coin.Silver}" FontFamily="{StaticResource BarlowSemiBold}"
+                               FontSize="54" Foreground="{StaticResource MetalSilverBrush}" />
+                    <TextBlock Text="s" FontSize="18" Foreground="{StaticResource MetalSilverBrush}"
+                               VerticalAlignment="Bottom" Margin="-9,0,0,11" />
+                    <TextBlock Text="{Binding Coin.Copper}" FontFamily="{StaticResource BarlowSemiBold}"
+                               FontSize="54" Foreground="{StaticResource MetalCopperBrush}" />
+                    <TextBlock Text="c" FontSize="18" Foreground="{StaticResource MetalCopperBrush}"
+                               VerticalAlignment="Bottom" Margin="-9,0,0,11" />
+                </StackPanel>
+            </Viewbox>
+        </Border>
 
-                <StackPanel Margin="20,10,20,0" Spacing="12">
-                    <!-- Coin first, in its three metals at headline size, on the gold wash: the number a
-                         player actually came for. -->
-                    <StackPanel Orientation="Horizontal" Spacing="12" IsVisible="{Binding HasCoin}" Margin="0,4,0,6">
-                        <TextBlock Text="{Binding Coin.Gold}" FontFamily="{StaticResource BarlowSemiBold}"
-                                   FontSize="54" Foreground="{StaticResource MetalGoldBrush}" />
-                        <TextBlock Text="g" FontSize="18" Foreground="{StaticResource MetalGoldBrush}"
-                                   VerticalAlignment="Bottom" Margin="-9,0,0,11" />
-                        <TextBlock Text="{Binding Coin.Silver}" FontFamily="{StaticResource BarlowSemiBold}"
-                                   FontSize="54" Foreground="{StaticResource MetalSilverBrush}" />
-                        <TextBlock Text="s" FontSize="18" Foreground="{StaticResource MetalSilverBrush}"
-                                   VerticalAlignment="Bottom" Margin="-9,0,0,11" />
-                        <TextBlock Text="{Binding Coin.Copper}" FontFamily="{StaticResource BarlowSemiBold}"
-                                   FontSize="54" Foreground="{StaticResource MetalCopperBrush}" />
-                        <TextBlock Text="c" FontSize="18" Foreground="{StaticResource MetalCopperBrush}"
-                                   VerticalAlignment="Bottom" Margin="-9,0,0,11" />
+        <controls:AreaTabStrip Grid.Row="1" Area="account" Current="wallet" />
+
+        <RefreshContainer Grid.Row="2" RefreshRequested="OnPullRefresh">
+            <ScrollViewer>
+                <StackPanel>
+                    <StackPanel Margin="20,14,20,0" Spacing="12">
+                        <!-- One number for the whole account. Asked for rather than done on arrival:
+                             reading every character's bags is the expensive half, and a wallet that took
+                             ten seconds to show coin would be a worse wallet. -->
+                        <!-- A row that says what its button does, rather than a box around a lone
+                             button; what it finds opens out beneath. -->
+                        <Grid ColumnDefinitions="4,*">
+                            <Border Background="{StaticResource BrassDimBrush}" />
+                            <StackPanel Grid.Column="1" Spacing="10" Margin="16,10,0,10">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <StackPanel Spacing="2" VerticalAlignment="Center">
+                                        <TextBlock Text="{ui:T 'Net worth'}" />
+                                        <TextBlock Text="{ui:T 'Every character, the bank and storage, at today\'s prices'}"
+                                                   Classes="caption small" />
+                                    </StackPanel>
+                                    <Button Grid.Column="1" Content="{ui:T 'ADD UP'}" Command="{Binding CountCommand}"
+                                            IsVisible="{Binding CanCount}" Classes="quiet" Padding="14,9"
+                                            Margin="12,0,0,0" VerticalAlignment="Center" />
+                                </Grid>
+                                <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsCounting}" />
+
+                                <!-- The same three metals as the coin at the top, a size down: one
+                                     flat gold figure read as a different kind of number entirely. -->
+                                <StackPanel Orientation="Horizontal" Spacing="9" IsVisible="{Binding HasWorth}">
+                                    <TextBlock Text="{Binding WorthTotal.Gold}" FontFamily="{StaticResource BarlowSemiBold}"
+                                               FontSize="26" Foreground="{StaticResource MetalGoldBrush}" />
+                                    <TextBlock Text="g" FontSize="13" Foreground="{StaticResource MetalGoldBrush}"
+                                               VerticalAlignment="Bottom" Margin="-6,0,0,5" />
+                                    <TextBlock Text="{Binding WorthTotal.Silver}" FontFamily="{StaticResource BarlowSemiBold}"
+                                               FontSize="26" Foreground="{StaticResource MetalSilverBrush}" />
+                                    <TextBlock Text="s" FontSize="13" Foreground="{StaticResource MetalSilverBrush}"
+                                               VerticalAlignment="Bottom" Margin="-6,0,0,5" />
+                                    <TextBlock Text="{Binding WorthTotal.Copper}" FontFamily="{StaticResource BarlowSemiBold}"
+                                               FontSize="26" Foreground="{StaticResource MetalCopperBrush}" />
+                                    <TextBlock Text="c" FontSize="13" Foreground="{StaticResource MetalCopperBrush}"
+                                               VerticalAlignment="Bottom" Margin="-6,0,0,5" />
+                                </StackPanel>
+
+                                <!-- Where the money actually is, largest first. -->
+                                <ItemsControl ItemsSource="{Binding WorthParts}" IsVisible="{Binding HasWorth}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="services:WorthRow">
+                                            <Grid ColumnDefinitions="*,Auto,44" RowDefinitions="Auto,Auto"
+                                                  Margin="0,6,0,2">
+                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="1" Text="{Binding ValueText}" Classes="figure"
+                                                           FontSize="14" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="2" Text="{Binding ShareText}" Classes="caption small"
+                                                           HorizontalAlignment="Right"
+                                                           VerticalAlignment="Center" />
+                                                <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Text="{Binding Where}"
+                                                           Classes="caption small" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <TextBlock Text="{Binding WorthCaveat}" IsVisible="{Binding HasWorth}"
+                                           Classes="caption small" Margin="0,8,0,0" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- The exchange quotes a trade rather than a rate, and quotes a small one
+                             worse — so this asks about the coin actually in the wallet. -->
+                        <Grid ColumnDefinitions="4,*">
+                            <Border Background="{StaticResource BrassDimBrush}" />
+                            <StackPanel Grid.Column="1" Spacing="8" Margin="16,10,0,10">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <StackPanel Spacing="2" VerticalAlignment="Center">
+                                        <TextBlock Text="{ui:T 'Gems'}" />
+                                        <TextBlock Text="{ui:T 'What your coin buys at today\'s exchange'}" Classes="caption small" />
+                                    </StackPanel>
+                                    <Button Grid.Column="1" Content="{ui:T 'ASK'}" Command="{Binding QuoteGemsCommand}"
+                                            IsVisible="{Binding CanQuote}" Classes="quiet" Padding="14,9"
+                                            Margin="12,0,0,0" VerticalAlignment="Center" />
+                                </Grid>
+                                <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsQuoting}" />
+                                <TextBlock Text="{Binding GemBuys}" IsVisible="{Binding HasGems}" Classes="figure"
+                                           Foreground="{StaticResource BrassBrush}" TextWrapping="Wrap" />
+                                <!-- The number the game never shows: what comes back the other way. -->
+                                <TextBlock Text="{Binding GemSellsBack}" IsVisible="{Binding HasSellBack}"
+                                           Classes="caption" />
+                                <!-- Absent until a quote is asked for; an empty line here was a gap under the button. -->
+                                <TextBlock Text="{Binding GemNote}" Classes="caption small" Margin="0,4,0,0"
+                                           IsVisible="{Binding GemNote, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption"
+                                   Margin="0,12,0,0" />
+                        <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
                     </StackPanel>
 
-                    <!-- One number for the whole account. Asked for rather than done on arrival:
-                         reading every character's bags is the expensive half, and a wallet that took
-                         ten seconds to show coin would be a worse wallet. -->
-                    <!-- A row that says what its button does, rather than a box around a lone
-                         button; what it finds opens out beneath. -->
-                    <Grid ColumnDefinitions="4,*">
-                        <Border Background="{StaticResource BrassDimBrush}" />
-                        <StackPanel Grid.Column="1" Spacing="10" Margin="16,10,0,10">
-                            <Grid ColumnDefinitions="*,Auto">
-                                <StackPanel Spacing="2" VerticalAlignment="Center">
-                                    <TextBlock Text="{ui:T 'Net worth'}" />
-                                    <TextBlock Text="{ui:T 'Every character, the bank and storage, at today\'s prices'}"
-                                               Classes="caption small" />
-                                </StackPanel>
-                                <Button Grid.Column="1" Content="{ui:T 'ADD UP'}" Command="{Binding CountCommand}"
-                                        IsVisible="{Binding CanCount}" Classes="quiet" Padding="14,9"
-                                        Margin="12,0,0,0" VerticalAlignment="Center" />
-                            </Grid>
-                            <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsCounting}" />
+                    <!-- Not a second copy of the notice above, which the empty message falls back to. -->
+                    <TextBlock Text="{Binding EmptyMessage}" Classes="caption" TextWrapping="Wrap"
+                               HorizontalAlignment="Center" Margin="20,32">
+                        <TextBlock.IsVisible>
+                            <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                <Binding Path="Currencies.Count" Converter="{x:Static ui:Counts.IsZero}" />
+                                <Binding Path="!HasNotice" />
+                            </MultiBinding>
+                        </TextBlock.IsVisible>
+                    </TextBlock>
 
-                            <!-- The same three metals as the coin card above, a size down: one
-                                 flat gold figure read as a different kind of number entirely. -->
-                            <StackPanel Orientation="Horizontal" Spacing="9" IsVisible="{Binding HasWorth}">
-                                <TextBlock Text="{Binding WorthTotal.Gold}" FontFamily="{StaticResource BarlowSemiBold}"
-                                           FontSize="26" Foreground="{StaticResource MetalGoldBrush}" />
-                                <TextBlock Text="g" FontSize="13" Foreground="{StaticResource MetalGoldBrush}"
-                                           VerticalAlignment="Bottom" Margin="-6,0,0,5" />
-                                <TextBlock Text="{Binding WorthTotal.Silver}" FontFamily="{StaticResource BarlowSemiBold}"
-                                           FontSize="26" Foreground="{StaticResource MetalSilverBrush}" />
-                                <TextBlock Text="s" FontSize="13" Foreground="{StaticResource MetalSilverBrush}"
-                                           VerticalAlignment="Bottom" Margin="-6,0,0,5" />
-                                <TextBlock Text="{Binding WorthTotal.Copper}" FontFamily="{StaticResource BarlowSemiBold}"
-                                           FontSize="26" Foreground="{StaticResource MetalCopperBrush}" />
-                                <TextBlock Text="c" FontSize="13" Foreground="{StaticResource MetalCopperBrush}"
-                                           VerticalAlignment="Bottom" Margin="-6,0,0,5" />
-                            </StackPanel>
-
-                            <!-- Where the money actually is, largest first. -->
-                            <ItemsControl ItemsSource="{Binding WorthParts}" IsVisible="{Binding HasWorth}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="services:WorthRow">
-                                        <Grid ColumnDefinitions="*,Auto,44" RowDefinitions="Auto,Auto"
-                                              Margin="0,6,0,2">
-                                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
-                                            <TextBlock Grid.Column="1" Text="{Binding ValueText}" Classes="figure"
-                                                       FontSize="14" VerticalAlignment="Center" />
-                                            <TextBlock Grid.Column="2" Text="{Binding ShareText}" Classes="caption small"
-                                                       HorizontalAlignment="Right"
-                                                       VerticalAlignment="Center" />
-                                            <TextBlock Grid.Row="1" Grid.ColumnSpan="3" Text="{Binding Where}"
-                                                       Classes="caption small" />
-                                        </Grid>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-
-                            <TextBlock Text="{Binding WorthCaveat}" IsVisible="{Binding HasWorth}"
-                                       Classes="caption small" Margin="0,8,0,0" />
-                        </StackPanel>
-                    </Grid>
-
-                    <!-- The exchange quotes a trade rather than a rate, and quotes a small one
-                         worse — so this asks about the coin actually in the wallet. -->
-                    <Grid ColumnDefinitions="4,*">
-                        <Border Background="{StaticResource BrassDimBrush}" />
-                        <StackPanel Grid.Column="1" Spacing="8" Margin="16,10,0,10">
-                            <Grid ColumnDefinitions="*,Auto">
-                                <StackPanel Spacing="2" VerticalAlignment="Center">
-                                    <TextBlock Text="{ui:T 'Gems'}" />
-                                    <TextBlock Text="{ui:T 'What your coin buys at today\'s exchange'}" Classes="caption small" />
-                                </StackPanel>
-                                <Button Grid.Column="1" Content="{ui:T 'ASK'}" Command="{Binding QuoteGemsCommand}"
-                                        IsVisible="{Binding CanQuote}" Classes="quiet" Padding="14,9"
-                                        Margin="12,0,0,0" VerticalAlignment="Center" />
-                            </Grid>
-                            <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsQuoting}" />
-                            <TextBlock Text="{Binding GemBuys}" IsVisible="{Binding HasGems}" Classes="figure"
-                                       Foreground="{StaticResource BrassBrush}" TextWrapping="Wrap" />
-                            <!-- The number the game never shows: what comes back the other way. -->
-                            <TextBlock Text="{Binding GemSellsBack}" IsVisible="{Binding HasSellBack}"
-                                       Classes="caption" />
-                            <!-- Absent until a quote is asked for; an empty line here was a gap under the button. -->
-                            <TextBlock Text="{Binding GemNote}" Classes="caption small" Margin="0,4,0,0"
-                                       IsVisible="{Binding GemNote, Converter={x:Static ObjectConverters.IsNotNull}}" />
-                        </StackPanel>
-                    </Grid>
-
-                    <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption"
-                               Margin="0,12,0,0" />
-                    <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
-                </StackPanel>
-
-                <TextBlock Text="{Binding EmptyMessage}" Classes="caption"
-                           IsVisible="{Binding Currencies.Count, Converter={x:Static ui:Counts.IsZero}}"
-                           HorizontalAlignment="Center" Margin="0,32" />
-
-                <ItemsControl ItemsSource="{Binding Currencies}" Margin="0,14,0,0">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="services:WalletRow">
-                            <StackPanel>
-                                <Grid ColumnDefinitions="34,14,*,Auto" Margin="20,11">
-                                    <Image ui:WebImage.Url="{Binding IconUrl}" Width="28" Height="28"
-                                           VerticalAlignment="Center" />
-                                    <TextBlock Grid.Column="2" Text="{Binding Name}" VerticalAlignment="Center" />
-                                    <TextBlock Grid.Column="3" Text="{Binding Amount}" Classes="figure"
+                    <ItemsControl ItemsSource="{Binding Currencies}" Margin="0,14,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:WalletRow">
+                                <StackPanel>
+                                    <Grid ColumnDefinitions="34,14,*,Auto" Margin="20,11">
+                                        <Image ui:WebImage.Url="{Binding IconUrl}" Width="28" Height="28"
                                                VerticalAlignment="Center" />
-                                </Grid>
-                                <Border Classes="hairline" Margin="20,0" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
-        </ScrollViewer>
-    </RefreshContainer>
+                                        <TextBlock Grid.Column="2" Text="{Binding Name}" VerticalAlignment="Center" />
+                                        <TextBlock Grid.Column="3" Text="{Binding Amount}" Classes="figure"
+                                                   VerticalAlignment="Center" />
+                                    </Grid>
+                                    <Border Classes="hairline" Margin="20,0" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </ScrollViewer>
+        </RefreshContainer>
+    </Grid>
 </shell:PageView>

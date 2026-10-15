@@ -5,7 +5,7 @@ namespace GuildWarsCompanion.Services;
 /// <summary>What the account is, as opposed to what it owns.</summary>
 public sealed record StandingView(
     IReadOnlyList<StandingRow> Rows, string Note, bool HasAny,
-    IReadOnlyList<Owned> Expansions, string OwnedSummary);
+    IReadOnlyList<Owned> Expansions, string OwnedSummary, int? MagicFind = null);
 
 /// <summary>
 /// Account-wide standing: luck, fractal level, WvW rank, mastery points.
@@ -19,6 +19,7 @@ public sealed class StandingService(Gw2Client client, ApiKeySession session, Off
     public async Task<StandingView> GetAsync(CancellationToken ct = default)
     {
         var rows = new List<StandingRow>();
+        int? magicFind = null;
 
         var account = (await offline.ReadAsync(
             "account", Gw2JsonContext.Default.Account, client.GetAccountAsync, ct)).Value;
@@ -37,7 +38,9 @@ public sealed class StandingService(Gw2Client client, ApiKeySession session, Off
                     "account/luck", Gw2JsonContext.Default.ListAccountLuck,
                     client.GetAccountLuckAsync, ct)).Value;
 
-                rows.Add(AccountStanding.Luck(luck.Sum(entry => entry.Value)));
+                var consumed = luck.Sum(entry => entry.Value);
+                rows.Add(AccountStanding.Luck(consumed));
+                magicFind = LuckTable.MagicFind(consumed);
             }
             catch (Gw2ApiException)
             {
@@ -59,7 +62,8 @@ public sealed class StandingService(Gw2Client client, ApiKeySession session, Off
             rows.Count > 0,
             // Free with every account read, and discarded until now.
             Access.Expansions(account.Access),
-            Access.Summarise(account.Access));
+            Access.Summarise(account.Access),
+            magicFind);
     }
 
     /// <summary>

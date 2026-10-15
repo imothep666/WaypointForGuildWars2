@@ -12,6 +12,12 @@ public sealed partial class StandingViewModel(
 {
     [ObservableProperty] private string? _footnote;
 
+    /// <summary>
+    /// Base magic find from luck, in percent: the one figure on this screen a player works
+    /// towards, so it leads it. Null when the key cannot read luck.
+    /// </summary>
+    [ObservableProperty] private int? _magicFind;
+
     public ObservableCollection<StandingRow> Rows { get; } = [];
 
     /// <summary>What the account owns, which the account read has always carried.</summary>
@@ -41,6 +47,7 @@ public sealed partial class StandingViewModel(
         Expansions.Clear();
         Nodes.Clear();
         Cats.Clear();
+        MagicFind = null;
 
         await session.EnsureRestoredAsync(ct);
 
@@ -67,6 +74,7 @@ public sealed partial class StandingViewModel(
             Expansions.Add(expansion);
 
         Owned = view.OwnedSummary;
+        MagicFind = view.MagicFind;
         OnPropertyChanged(nameof(HasExpansions));
 
         await LoadHomeAsync(ct);

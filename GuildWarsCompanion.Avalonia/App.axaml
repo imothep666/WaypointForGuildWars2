@@ -140,6 +140,15 @@
             <Setter Property="Padding" Value="18,16" />
         </Style>
 
+        <!-- The top of a page in an area with tabs, on its wash, above the tab strip: the one
+             number the page is for, sat on the strip. The same height on every page of the
+             area, so the strip stays put when moving between them, whether there is a number
+             to show or not. -->
+        <Style Selector="Border.masthead">
+            <Setter Property="Height" Value="96" />
+            <Setter Property="Margin" Value="20,0" />
+        </Style>
+
         <Style Selector="Border.hairline">
             <Setter Property="Height" Value="1" />
             <Setter Property="Background" Value="{StaticResource HairlineBrush}" />

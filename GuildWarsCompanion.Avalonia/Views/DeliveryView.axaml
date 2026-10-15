@@ -9,36 +9,40 @@
                 x:DataType="vm:DeliveryViewModel"
                 ShowsWash="True">
 
-    <Grid RowDefinitions="Auto,Auto,*">
-        <controls:AreaTabStrip Area="tradingpost" Current="delivery" />
-
-        <StackPanel Grid.Row="1" Margin="20,14,20,0" Spacing="12">
-            <!-- Coins from completed sales, in the same three metals as the wallet. -->
-            <Border Classes="card" IsVisible="{Binding HasCoins}">
-                <StackPanel Spacing="8">
-                    <TextBlock Text="{ui:T 'READY TO COLLECT'}" Classes="heading small" />
-                    <!-- The metals in their own colours. -->
-                    <StackPanel Orientation="Horizontal" Spacing="10">
+    <!-- The masthead and the tabs stay where they are; only the items below them scroll. -->
+    <Grid RowDefinitions="Auto,Auto,Auto,*">
+        <!-- Coins from completed sales, in the same three metals as the wallet, where the wallet
+             has its coin. -->
+        <Border Classes="masthead">
+            <StackPanel VerticalAlignment="Bottom" Spacing="4" IsVisible="{Binding HasCoins}">
+                <TextBlock Text="{ui:T 'READY TO COLLECT'}" Classes="heading small" />
+                <Viewbox StretchDirection="DownOnly" HorizontalAlignment="Left">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
                         <TextBlock Text="{Binding Coins.Gold}" FontFamily="{StaticResource BarlowSemiBold}"
-                                   FontSize="28" Foreground="{StaticResource MetalGoldBrush}" />
-                        <TextBlock Text="g" FontSize="14" Foreground="{StaticResource MetalGoldBrush}" VerticalAlignment="Bottom"
-                                   Margin="-7,0,0,5" />
+                                   FontSize="54" Foreground="{StaticResource MetalGoldBrush}" />
+                        <TextBlock Text="g" FontSize="18" Foreground="{StaticResource MetalGoldBrush}"
+                                   VerticalAlignment="Bottom" Margin="-9,0,0,11" />
                         <TextBlock Text="{Binding Coins.Silver}" FontFamily="{StaticResource BarlowSemiBold}"
-                                   FontSize="28" Foreground="{StaticResource MetalSilverBrush}" />
-                        <TextBlock Text="s" FontSize="14" Foreground="{StaticResource MetalSilverBrush}" VerticalAlignment="Bottom"
-                                   Margin="-7,0,0,5" />
+                                   FontSize="54" Foreground="{StaticResource MetalSilverBrush}" />
+                        <TextBlock Text="s" FontSize="18" Foreground="{StaticResource MetalSilverBrush}"
+                                   VerticalAlignment="Bottom" Margin="-9,0,0,11" />
                         <TextBlock Text="{Binding Coins.Copper}" FontFamily="{StaticResource BarlowSemiBold}"
-                                   FontSize="28" Foreground="{StaticResource MetalCopperBrush}" />
-                        <TextBlock Text="c" FontSize="14" Foreground="{StaticResource MetalCopperBrush}" VerticalAlignment="Bottom"
-                                   Margin="-7,0,0,5" />
+                                   FontSize="54" Foreground="{StaticResource MetalCopperBrush}" />
+                        <TextBlock Text="c" FontSize="18" Foreground="{StaticResource MetalCopperBrush}"
+                                   VerticalAlignment="Bottom" Margin="-9,0,0,11" />
                     </StackPanel>
-                </StackPanel>
-            </Border>
+                </Viewbox>
+            </StackPanel>
+        </Border>
 
-            <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+        <controls:AreaTabStrip Grid.Row="1" Area="tradingpost" Current="delivery" />
+
+        <StackPanel Grid.Row="2" Margin="20,0" Spacing="12">
+            <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error"
+                       Margin="0,12,0,0" />
         </StackPanel>
 
-        <RefreshContainer Grid.Row="2" Margin="0,10,0,0" RefreshRequested="OnPullRefresh">
+        <RefreshContainer Grid.Row="3" Margin="0,10,0,0" RefreshRequested="OnPullRefresh">
             <ScrollViewer>
                 <StackPanel>
                     <TextBlock Text="{Binding EmptyMessage}" Classes="caption"

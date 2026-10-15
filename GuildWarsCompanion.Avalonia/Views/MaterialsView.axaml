@@ -10,56 +10,69 @@
                 ShowsWash="True">
 
 
-    <Grid RowDefinitions="Auto,Auto,*">
-        <controls:AreaTabStrip Area="account" Current="materials" />
-
-        <StackPanel Grid.Row="1" Margin="20,0" Spacing="10">
-            <!-- What the pile is worth. Two numbers, because "dump it now" and "list it and
-                 wait" are different decisions and the gap between them is the point. -->
-            <Border Classes="card" IsVisible="{Binding HasValue}" Margin="0,14,0,0">
-                <StackPanel Spacing="10">
-                    <TextBlock Text="{ui:T 'ESTIMATED VALUE'}" Classes="heading small" />
-                    <Grid ColumnDefinitions="*,14,*">
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="{ui:T 'Sell instantly'}" Classes="caption" />
-                            <StackPanel Orientation="Horizontal" Spacing="8">
+    <!-- The masthead and the tabs stay where they are; only the list below them scrolls. -->
+    <Grid RowDefinitions="Auto,Auto,Auto,*">
+        <!-- What the pile is worth, on the wash where the wallet has its coin. Two numbers,
+             because "dump it now" and "list it and wait" are different decisions and the gap
+             between them is the point. -->
+        <Border Classes="masthead">
+            <StackPanel VerticalAlignment="Bottom" Spacing="6" IsVisible="{Binding HasValue}">
+                <TextBlock Text="{ui:T 'ESTIMATED VALUE'}" Classes="heading small" />
+                <Grid ColumnDefinitions="*,14,*">
+                    <StackPanel Spacing="2">
+                        <TextBlock Text="{ui:T 'Sell instantly'}" Classes="caption" />
+                        <Viewbox StretchDirection="DownOnly" HorizontalAlignment="Left">
+                            <StackPanel Orientation="Horizontal" Spacing="9">
                                 <TextBlock Text="{Binding InstantValue.Gold}" FontFamily="{StaticResource BarlowSemiBold}"
-                                           FontSize="24" Foreground="{StaticResource MetalGoldBrush}" />
-                                <TextBlock Text="g" FontSize="13" Foreground="{StaticResource MetalGoldBrush}"
-                                           VerticalAlignment="Bottom" Margin="-6,0,0,4" />
+                                           FontSize="34" Foreground="{StaticResource MetalGoldBrush}" />
+                                <TextBlock Text="g" FontSize="15" Foreground="{StaticResource MetalGoldBrush}"
+                                           VerticalAlignment="Bottom" Margin="-7,0,0,7" />
                                 <TextBlock Text="{Binding InstantValue.Silver}" FontFamily="{StaticResource BarlowSemiBold}"
-                                           FontSize="24" Foreground="{StaticResource MetalSilverBrush}" />
-                                <TextBlock Text="s" FontSize="13" Foreground="{StaticResource MetalSilverBrush}"
-                                           VerticalAlignment="Bottom" Margin="-6,0,0,4" />
+                                           FontSize="34" Foreground="{StaticResource MetalSilverBrush}" />
+                                <TextBlock Text="s" FontSize="15" Foreground="{StaticResource MetalSilverBrush}"
+                                           VerticalAlignment="Bottom" Margin="-7,0,0,7" />
                             </StackPanel>
-                        </StackPanel>
-                        <StackPanel Grid.Column="2" Spacing="4">
-                            <TextBlock Text="{ui:T 'If listed'}" Classes="caption" />
-                            <StackPanel Orientation="Horizontal" Spacing="8">
+                        </Viewbox>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Spacing="2">
+                        <TextBlock Text="{ui:T 'If listed'}" Classes="caption" />
+                        <Viewbox StretchDirection="DownOnly" HorizontalAlignment="Left">
+                            <StackPanel Orientation="Horizontal" Spacing="9">
                                 <TextBlock Text="{Binding ListedValue.Gold}" FontFamily="{StaticResource BarlowSemiBold}"
-                                           FontSize="24" Foreground="{StaticResource MetalGoldBrush}" />
-                                <TextBlock Text="g" FontSize="13" Foreground="{StaticResource MetalGoldBrush}"
-                                           VerticalAlignment="Bottom" Margin="-6,0,0,4" />
+                                           FontSize="34" Foreground="{StaticResource MetalGoldBrush}" />
+                                <TextBlock Text="g" FontSize="15" Foreground="{StaticResource MetalGoldBrush}"
+                                           VerticalAlignment="Bottom" Margin="-7,0,0,7" />
                                 <TextBlock Text="{Binding ListedValue.Silver}" FontFamily="{StaticResource BarlowSemiBold}"
-                                           FontSize="24" Foreground="{StaticResource MetalSilverBrush}" />
-                                <TextBlock Text="s" FontSize="13" Foreground="{StaticResource MetalSilverBrush}"
-                                           VerticalAlignment="Bottom" Margin="-6,0,0,4" />
+                                           FontSize="34" Foreground="{StaticResource MetalSilverBrush}" />
+                                <TextBlock Text="s" FontSize="15" Foreground="{StaticResource MetalSilverBrush}"
+                                           VerticalAlignment="Bottom" Margin="-7,0,0,7" />
                             </StackPanel>
-                        </StackPanel>
-                    </Grid>
-                    <TextBlock Text="{Binding ValueNote}" Classes="caption small" />
-                </StackPanel>
-            </Border>
+                        </Viewbox>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Border>
 
+        <controls:AreaTabStrip Grid.Row="1" Area="account" Current="materials" />
+
+        <StackPanel Grid.Row="2" Margin="20,10,20,0" Spacing="10">
+            <TextBlock Text="{Binding ValueNote}" IsVisible="{Binding HasValue}" Classes="caption small" />
             <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption"
                        Margin="0,12,0,0" />
             <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
-            <TextBlock Text="{Binding EmptyMessage}" Classes="caption"
-                       IsVisible="{Binding Sections.Count, Converter={x:Static ui:Counts.IsZero}}"
-                       HorizontalAlignment="Center" Margin="0,32" />
+            <!-- Not a second copy of the notice above, which the empty message falls back to. -->
+            <TextBlock Text="{Binding EmptyMessage}" Classes="caption" TextWrapping="Wrap"
+                       HorizontalAlignment="Center" Margin="0,32">
+                <TextBlock.IsVisible>
+                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                        <Binding Path="Sections.Count" Converter="{x:Static ui:Counts.IsZero}" />
+                        <Binding Path="!HasNotice" />
+                    </MultiBinding>
+                </TextBlock.IsVisible>
+            </TextBlock>
         </StackPanel>
 
-        <RefreshContainer Grid.Row="2" Margin="0,8,0,0" RefreshRequested="OnPullRefresh">
+        <RefreshContainer Grid.Row="3" Margin="0,8,0,0" RefreshRequested="OnPullRefresh">
             <!-- Several hundred rows: a flat, virtualised list of headers and rows. -->
             <ItemsControl x:Name="List">
                 <ItemsControl.Template>

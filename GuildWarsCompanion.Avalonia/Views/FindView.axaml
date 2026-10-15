@@ -9,15 +9,22 @@
                 x:DataType="vm:FindViewModel"
                 ShowsWash="True">
 
-    <Grid RowDefinitions="Auto,*">
-        <controls:AreaTabStrip Area="account" Current="find" />
+    <!-- The masthead and the tabs stay where they are; only the answers below them scroll. -->
+    <Grid RowDefinitions="Auto,Auto,*">
+        <!-- The screen's one statement: where a thing is. The question takes the masthead,
+             where the wallet has its coin, so it stays to hand over a long list of answers. -->
+        <Border Classes="masthead">
+            <StackPanel VerticalAlignment="Bottom" Spacing="10">
+                <TextBlock Text="{ui:T 'WHERE IS MY…'}" Classes="heading" />
+                <TextBox Text="{Binding Search}" PlaceholderText="{ui:T 'Item name'}" KeyDown="OnSearchKeyDown" />
+            </StackPanel>
+        </Border>
 
-        <RefreshContainer Grid.Row="1" RefreshRequested="OnPullRefresh">
+        <controls:AreaTabStrip Grid.Row="1" Area="account" Current="find" />
+
+        <RefreshContainer Grid.Row="2" RefreshRequested="OnPullRefresh">
             <ScrollViewer>
-                <StackPanel Margin="20,16,20,32" Spacing="12">
-                    <!-- The screen's one statement: where a thing is. -->
-                    <TextBlock Text="{ui:T 'WHERE IS MY…'}" Classes="heading" />
-                    <TextBox Text="{Binding Search}" PlaceholderText="{ui:T 'Item name'}" KeyDown="OnSearchKeyDown" />
+                <StackPanel Margin="20,14,20,32" Spacing="12">
                     <TextBlock Text="{Binding SearchNote}" Classes="caption small" />
                     <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
 

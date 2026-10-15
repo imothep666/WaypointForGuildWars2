@@ -20,7 +20,7 @@ public sealed record OrderRow(
 }
 
 /// <summary>Selling and Buying, or Sold and Bought — the screens share this shape.</summary>
-public sealed class OrderSection(string name, string summary, IEnumerable<OrderRow> rows)
+public sealed class OrderSection(string name, string summary, long coin, IEnumerable<OrderRow> rows)
     : List<OrderRow>(rows)
 {
     /// <summary>English, always: the shell tells the sides apart by it.</summary>
@@ -30,6 +30,9 @@ public sealed class OrderSection(string name, string summary, IEnumerable<OrderR
     public string Title => L.T(Name);
 
     public string Summary { get; } = summary;
+
+    /// <summary>What every order or trade in it comes to, at its own price.</summary>
+    public CoinPurse Coin { get; } = new(coin);
 }
 
 /// <summary>What the trading post is holding.</summary>
@@ -163,14 +166,10 @@ public sealed class TradingPostService(Gw2Client client, ItemLookup lookup, Offl
             .OrderByDescending(row => row.IsBeaten)
             .ToList();
 
-        var summary = OrderBook.Summarise(
-            orders.Count,
-            orders.Sum(order => order.Price * order.Quantity),
-            rows.Count(row => row.IsBeaten),
-            selling,
-            capped);
+        var coin = orders.Sum(order => order.Price * order.Quantity);
+        var summary = OrderBook.Summarise(orders.Count, coin, rows.Count(row => row.IsBeaten), selling, capped);
 
-        return new OrderSection(name, summary, rows);
+        return new OrderSection(name, summary, coin, rows);
     }
 
     /// <summary>What the trading post is holding of yours, in coin.</summary>
@@ -245,11 +244,11 @@ public sealed class TradingPostService(Gw2Client client, ItemLookup lookup, Offl
         var sections = new List<OrderSection>();
 
         if (sold.Count > 0)
-            sections.Add(new OrderSection("Sold", Summarise(sold),
+            sections.Add(new OrderSection("Sold", Summarise(sold), Total(sold),
                 sold.OrderByDescending(t => t.Purchased).Take(50).Select(t => ToHistoryRow(t, items))));
 
         if (bought.Count > 0)
-            sections.Add(new OrderSection("Bought", Summarise(bought),
+            sections.Add(new OrderSection("Bought", Summarise(bought), Total(bought),
                 bought.OrderByDescending(t => t.Purchased).Take(50).Select(t => ToHistoryRow(t, items))));
 
         return sections;
@@ -339,7 +338,10 @@ public sealed class TradingPostService(Gw2Client client, ItemLookup lookup, Offl
 
     /// <summary>Orders and trades are both worth totalling: that is the number people want.</summary>
     private static string Summarise(IReadOnlyCollection<Transaction> transactions) =>
-        $"{transactions.Count} · {Coin.Format(transactions.Sum(t => t.Price * t.Quantity))}";
+        $"{transactions.Count} · {Coin.Format(Total(transactions))}";
+
+    private static long Total(IEnumerable<Transaction> transactions) =>
+        transactions.Sum(t => t.Price * t.Quantity);
 
     /// <summary>
     /// One side of the market ledger, kept so the screen still has something to show with no

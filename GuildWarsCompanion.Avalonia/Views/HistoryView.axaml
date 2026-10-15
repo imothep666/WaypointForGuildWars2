@@ -9,15 +9,61 @@
                 x:DataType="vm:HistoryViewModel"
                 ShowsWash="True">
 
-    <Grid RowDefinitions="Auto,Auto,*">
-        <controls:AreaTabStrip Area="tradingpost" Current="history" />
+    <!-- The masthead and the tabs stay where they are; only the trades below them scroll. -->
+    <Grid RowDefinitions="Auto,Auto,Auto,*">
+        <!-- Both sides of the ledger, as the materials screen sets its two values side by side:
+             what the recent sales and purchases came to. -->
+        <Border Classes="masthead">
+            <Grid VerticalAlignment="Bottom" ColumnDefinitions="*,14,*">
+                    <StackPanel Spacing="2" IsVisible="{Binding Sold, Converter={x:Static ObjectConverters.IsNotNull}}">
+                        <TextBlock Text="{Binding Sold.Title}" Classes="caption" />
+                        <Viewbox StretchDirection="DownOnly" HorizontalAlignment="Left">
+                            <StackPanel Orientation="Horizontal" Spacing="9">
+                                <TextBlock Text="{Binding Sold.Coin.Gold}" FontFamily="{StaticResource BarlowSemiBold}"
+                                           FontSize="34" Foreground="{StaticResource MetalGoldBrush}" />
+                                <TextBlock Text="g" FontSize="15" Foreground="{StaticResource MetalGoldBrush}"
+                                           VerticalAlignment="Bottom" Margin="-7,0,0,7" />
+                                <TextBlock Text="{Binding Sold.Coin.Silver}" FontFamily="{StaticResource BarlowSemiBold}"
+                                           FontSize="34" Foreground="{StaticResource MetalSilverBrush}" />
+                                <TextBlock Text="s" FontSize="15" Foreground="{StaticResource MetalSilverBrush}"
+                                           VerticalAlignment="Bottom" Margin="-7,0,0,7" />
+                                <TextBlock Text="{Binding Sold.Coin.Copper}" FontFamily="{StaticResource BarlowSemiBold}"
+                                           FontSize="34" Foreground="{StaticResource MetalCopperBrush}" />
+                                <TextBlock Text="c" FontSize="15" Foreground="{StaticResource MetalCopperBrush}"
+                                           VerticalAlignment="Bottom" Margin="-7,0,0,7" />
+                            </StackPanel>
+                        </Viewbox>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Spacing="2" IsVisible="{Binding Bought, Converter={x:Static ObjectConverters.IsNotNull}}">
+                        <TextBlock Text="{Binding Bought.Title}" Classes="caption" />
+                        <Viewbox StretchDirection="DownOnly" HorizontalAlignment="Left">
+                            <StackPanel Orientation="Horizontal" Spacing="9">
+                                <TextBlock Text="{Binding Bought.Coin.Gold}" FontFamily="{StaticResource BarlowSemiBold}"
+                                           FontSize="34" Foreground="{StaticResource MetalGoldBrush}" />
+                                <TextBlock Text="g" FontSize="15" Foreground="{StaticResource MetalGoldBrush}"
+                                           VerticalAlignment="Bottom" Margin="-7,0,0,7" />
+                                <TextBlock Text="{Binding Bought.Coin.Silver}" FontFamily="{StaticResource BarlowSemiBold}"
+                                           FontSize="34" Foreground="{StaticResource MetalSilverBrush}" />
+                                <TextBlock Text="s" FontSize="15" Foreground="{StaticResource MetalSilverBrush}"
+                                           VerticalAlignment="Bottom" Margin="-7,0,0,7" />
+                                <TextBlock Text="{Binding Bought.Coin.Copper}" FontFamily="{StaticResource BarlowSemiBold}"
+                                           FontSize="34" Foreground="{StaticResource MetalCopperBrush}" />
+                                <TextBlock Text="c" FontSize="15" Foreground="{StaticResource MetalCopperBrush}"
+                                           VerticalAlignment="Bottom" Margin="-7,0,0,7" />
+                            </StackPanel>
+                        </Viewbox>
+                    </StackPanel>
+            </Grid>
+        </Border>
 
-        <StackPanel Grid.Row="1" Margin="20,0" Spacing="8">
+        <controls:AreaTabStrip Grid.Row="1" Area="tradingpost" Current="history" />
+
+        <StackPanel Grid.Row="2" Margin="20,0" Spacing="8">
             <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error"
                        Margin="0,12,0,0" />
         </StackPanel>
 
-        <RefreshContainer Grid.Row="2" RefreshRequested="OnPullRefresh">
+        <RefreshContainer Grid.Row="3" RefreshRequested="OnPullRefresh">
             <ScrollViewer>
                 <StackPanel>
                     <TextBlock Text="{Binding EmptyMessage}" Classes="caption"

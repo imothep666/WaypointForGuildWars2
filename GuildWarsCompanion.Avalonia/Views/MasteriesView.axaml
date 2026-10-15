@@ -9,15 +9,25 @@
                 x:DataType="vm:MasteriesViewModel"
                 ShowsWash="True">
 
-    <Grid RowDefinitions="Auto,*">
-        <controls:AreaTabStrip Area="account" Current="masteries" />
+    <!-- The masthead and the tabs stay where they are; only the tracks below them scroll. -->
+    <Grid RowDefinitions="Auto,Auto,*">
+        <!-- Points sitting unspent is what this screen exists to catch, so they lead it, large,
+             as Astral Acclaim leads the vault. -->
+        <Border Classes="masthead">
+            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Bottom"
+                        IsVisible="{Binding Spendable, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <TextBlock Text="{Binding Spendable}" FontFamily="{StaticResource BarlowSemiBold}"
+                           FontSize="54" Foreground="{StaticResource BrassBrush}" />
+                <TextBlock Text="{Binding SpendableLabel}" Foreground="{DynamicResource AreaTintBrush}"
+                           VerticalAlignment="Bottom" Margin="0,0,0,10" />
+            </StackPanel>
+        </Border>
 
-        <RefreshContainer Grid.Row="1" RefreshRequested="OnPullRefresh">
+        <controls:AreaTabStrip Grid.Row="1" Area="account" Current="masteries" />
+
+        <RefreshContainer Grid.Row="2" RefreshRequested="OnPullRefresh">
             <ScrollViewer>
-                <StackPanel Margin="20,16,20,32" Spacing="14">
-                    <!-- Points sitting unspent is what this screen exists to catch. -->
-                    <TextBlock Text="{Binding Summary}" Classes="figure"
-                               Foreground="{StaticResource BrassBrush}" TextWrapping="Wrap" />
+                <StackPanel Margin="20,14,20,32" Spacing="14">
                     <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
                     <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
 

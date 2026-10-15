@@ -1211,6 +1211,15 @@
   <data name="Mastery points are account-wide, not per character." xml:space="preserve">
     <value>Beherrschungspunkte gelten für den ganzen Account, nicht pro Charakter.</value>
   </data>
+  <data name="magic find from luck · up to 300%" xml:space="preserve">
+    <value>Magiefund durch Glück · bis 300 %</value>
+  </data>
+  <data name="mastery point to spend" xml:space="preserve">
+    <value>Beherrschungspunkt zu vergeben</value>
+  </data>
+  <data name="mastery points to spend" xml:space="preserve">
+    <value>Beherrschungspunkte zu vergeben</value>
+  </data>
   <data name="Mastery progress needs an API key with the 'progression' permission." xml:space="preserve">
     <value>Der Beherrschungsfortschritt braucht einen API-Schlüssel mit der Berechtigung „progression“.</value>
   </data>
@@ -1603,6 +1612,18 @@
   </data>
   <data name="Other" xml:space="preserve">
     <value>Sonstige</value>
+  </data>
+  <data name="of 1 watched price reached" xml:space="preserve">
+    <value>von 1 beobachteten Preis erreicht</value>
+  </data>
+  <data name="of {0} watched prices reached" xml:space="preserve">
+    <value>von {0} beobachteten Preisen erreicht</value>
+  </data>
+  <data name="order undercut or outbid" xml:space="preserve">
+    <value>Auftrag unterboten oder überboten</value>
+  </data>
+  <data name="orders undercut or outbid" xml:space="preserve">
+    <value>Aufträge unterboten oder überboten</value>
   </data>
   <data name="outbid by {0}" xml:space="preserve">
     <value>überboten um {0}</value>

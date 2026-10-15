@@ -9,15 +9,27 @@
                 x:DataType="vm:OrdersViewModel"
                 ShowsWash="True">
 
-    <Grid RowDefinitions="Auto,Auto,*">
-        <controls:AreaTabStrip Area="tradingpost" Current="orders" />
+    <!-- The masthead and the tabs stay where they are; only the orders below them scroll. -->
+    <Grid RowDefinitions="Auto,Auto,Auto,*">
+        <!-- What needs doing: orders the market has moved past. Which ones, and by how much, is
+             in brass in the list below. -->
+        <Border Classes="masthead">
+            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Bottom"
+                        IsVisible="{Binding Beaten, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <TextBlock Text="{Binding Beaten}" FontFamily="{StaticResource BarlowSemiBold}" FontSize="54" />
+                <TextBlock Text="{Binding BeatenLabel}" Foreground="{DynamicResource AreaTintBrush}"
+                           VerticalAlignment="Bottom" Margin="0,0,0,10" />
+            </StackPanel>
+        </Border>
 
-        <StackPanel Grid.Row="1" Margin="20,0" Spacing="8">
+        <controls:AreaTabStrip Grid.Row="1" Area="tradingpost" Current="orders" />
+
+        <StackPanel Grid.Row="2" Margin="20,0" Spacing="8">
             <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error"
                        Margin="0,12,0,0" />
         </StackPanel>
 
-        <RefreshContainer Grid.Row="2" RefreshRequested="OnPullRefresh">
+        <RefreshContainer Grid.Row="3" RefreshRequested="OnPullRefresh">
             <ScrollViewer>
                 <StackPanel>
                     <TextBlock Text="{Binding EmptyMessage}" Classes="caption"

@@ -10,10 +10,21 @@
                 ShowsWash="True">
 
     <Grid>
-        <Grid RowDefinitions="Auto,*">
-            <controls:AreaTabStrip Area="tradingpost" Current="watch" />
+        <!-- The masthead and the tabs stay where they are; only the page below them scrolls. -->
+        <Grid RowDefinitions="Auto,Auto,*">
+            <!-- Whether anything has come in: the watches whose price has arrived. -->
+            <Border Classes="masthead">
+                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Bottom"
+                            IsVisible="{Binding !HasNoWatches}">
+                    <TextBlock Text="{Binding Met}" FontFamily="{StaticResource BarlowSemiBold}" FontSize="54" />
+                    <TextBlock Text="{Binding MetLabel}" Foreground="{DynamicResource AreaTintBrush}"
+                               VerticalAlignment="Bottom" Margin="0,0,0,10" />
+                </StackPanel>
+            </Border>
 
-            <ScrollViewer Grid.Row="1">
+            <controls:AreaTabStrip Grid.Row="1" Area="tradingpost" Current="watch" />
+
+            <ScrollViewer Grid.Row="2">
                 <StackPanel Margin="20,14,20,28" Spacing="12">
                     <TextBlock Text="{ui:T 'PRICE WATCH'}" Classes="heading" />
                     <TextBlock Classes="caption small"

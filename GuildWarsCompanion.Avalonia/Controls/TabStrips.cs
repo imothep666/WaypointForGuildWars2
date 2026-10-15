@@ -5,6 +5,7 @@ using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.Threading;
 
 using GuildWarsCompanion.Ava.Ui;
 using GuildWarsCompanion.Host;
@@ -44,6 +45,9 @@ internal static class StripLook
         {
             Classes = { "row" },
             MinWidth = 64,
+            // From the top, so the live heading, which has the rule under it, stays level with
+            // the rest rather than being centred a few pixels above them.
+            VerticalAlignment = VerticalAlignment.Top,
             Content = new StackPanel { Spacing = 5, Children = { label, rule } }
         };
         button.Click += (sender, _) => tapped((sender as Control)?.DataContext);
@@ -170,6 +174,12 @@ public sealed class AreaTabStrip : UserControl
         foreach (var tab in tabs) tab.IsSelected = tab.Route.EndsWith($"/{Current}", StringComparison.Ordinal);
 
         _items.ItemsSource = tabs;
+
+        // A page whose tab is past the edge (Masteries, on a phone) opens with the row slid
+        // along to it, rather than with its own name cut off.
+        if (tabs.FirstOrDefault(tab => tab.IsSelected) is { } selected)
+            Dispatcher.UIThread.Post(() => _items.ContainerFromItem(selected)?.BringIntoView(),
+                DispatcherPriority.Loaded);
     }
 
     private static async void OnTapped(object? context)

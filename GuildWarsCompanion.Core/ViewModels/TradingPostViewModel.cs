@@ -17,6 +17,7 @@ public abstract partial class TradingPostViewModelBase(ApiKeySession session) : 
     public Task RefreshAsync() => RunAsync(async ct =>
     {
         Sections.Clear();
+        OnSectionsChanged();
 
         await session.EnsureRestoredAsync(ct);
 
@@ -34,15 +35,34 @@ public abstract partial class TradingPostViewModelBase(ApiKeySession session) : 
 
         Notice = null;
         await LoadAsync(ct);
+        OnSectionsChanged();
     });
 
     protected abstract Task LoadAsync(CancellationToken ct);
+
+    /// <summary>For the figures a screen works out from its sections, to be read again.</summary>
+    protected virtual void OnSectionsChanged()
+    {
+    }
 }
 
 public sealed class OrdersViewModel(TradingPostService trading, ApiKeySession session)
     : TradingPostViewModelBase(session)
 {
     protected override string DefaultEmptyMessage => L.T("No open orders. Pull down to refresh.");
+
+    /// <summary>Orders the market has moved past, on both sides; null until there are orders.</summary>
+    public int? Beaten => Sections.Count == 0 ? null : Sections.Sum(section => section.Count(row => row.IsBeaten));
+
+    public string BeatenLabel => Beaten == 1
+        ? L.T("order undercut or outbid")
+        : L.T("orders undercut or outbid");
+
+    protected override void OnSectionsChanged()
+    {
+        OnPropertyChanged(nameof(Beaten));
+        OnPropertyChanged(nameof(BeatenLabel));
+    }
 
     protected override async Task LoadAsync(CancellationToken ct)
     {
@@ -55,6 +75,16 @@ public sealed class HistoryViewModel(TradingPostService trading, ApiKeySession s
     : TradingPostViewModelBase(session)
 {
     protected override string DefaultEmptyMessage => L.T("No trades in the last 90 days.");
+
+    public OrderSection? Sold => Sections.FirstOrDefault(section => section.Name == "Sold");
+
+    public OrderSection? Bought => Sections.FirstOrDefault(section => section.Name == "Bought");
+
+    protected override void OnSectionsChanged()
+    {
+        OnPropertyChanged(nameof(Sold));
+        OnPropertyChanged(nameof(Bought));
+    }
 
     protected override async Task LoadAsync(CancellationToken ct)
     {

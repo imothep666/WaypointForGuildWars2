@@ -12,12 +12,19 @@ namespace GuildWarsCompanion.ViewModels;
 public sealed partial class MasteriesViewModel(MasteryService masteries, ApiKeySession session)
     : BaseViewModel
 {
-    [ObservableProperty] private string? _summary;
+    /// <summary>Mastery points earned and not yet spent, across every region; null until read.</summary>
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(SpendableLabel))] private int? _spendable;
+
     [ObservableProperty] private string? _footnote;
 
     public ObservableCollection<RegionPoints> Regions { get; } = [];
 
     public ObservableCollection<MasteryRow> Tracks { get; } = [];
+
+    /// <summary>What the number in the masthead counts.</summary>
+    public string SpendableLabel => Spendable == 1
+        ? L.T("mastery point to spend")
+        : L.T("mastery points to spend");
 
     protected override string DefaultEmptyMessage => L.T("Pull down to read your mastery tracks.");
 
@@ -26,6 +33,7 @@ public sealed partial class MasteriesViewModel(MasteryService masteries, ApiKeyS
     {
         Regions.Clear();
         Tracks.Clear();
+        Spendable = null;
 
         await session.EnsureRestoredAsync(ct);
 
@@ -45,7 +53,7 @@ public sealed partial class MasteriesViewModel(MasteryService masteries, ApiKeyS
         foreach (var track in view.Tracks)
             Tracks.Add(track);
 
-        Summary = view.Summary;
+        Spendable = view.HasAny ? view.Regions.Sum(region => region.Available) : null;
         Footnote = view.Note;
 
         if (!view.HasAny) Notice = view.Note;

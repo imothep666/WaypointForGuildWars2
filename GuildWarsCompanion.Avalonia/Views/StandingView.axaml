@@ -9,12 +9,30 @@
                 x:DataType="vm:StandingViewModel"
                 ShowsWash="True">
 
-    <Grid RowDefinitions="Auto,*">
-        <controls:AreaTabStrip Area="account" Current="standing" />
+    <!-- The masthead and the tabs stay where they are; only the page below them scrolls. -->
+    <Grid RowDefinitions="Auto,Auto,*">
+        <!-- Magic find from luck: of the account's standing, the one figure a player works
+             towards, with the cap it climbs to. The rest are in the list below. -->
+        <Border Classes="masthead">
+            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Bottom"
+                        IsVisible="{Binding MagicFind, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding MagicFind}" FontFamily="{StaticResource BarlowSemiBold}"
+                               FontSize="54" />
+                    <TextBlock Text="%" FontFamily="{StaticResource BarlowSemiBold}" FontSize="28"
+                               VerticalAlignment="Bottom" Margin="2,0,0,10" />
+                </StackPanel>
+                <TextBlock Text="{ui:T 'magic find from luck · up to 300%'}"
+                           Foreground="{DynamicResource AreaTintBrush}"
+                           VerticalAlignment="Bottom" Margin="0,0,0,10" />
+            </StackPanel>
+        </Border>
 
-        <RefreshContainer Grid.Row="1" RefreshRequested="OnPullRefresh">
+        <controls:AreaTabStrip Grid.Row="1" Area="account" Current="standing" />
+
+        <RefreshContainer Grid.Row="2" RefreshRequested="OnPullRefresh">
             <ScrollViewer>
-                <StackPanel Margin="20,16,20,32" Spacing="14">
+                <StackPanel Margin="20,14,20,32" Spacing="14">
                     <!-- What the account is, rather than what it owns. -->
                     <TextBlock Text="{ui:T 'STANDING'}" Classes="heading" />
                     <TextBlock Text="{Binding Notice}" IsVisible="{Binding HasNotice}" Classes="caption" />
