@@ -19,6 +19,21 @@ public sealed class AndroidSystemActions(Shells shells) : AvaloniaSystemActions(
 {
     private const string Authority = "com.mpsoft.gw2companion.files";
 
+    /// <summary>
+    /// Android's own clipboard rather than the window's: a notification's button copies with no
+    /// screen open, where the shared version has no window to ask and would build one off the UI
+    /// thread.
+    /// </summary>
+    public override Task CopyAsync(string text)
+    {
+        var context = global::Android.App.Application.Context;
+
+        if (context.GetSystemService(Context.ClipboardService) is ClipboardManager clipboard)
+            clipboard.PrimaryClip = ClipData.NewPlainText(text, text);
+
+        return Task.CompletedTask;
+    }
+
     public override Task ShareFileAsync(string title, string path)
     {
         if (MainActivity.Current is not { } activity) return Task.CompletedTask;

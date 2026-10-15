@@ -52,7 +52,14 @@ public sealed class PriceWatcher(Gw2Client client, WatchStore store) : IAccountW
             alerts.Add(new AccountAlert(
                 $"price:{watch.Id}:{current}",
                 L.F("{0} is at {1}", watch.Name, Coin.Format(current!.Value)),
-                L.F("{0} — you asked to be told.", PriceRules.Describe(watch))));
+                L.F("{0} — you asked to be told.", PriceRules.Describe(watch)))
+            {
+                // The watch list, and the link for the trading post's search from the shade itself:
+                // a price that has arrived is a reason to go and buy or sell.
+                Route = "//tradingpost/watch",
+                TradingPostItem = watch.ItemId,
+                TradingPostName = watch.Name
+            });
         }
 
         return alerts;

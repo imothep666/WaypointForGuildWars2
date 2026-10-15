@@ -6,6 +6,7 @@ using Android.Runtime;
 using AndroidX.Core.Content;
 
 using Avalonia.Android;
+using Avalonia.Threading;
 
 using GuildWarsCompanion.Ava.Host;
 using GuildWarsCompanion.Host;
@@ -35,10 +36,44 @@ public class MainActivity : AvaloniaMainActivity
     /// <summary>The activity on screen, for what has to start another one: the scanner.</summary>
     internal static MainActivity? Current { get; private set; }
 
+    /// <summary>The route a notification opens the app at; see <see cref="AndroidNotifier"/>.</summary>
+    internal const string RouteExtra = "route";
+
     protected override void OnCreate(Android.OS.Bundle? savedInstanceState)
     {
         Current = this;
         base.OnCreate(savedInstanceState);
+
+        // Only for a fresh start: an activity rebuilt from saved state carries the intent that
+        // first started it, and would go back to that screen every time.
+        if (savedInstanceState is null) Open(Intent);
+    }
+
+    /// <summary>A notification tapped while the app is already running.</summary>
+    protected override void OnNewIntent(Android.Content.Intent? intent)
+    {
+        base.OnNewIntent(intent);
+        Open(intent);
+    }
+
+    /// <summary>
+    /// Goes where the intent says, once the shell has had its turn: posted at background priority,
+    /// so a cold start's first page is made before this one replaces it.
+    /// </summary>
+    private static void Open(Android.Content.Intent? intent)
+    {
+#if DEBUG
+        // adb shell am start -n com.mpsoft.gw2companion/<activity> --ez sample_alert true
+        // A price notification for the first watch, outside the poll and the quiet hours, so the
+        // shade's half can be tried at any time of day.
+        if (intent?.GetBooleanExtra("sample_alert", false) == true) _ = SampleAlertAsync();
+#endif
+
+        if (intent?.GetStringExtra(RouteExtra) is not { Length: > 0 } route) return;
+
+        Dispatcher.UIThread.Post(
+            () => _ = App.Services.GetRequiredService<INavigator>().GoToAsync(route),
+            DispatcherPriority.Background);
     }
 
     protected override void OnDestroy()
@@ -46,6 +81,23 @@ public class MainActivity : AvaloniaMainActivity
         if (ReferenceEquals(Current, this)) Current = null;
         base.OnDestroy();
     }
+
+#if DEBUG
+    private static async Task SampleAlertAsync()
+    {
+        var services = App.Services;
+        var watches = await services.GetRequiredService<GuildWarsCompanion.Data.WatchStore>().ListAsync();
+        if (watches.FirstOrDefault() is not { } watch) return;
+
+        await services.GetRequiredService<INotifier>().NotifyAsync(
+            new AccountAlert($"sample:{watch.Id}", L.F("{0} is at {1}", watch.Name, "—"), "Sample alert from adb.")
+            {
+                Route = "//tradingpost/watch",
+                TradingPostItem = watch.ItemId,
+                TradingPostName = watch.Name
+            });
+    }
+#endif
 
     private const int NotificationRequest = 11;
 

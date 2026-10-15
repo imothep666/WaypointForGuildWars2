@@ -7,7 +7,9 @@ using GuildWarsCompanion.Services;
 
 namespace GuildWarsCompanion.ViewModels;
 
-public sealed partial class WatchViewModel(WatchService watches, TestEvidence evidence) : BaseViewModel, IQueryTarget
+public sealed partial class WatchViewModel(
+    WatchService watches, TradingPostLink link, TestEvidence evidence)
+    : BaseViewModel, IQueryTarget
 {
     /// <summary>
     /// Opened from an item's page with <c>item=id</c>: that item is chosen, the market as it stands
@@ -193,4 +195,17 @@ public sealed partial class WatchViewModel(WatchService watches, TestEvidence ev
 
             CountWatches();
         });
+
+    /// <summary>
+    /// The watched item's chat link to wherever the game can paste it, for the trading post's
+    /// search; see <see cref="TradingPostLink"/>.
+    /// </summary>
+    [RelayCommand]
+    public async Task SendToTradingPostAsync(WatchRow? row)
+    {
+        if (row is null) return;
+
+        ErrorMessage = null;
+        Notice = await link.SendAsync(row.ItemId, row.Name, sending => Notice = sending);
+    }
 }

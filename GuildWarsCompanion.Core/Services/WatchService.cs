@@ -5,7 +5,7 @@ namespace GuildWarsCompanion.Services;
 
 /// <summary>A watch with the market beside it, ready to show.</summary>
 public sealed record WatchRow(
-    long Id, string Name, string? IconUrl, string Condition, string Current, bool IsMet)
+    long Id, int ItemId, string Name, string? IconUrl, string Condition, string Current, bool IsMet)
 {
     /// <summary>Brass once the price is where you wanted it.</summary>
     public Color EdgeColor => IsMet ? Theme.Brass : Theme.EmptySlot;
@@ -72,6 +72,7 @@ public sealed class WatchService(Gw2Client client, WatchStore store, Gw2Cache ca
 
             rows.Add(new WatchRow(
                 watch.Id,
+                watch.ItemId,
                 named.GetValueOrDefault(watch.ItemId)?.Name ?? watch.Name,
                 watch.Icon,
                 PriceRules.Describe(watch),

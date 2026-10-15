@@ -4,6 +4,7 @@ namespace GuildWarsCompanion.Services;
 
 /// <summary>One open order, with the market beside it so the number means something.</summary>
 public sealed record OrderRow(
+    int ItemId,
     string ItemName,
     string? IconUrl,
     string? Rarity,
@@ -270,6 +271,7 @@ public sealed class TradingPostService(Gw2Client client, ItemLookup lookup, Offl
             {
                 var item = items.GetValueOrDefault(entry.Id);
                 return new OrderRow(
+                    entry.Id,
                     item?.Name ?? L.F("Item {0}", entry.Id),
                     item?.Icon,
                     item?.Rarity,
@@ -311,6 +313,7 @@ public sealed class TradingPostService(Gw2Client client, ItemLookup lookup, Offl
             side is null ? null : OrderBook.Tied(side, order.Price, order.Quantity));
 
         return new OrderRow(
+            order.ItemId,
             item?.Name ?? L.F("Item {0}", order.ItemId),
             item?.Icon,
             item?.Rarity,
@@ -326,6 +329,7 @@ public sealed class TradingPostService(Gw2Client client, ItemLookup lookup, Offl
         var item = items.GetValueOrDefault(trade.ItemId);
 
         return new OrderRow(
+            trade.ItemId,
             item?.Name ?? L.F("Item {0}", trade.ItemId),
             item?.Icon,
             item?.Rarity,

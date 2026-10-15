@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GuildWarsCompanion.Gw2;
 using GuildWarsCompanion.Services;
@@ -46,10 +47,29 @@ public abstract partial class TradingPostViewModelBase(ApiKeySession session) : 
     }
 }
 
-public sealed class OrdersViewModel(TradingPostService trading, ApiKeySession session)
+public sealed partial class OrdersViewModel(TradingPostService trading, TradingPostLink link, ApiKeySession session)
     : TradingPostViewModelBase(session)
 {
     protected override string DefaultEmptyMessage => L.T("No open orders. Pull down to refresh.");
+
+    /// <summary>Where the last chat link went, under the error line.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasLinked))]
+    private string? _linked;
+
+    public bool HasLinked => !string.IsNullOrEmpty(Linked);
+
+    /// <summary>
+    /// A beaten order's item, for the trading post's search: relisting starts with finding it
+    /// there, which is the same need as a watch whose price has arrived.
+    /// </summary>
+    [RelayCommand]
+    public async Task SendToTradingPostAsync(OrderRow? row)
+    {
+        if (row is null) return;
+
+        Linked = await link.SendAsync(row.ItemId, row.ItemName, sending => Linked = sending);
+    }
 
     /// <summary>Orders the market has moved past, on both sides; null until there are orders.</summary>
     public int? Beaten => Sections.Count == 0 ? null : Sections.Sum(section => section.Count(row => row.IsBeaten));

@@ -39,7 +39,7 @@ public class AvaloniaSystemActions(Shells shells) : ISystemActions
     public virtual async Task ShareFileAsync(string title, string path) =>
         await Top.Launcher.LaunchFileInfoAsync(new FileInfo(path));
 
-    public async Task CopyAsync(string text)
+    public virtual async Task CopyAsync(string text)
     {
         if (Top.Clipboard is { } clipboard) await clipboard.SetTextAsync(text);
     }

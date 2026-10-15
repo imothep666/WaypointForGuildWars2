@@ -40,6 +40,14 @@ public partial class WatchView : PageView
         ConfirmLayer.IsVisible = true;
     }
 
+    /// <summary>Inside the row's own button, so it marks the click handled: no deletion asked.</summary>
+    private async void OnSendClicked(object? sender, RoutedEventArgs e)
+    {
+        e.Handled = true;
+
+        if ((sender as Control)?.DataContext is WatchRow row) await ViewModel.SendToTradingPostAsync(row);
+    }
+
     private async void OnStopClicked(object? sender, RoutedEventArgs e)
     {
         var row = _confirming;

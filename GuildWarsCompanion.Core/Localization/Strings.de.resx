@@ -509,6 +509,9 @@
   <data name="Copied {0}" xml:space="preserve">
     <value>{0} kopiert</value>
   </data>
+  <data name="Copied the link for {0}. Paste it into the trading post's search." xml:space="preserve">
+    <value>Link für {0} kopiert. Füge ihn in die Suche des Handelspostens ein.</value>
+  </data>
   <data name="COPY CHAT LINK" xml:space="preserve">
     <value>CHATLINK KOPIEREN</value>
   </data>
@@ -1952,6 +1955,9 @@
   <data name="Selling" xml:space="preserve">
     <value>Verkauf</value>
   </data>
+  <data name="SEND TO TP" xml:space="preserve">
+    <value>AN HP SENDEN</value>
+  </data>
   <data name="Sending {0}…" xml:space="preserve">
     <value>Sende {0}…</value>
   </data>
@@ -1963,6 +1969,9 @@
   </data>
   <data name="Sent {0} to {1}" xml:space="preserve">
     <value>{0} an {1} gesendet</value>
+  </data>
+  <data name="Sent the link for {0} to {1}. Paste it into the trading post's search." xml:space="preserve">
+    <value>Link für {0} an {1} gesendet. Füge ihn in die Suche des Handelspostens ein.</value>
   </data>
   <data name="Session recap · {0}" xml:space="preserve">
     <value>Sitzungsrückblick · {0}</value>

@@ -124,6 +124,7 @@ public static class CompanionServices
         services.AddSingleton(provider =>
             new WatchStore(Path.Combine(Environment(provider).DataDirectory, "watches.db3")));
         services.AddSingleton<WatchService>();
+        services.AddSingleton<TradingPostLink>();
 
         services.AddSingleton(provider =>
             new GoalStore(Path.Combine(Environment(provider).DataDirectory, "goals.db3")));

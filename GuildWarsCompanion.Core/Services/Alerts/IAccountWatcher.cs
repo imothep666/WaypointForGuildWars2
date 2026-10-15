@@ -13,6 +13,16 @@ public sealed record AccountAlert(string Key, string Title, string Body)
 
     /// <summary>The <see cref="IAccountWatcher.Name"/> that found it, set by the service.</summary>
     public string? Watcher { get; init; }
+
+    /// <summary>Where a tap on it opens the app, as a route; null opens the app as it was.</summary>
+    public string? Route { get; init; }
+
+    /// <summary>The item it is about, when there is one the player may go to the trading post for:
+    /// the notification then offers to send its chat link to the PC.</summary>
+    public int? TradingPostItem { get; init; }
+
+    /// <summary>That item's name, for saying where its link went.</summary>
+    public string? TradingPostName { get; init; }
 }
 
 /// <summary>

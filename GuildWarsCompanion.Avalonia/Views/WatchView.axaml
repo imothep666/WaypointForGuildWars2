@@ -48,8 +48,14 @@
                                                    TextTrimming="CharacterEllipsis" />
                                         <TextBlock Grid.Column="3" Text="{Binding Current}" Classes="figure"
                                                    Margin="0,12,0,0" />
-                                        <TextBlock Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2"
-                                                   Text="{Binding Condition}" Classes="caption" Margin="14,2,0,12" />
+                                        <TextBlock Grid.Row="1" Grid.Column="2"
+                                                   Text="{Binding Condition}" Classes="caption" Margin="14,2,8,12"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <!-- The chat link to the PC: pasted into the trading post's
+                                             search, it finds exactly this item. -->
+                                        <Button Grid.Row="1" Grid.Column="3" Content="{ui:T 'SEND TO TP'}"
+                                                Classes="quiet" FontSize="11" Padding="10,3" Margin="0,2,0,10"
+                                                VerticalAlignment="Top" Click="OnSendClicked" />
                                     </Grid>
                                 </Button>
                             </DataTemplate>
