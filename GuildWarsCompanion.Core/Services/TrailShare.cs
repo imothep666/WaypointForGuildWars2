@@ -50,7 +50,7 @@ public sealed class TrailShare(BridgeClient bridge)
 
             // No trail to it, but it is a place: the game shows the objective by itself.
             _target = who;
-            Say(alone, $"{who}|alone");
+            Say(alone.Named(target.Name), $"{who}|alone");
             return;
         }
 
@@ -75,7 +75,7 @@ public sealed class TrailShare(BridgeClient bridge)
 
         // A trail with no heights cannot be drawn in the world, and saying nothing would leave
         // the last objective's line standing. So a trail that cannot be sent clears instead.
-        Say(trail, trail is null ? "none" : $"{who}|{guide.Route.Name}");
+        Say(trail?.Named(target.Name), trail is null ? "none" : $"{who}|{guide.Route.Name}");
     }
 
     /// <summary>

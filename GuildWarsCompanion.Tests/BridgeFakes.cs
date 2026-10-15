@@ -66,11 +66,21 @@ public sealed class FakePc(string id, string name, string secret, string address
     /// <summary>Whether the game is up on it.</summary>
     public bool Playing { get; set; }
 
+    /// <summary>Who is in the game while <see cref="Playing"/>; null reports a game with nobody named.</summary>
+    public string? Character { get; set; }
+
+    /// <summary>How it answers /notify: 204 shown in the game, 409 no module to show it. Null is a
+    /// bridge from before alerts, which does not know the path.</summary>
+    public int? NotifyStatus { get; set; }
+
     public int Port { get; set; } = BridgeProtocol.DefaultPort;
 
     /// <summary>How it answers /emote: 200 done in game, 204 copied. Null is a bridge from
     /// before /emote existed, which answers 400 like any path it does not know.</summary>
     public int? EmoteStatus { get; set; }
+
+    /// <summary>A bridge from before the objective's name, which refuses a trail that has one.</summary>
+    public bool RefusesNames { get; set; }
 
     /// <summary>What this PC will actually prove with — a reinstall changes it and not the id.</summary>
     public string? ProvesWith { get; set; }
@@ -151,12 +161,23 @@ public sealed class FakeNetwork : IBridgeTransport, IBridgeDiscovery
             return Task.FromResult(new BridgeResponse(
                 200,
                 JsonSerializer.Serialize(
-                    new GameReport(null, found.Playing, "as the fake PC has it"),
+                    new GameReport(
+                        found.Playing && found.Character is { } name
+                            ? new GameState(1, name, 4, 0, 3, false, 15, 1, 1, 0, UiState.GameHasFocus, 0, 0)
+                            : null,
+                        found.Playing, "as the fake PC has it"),
                     BridgeJson.Default.GameReport),
                 null));
 
         if (BridgeProtocol.PathIs(uri.AbsolutePath, BridgeProtocol.PastePath))
             return Task.FromResult(new BridgeResponse(204, string.Empty, null));
+
+        if (BridgeProtocol.PathIs(uri.AbsolutePath, BridgeProtocol.NotifyPath))
+            return Task.FromResult(new BridgeResponse(found.NotifyStatus ?? 404, string.Empty, null));
+
+        if (BridgeProtocol.PathIs(uri.AbsolutePath, BridgeProtocol.GuidePath))
+            return Task.FromResult(new BridgeResponse(
+                found.RefusesNames && body?.Contains("\nname ") == true ? 400 : 204, string.Empty, null));
 
         if (BridgeProtocol.PathIs(uri.AbsolutePath, BridgeProtocol.EmotePath))
             return Task.FromResult(new BridgeResponse(found.EmoteStatus ?? 400, string.Empty, null));

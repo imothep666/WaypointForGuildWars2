@@ -74,6 +74,15 @@ public sealed class ModuleLink(string cardPath) : IDisposable
     public string? Problem { get; private set; }
 
     /// <summary>
+    /// Whether the module will show an alert: it says so after its hello and whenever the player
+    /// changes it. False until it has, so a module from before alerts is never sent one it would
+    /// drop — the phone shows it instead.
+    /// </summary>
+    public bool TakesAlerts => IsConnected && _alerts;
+
+    private volatile bool _alerts;
+
+    /// <summary>
     /// Listens on loopback and writes the card the module reads to find it.
     ///
     /// A fresh token every run: the card is readable by anything running as this user, and a
@@ -189,6 +198,7 @@ public sealed class ModuleLink(string cardPath) : IDisposable
             }
 
             replaced?.Dispose();
+            _alerts = false;
             Changed?.Invoke();
 
             if (_trail is { } trail) await SendTrailAsync(connection, trail);
@@ -203,6 +213,12 @@ public sealed class ModuleLink(string cardPath) : IDisposable
                 if (line.Kind == ModuleLineKind.Arrived)
                 {
                     Arrive(line.Text);
+                    continue;
+                }
+
+                if (line.Kind == ModuleLineKind.Alerts)
+                {
+                    _alerts = line.Text == "on";
                     continue;
                 }
 
@@ -270,6 +286,18 @@ public sealed class ModuleLink(string cardPath) : IDisposable
         Arrival = new TrailArrival(trail.MapId, trail.Target.X, trail.Target.Z);
 
         Reached?.Invoke(Arrival);
+    }
+
+    /// <summary>
+    /// Hands the module an alert to show in the game. True when a module that shows alerts was
+    /// there to take it; false and nothing sent otherwise, for the caller to say it some other way.
+    /// </summary>
+    public async Task<bool> NotifyAsync(string title, string detail)
+    {
+        Connection? to;
+        lock (_gate) to = _current;
+
+        return to is not null && _alerts && await SendAsync(to, ModuleWire.Notify(title, detail));
     }
 
     /// <summary>Raised when the module reports an objective reached, from a socket thread.</summary>

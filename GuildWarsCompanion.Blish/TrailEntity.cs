@@ -151,6 +151,12 @@ public sealed partial class TrailEntity : IEntity
 
     public float DrawOrder => 0;
 
+    /// <summary>What is being drawn, for the card to describe; null when nothing is.</summary>
+    public GuidedTrail? Current => _trail;
+
+    /// <summary>Whether the character has reached it and it is on its way out.</summary>
+    public bool HasArrived => _arrivedAt is not null;
+
     /// <summary>Replaces what is drawn. Called on the game thread; null takes the line away.</summary>
     public void Show(GuidedTrail? trail)
     {

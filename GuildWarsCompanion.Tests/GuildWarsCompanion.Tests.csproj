@@ -33,6 +33,8 @@
         <Compile Include="..\GuildWarsCompanion.Bridge\Protocol\BlishHudInstall.cs" Link="Logic\BlishHudInstall.cs" />
         <Compile Include="..\GuildWarsCompanion.Bridge\Protocol\ModuleWire.cs" Link="Logic\ModuleWire.cs" />
         <Compile Include="..\GuildWarsCompanion.Bridge\Protocol\TrailAhead.cs" Link="Logic\TrailAhead.cs" />
+        <!-- The Blish HUD module's one piece with no Blish HUD in it: the numbers on its card. -->
+        <Compile Include="..\GuildWarsCompanion.Blish\CardText.cs" Link="Logic\CardText.cs" />
     </ItemGroup>
 
     <ItemGroup>

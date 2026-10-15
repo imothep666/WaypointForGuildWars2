@@ -462,6 +462,9 @@ public sealed partial class SettingsViewModel(
                 L.F("Checked. {0} held back: it is outside your notification hours. {1}",
                     run.Quiet, QuietHours.Describe(schedule.Current)),
             (0, 0) => L.T("Checked. Nothing waiting that you have not already seen."),
+            // Said, because a reminder sent with no buzz on the phone looks like none was sent.
+            (_, 0) when run.InGame > 0 =>
+                L.F("Checked. {0} sent, {1} of them shown in the game on {2}'s screen.", run.Sent, run.InGame, run.Player),
             (_, 0) => run.Sent == 1 ? L.T("Checked. One reminder sent.") : L.F("Checked. {0} reminders sent.", run.Sent),
             // Said, because a check that found something and showed nothing looks broken.
             _ => L.F("Checked. {0} sent, {1} held back: {2} is in the game, " +

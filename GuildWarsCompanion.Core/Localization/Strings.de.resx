@@ -413,6 +413,9 @@
   <data name="Checked. {0} reminders sent." xml:space="preserve">
     <value>Geprüft. {0} Erinnerungen gesendet.</value>
   </data>
+  <data name="Checked. {0} sent, {1} of them shown in the game on {2}'s screen." xml:space="preserve">
+    <value>Geprüft. {0} gesendet, davon {1} im Spiel bei {2} angezeigt.</value>
+  </data>
   <data name="Checked. {0} sent, {1} held back: {2} is in the game, which shows trading post and vault news itself." xml:space="preserve">
     <value>Geprüft. {0} gesendet, {1} zurückgehalten: {2} ist im Spiel, und das zeigt Neuigkeiten von Handelsposten und Gewölbe selbst an.</value>
   </data>

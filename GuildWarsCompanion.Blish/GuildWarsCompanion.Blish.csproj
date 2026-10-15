@@ -33,6 +33,13 @@
         <Compile Include="..\GuildWarsCompanion.Bridge\Protocol\TrailAhead.cs" Link="TrailAhead.cs" />
     </ItemGroup>
 
+    <!-- The corner icon: the bridge's own tray icon, so the two read as one thing. Blish HUD reads
+         a module's textures from "ref" inside the .bhm, which the packing below zips as it finds it. -->
+    <ItemGroup>
+        <None Include="..\GuildWarsCompanion.Bridge\Assets\tray.png" Link="ref\waypoint.png"
+              CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
     <!--
         What the BlishHUD package's own targets did — zip the output with manifest.json beside it —
         except that the manifest's "version" is replaced by the repository version on the way in

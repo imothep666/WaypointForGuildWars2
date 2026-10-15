@@ -20,18 +20,27 @@ public enum ModuleLineKind
 
     /// <summary>The character reached the objective of the trail named in <see cref="ModuleLine.Text"/>,
     /// and the module has taken the trail down.</summary>
-    Arrived
+    Arrived,
+
+    /// <summary>Something the phone would have said, to be said in the game instead: the title in
+    /// <see cref="ModuleLine.Text"/>, the line under it in <see cref="ModuleLine.Detail"/>.</summary>
+    Notify,
+
+    /// <summary>Whether the module will show alerts: "on" or "off" in <see cref="ModuleLine.Text"/>.
+    /// Said after the hello and again whenever the player changes it.</summary>
+    Alerts
 }
 
 /// <summary>One parsed line. A class rather than a record: this file is compiled into the
 /// Blish HUD module too, which is net48 and has no init-only setters.</summary>
 public sealed class ModuleLine
 {
-    public ModuleLine(ModuleLineKind kind, int id, string text)
+    public ModuleLine(ModuleLineKind kind, int id, string text, string detail = "")
     {
         Kind = kind;
         Id = id;
         Text = text;
+        Detail = detail;
     }
 
     public ModuleLineKind Kind { get; }
@@ -42,6 +51,9 @@ public sealed class ModuleLine
     /// <summary>The token on a hello, the command on an emote, the reason on a busy, the
     /// objective on an arrived.</summary>
     public string Text { get; }
+
+    /// <summary>The line under a notify's title; empty on every other line.</summary>
+    public string Detail { get; }
 }
 
 /// <summary>
@@ -61,6 +73,12 @@ public sealed class ModuleLine
 ///   module → bridge   done &lt;id&gt;   |   busy &lt;id&gt; &lt;reason&gt;
 ///   bridge → module   trail, then a <see cref="GuideWire"/> body line by line, then end
 ///   module → bridge   arrived &lt;map&gt; &lt;x&gt; &lt;z&gt;
+///   bridge → module   notify &lt;title&gt; TAB &lt;detail&gt;
+///   module → bridge   alerts on   |   alerts off
+///
+/// <c>alerts</c> is how the bridge knows a notify will be shown. Until a module has said
+/// <c>alerts on</c> — and one from before alerts never will — the bridge says no module took it,
+/// and the phone puts the alert on its own screen instead.
 ///
 /// <c>arrived</c> names the objective by its map and where it stands, so the bridge can tell it
 /// apart from a trail the phone has chosen since: an arrival for the last objective must not
@@ -133,6 +151,41 @@ public static class ModuleWire
         $"{trail.Target.X.ToString("0.##", CultureInfo.InvariantCulture)} " +
         $"{trail.Target.Z.ToString("0.##", CultureInfo.InvariantCulture)}";
 
+    public const string NotifyWord = "notify";
+
+    public const string AlertsWord = "alerts";
+
+    public static string Alerts(bool on) => $"{AlertsWord} {(on ? "on" : "off")}";
+
+    /// <summary>The longest title a notify carries, in characters; a longer one is cut.</summary>
+    public const int LongestTitle = 100;
+
+    /// <summary>The longest line under it.</summary>
+    public const int LongestDetail = 300;
+
+    /// <summary>
+    /// "notify Mystic Coin is at 1g 20s", a tab, then the line under it. A tab because a title has
+    /// spaces and never a tab; each part is made one line of plain text first and cut to its
+    /// length, so whatever the phone sent stays one line inside <see cref="MaxLine"/>.
+    /// </summary>
+    public static string Notify(string title, string detail) =>
+        $"{NotifyWord} {Plain(title, LongestTitle)}{Tab}{Plain(detail, LongestDetail)}";
+
+    private const char Tab = '\u0009';
+
+    /// <summary>Text as one line: control characters, tabs and newlines among them, become spaces.</summary>
+    private static string Plain(string? text, int longest)
+    {
+        var plain = new System.Text.StringBuilder((text ?? string.Empty).Length);
+
+        foreach (var c in text ?? string.Empty)
+            plain.Append(char.IsControl(c) ? ' ' : c);
+
+        var line = plain.ToString().Trim();
+
+        return line.Length > longest ? line.Substring(0, longest - 1).TrimEnd() + "…" : line;
+    }
+
     /// <summary>Reasons are one line, always: a newline in one would be a second message.</summary>
     public static string Busy(int id, string reason) =>
         $"busy {id} {reason.Replace('\r', ' ').Replace('\n', ' ')}";
@@ -159,6 +212,18 @@ public static class ModuleWire
 
             case ArrivedWord:
                 return rest.Length > 0 ? new ModuleLine(ModuleLineKind.Arrived, 0, rest) : null;
+
+            case NotifyWord:
+                {
+                    var tab = rest.IndexOf(Tab);
+                    var title = (tab < 0 ? rest : rest.Substring(0, tab)).Trim();
+                    var detail = tab < 0 ? string.Empty : rest.Substring(tab + 1).Trim();
+
+                    return title.Length > 0 ? new ModuleLine(ModuleLineKind.Notify, 0, title, detail) : null;
+                }
+
+            case AlertsWord:
+                return rest is "on" or "off" ? new ModuleLine(ModuleLineKind.Alerts, 0, rest) : null;
 
             case "hello":
                 return rest.Length > 0 ? new ModuleLine(ModuleLineKind.Hello, 0, rest) : null;

@@ -16,13 +16,23 @@ public sealed class GuidedTrail
 {
     public GuidedTrail(
         int mapId, (double X, double Up, double Z) target, IReadOnlyList<(double X, double Up, double Z)> points,
-        bool heightKnown = true)
+        bool heightKnown = true, string? name = null)
     {
         MapId = mapId;
         Target = target;
         Points = points;
         HeightKnown = heightKnown;
+        Name = name;
     }
+
+    /// <summary>
+    /// What the objective is called, in the phone's language, for the module's card. Null for a
+    /// trail from a phone that does not say: the card then has a distance and no name.
+    /// </summary>
+    public string? Name { get; }
+
+    /// <summary>The same trail, called <paramref name="name"/>.</summary>
+    public GuidedTrail Named(string? name) => new(MapId, Target, Points, HeightKnown, name);
 
     public int MapId { get; }
 
@@ -69,6 +79,9 @@ public sealed class GuidedTrail
 /// An objective with no trail to it has no <c>p</c> lines at all, and one whose height is unknown
 /// says <c>height unknown</c> after its target. An older module refuses both as not a path, and
 /// draws nothing rather than something wrong.
+///
+/// A <c>name</c> line after the map gives the objective's name for the module's card. A bridge
+/// from before it refuses the whole trail, so the phone sends it again without one when refused.
 /// </summary>
 public static class GuideWire
 {
@@ -84,6 +97,14 @@ public static class GuideWire
     /// <summary>Far larger than any map, small enough that a number this big is certainly junk.</summary>
     private const double Largest = 100_000;
 
+    /// <summary>
+    /// The longest name sent, in characters. Longer than any objective the game names, and short
+    /// enough that the line stays well inside the module link's limit whatever the language.
+    /// </summary>
+    public const int LongestName = 80;
+
+    private const string NameWord = "name ";
+
     public static string Write(GuidedTrail? path)
     {
         var text = new StringBuilder().Append(Header).Append('\n');
@@ -91,6 +112,8 @@ public static class GuideWire
         if (path is null) return text.Append("clear\n").ToString();
 
         text.Append("map ").Append(path.MapId.ToString(CultureInfo.InvariantCulture)).Append('\n');
+
+        if (OneLine(path.Name) is { } name) text.Append(NameWord).Append(name).Append('\n');
 
         Point(text.Append("target "), path.Target);
 
@@ -122,6 +145,7 @@ public static class GuideWire
         (double X, double Up, double Z)? target = null;
         var points = new List<(double X, double Up, double Z)>();
         var heightKnown = true;
+        string? name = null;
 
         string? line;
 
@@ -130,6 +154,16 @@ public static class GuideWire
             line = line.Trim();
 
             if (line.Length == 0) continue;
+
+            // Before the split: a name has spaces in it.
+            if (line.StartsWith(NameWord, StringComparison.Ordinal))
+            {
+                var said = line.Substring(NameWord.Length);
+                if (said.Length > LongestName) return null;
+
+                name = OneLine(said);
+                continue;
+            }
 
             if (line == "clear")
             {
@@ -170,7 +204,27 @@ public static class GuideWire
         // No points is an objective alone; one point is neither an objective nor a line.
         if (mapId <= 0 || target is not { } place || points.Count == 1) return null;
 
-        return new GuidedTrail(mapId, place, points, heightKnown);
+        return new GuidedTrail(mapId, place, points, heightKnown, name);
+    }
+
+    /// <summary>
+    /// A name as one line of plain text, cut to <see cref="LongestName"/>; null when nothing is left.
+    /// Control characters go, so a name cannot start a second line or hide one.
+    /// </summary>
+    private static string? OneLine(string? text)
+    {
+        if (text is null) return null;
+
+        var plain = new StringBuilder(text.Length);
+
+        foreach (var c in text)
+            plain.Append(char.IsControl(c) ? ' ' : c);
+
+        var line = plain.ToString().Trim();
+
+        if (line.Length > LongestName) line = line.Substring(0, LongestName - 1).TrimEnd() + "…";
+
+        return line.Length == 0 ? null : line;
     }
 
     private static void Point(StringBuilder text, (double X, double Up, double Z) point) =>

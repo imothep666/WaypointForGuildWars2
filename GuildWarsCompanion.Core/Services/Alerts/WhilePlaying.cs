@@ -14,14 +14,6 @@ namespace GuildWarsCompanion.Services.Alerts;
 public static class WhilePlaying
 {
     /// <summary>
-    /// Whether the bridge is worth asking at all. Most polls find nothing new, and finding a PC
-    /// on the local network is not free, so it is only asked when its answer could change
-    /// something.
-    /// </summary>
-    public static bool NeedsAsking(IEnumerable<AccountAlert> news) =>
-        news.Any(alert => alert.GameSaysItToo);
-
-    /// <summary>
     /// The alerts to show. Only a named character holds anything back: an unreachable bridge is
     /// ignorance, and every ambiguous case lets a notification through.
     /// </summary>

@@ -232,6 +232,14 @@ public sealed class BridgeClient(
 
         var answer = await Ask(found, BridgeProtocol.GuidePath, HttpMethod.Post, GuideWire.Write(trail), ct);
 
+        // A bridge from before the objective's name refuses the whole trail for it; the line in
+        // the world matters more than the name on the card.
+        if (answer.Status == 400 && trail?.Name is not null)
+        {
+            trail = trail.Named(null);
+            answer = await Ask(found, BridgeProtocol.GuidePath, HttpMethod.Post, GuideWire.Write(trail), ct);
+        }
+
         journal.Write("guide", (trail is null ? "cleared" : $"{trail.Points.Count} points on map {trail.MapId}") +
                                $" to {found.Bridge.Label} — {answer.Status}" +
                                (answer.Error is { } why ? $" ({why})" : string.Empty));
@@ -284,6 +292,27 @@ public sealed class BridgeClient(
                 LiveReading.Playing(report.State.CharacterName),
             _ => LiveReading.NobodyPlaying
         };
+
+    /// <summary>
+    /// Asks the PC to show an alert in the game, through the Blish HUD module. True only when the
+    /// module took it; false for anything else — no bridge, no module, alerts switched off in it,
+    /// a bridge from before alerts — so the caller shows it on the phone instead.
+    /// </summary>
+    /// <param name="sweep">False from the background poll; see <see cref="BridgeFinder.ResolveAsync"/>.</param>
+    public async Task<bool> NotifyAsync(string title, string detail, CancellationToken ct = default, bool sweep = false)
+    {
+        if (!await finder.IsSetUpAsync()) return false;
+
+        if (await FindAsync(ct, sweep) is not { } found) return false;
+
+        var answer = await Ask(found, BridgeProtocol.NotifyPath, HttpMethod.Post, BridgeProtocol.NotifyBody(title, detail), ct);
+        var shown = answer.Status == (int)HttpStatusCode.NoContent;
+
+        journal.Write("alert", $"{title} to {found.Bridge.Label} — " +
+                               (shown ? "shown in the game" : $"not shown there ({answer.Status})"));
+
+        return shown;
+    }
 
     private async Task<BridgeResponse> Ask(
         ResolvedBridge found, string path, HttpMethod method, string? body, CancellationToken ct)

@@ -146,6 +146,45 @@ public class ModuleWireTests
     }
 
     [Fact]
+    public void A_notification_reads_back_as_its_title_and_the_line_under_it()
+    {
+        var line = ModuleWire.Parse(ModuleWire.Notify("Mystic Coin is at 1g 20s", "Your watch: at or under 1g 25s"))!;
+
+        Assert.Equal(ModuleLineKind.Notify, line.Kind);
+        Assert.Equal("Mystic Coin is at 1g 20s", line.Text);
+        Assert.Equal("Your watch: at or under 1g 25s", line.Detail);
+    }
+
+    [Fact]
+    public void A_notification_is_one_line_whatever_it_was_sent()
+    {
+        var text = ModuleWire.Notify("Two\nlines\tand a tab", "and\r\nmore");
+        var line = ModuleWire.Parse(text)!;
+
+        Assert.DoesNotContain('\n', text);
+        Assert.Equal("Two lines and a tab", line.Text);
+        Assert.Equal("and  more", line.Detail);
+    }
+
+    [Fact]
+    public void A_long_notification_is_cut_to_fit_the_link()
+    {
+        var text = ModuleWire.Notify(new string('t', 1000), new string('d', 1000));
+        var line = ModuleWire.Parse(text)!;
+
+        Assert.True(text.Length <= ModuleWire.MaxLine);
+        Assert.Equal(ModuleWire.LongestTitle, line.Text.Length);
+        Assert.Equal(ModuleWire.LongestDetail, line.Detail.Length);
+    }
+
+    [Fact]
+    public void A_notification_needs_a_title_but_not_a_line_under_it()
+    {
+        Assert.Null(ModuleWire.Parse(ModuleWire.Notify("  ", "only a body")));
+        Assert.Equal(string.Empty, ModuleWire.Parse(ModuleWire.Notify("Reset in 10 minutes", ""))!.Detail);
+    }
+
+    [Fact]
     public void An_overlong_line_is_refused() =>
         Assert.Null(ModuleWire.Parse("emote 1 /" + new string('a', ModuleWire.MaxLine)));
 

@@ -50,7 +50,8 @@ public sealed class BridgeServer(
     Action? onShow = null,
     Func<string>? gameJson = null,
     Action<PhoneContact>? onContact = null,
-    Func<string?, Task<int>>? onGuide = null)
+    Func<string?, Task<int>>? onGuide = null,
+    Func<string?, Task<int>>? onNotify = null)
 {
     private TcpListener? _listener;
     private CancellationTokenSource? _stopping;
@@ -186,6 +187,18 @@ public sealed class BridgeServer(
                                  ?? await onGuide(body);
 
                     await WriteAsync(stream, status, status == 204 ? string.Empty : "Not a trail", timeout.Token);
+                    return;
+                }
+
+                // An alert for the Blish HUD module to show in the game. The same gate as the trail:
+                // it is put on the player's screen, which is nobody else's to write on.
+                if (head is not null && onNotify is not null &&
+                    BridgeProtocol.PathIs(head.Path, BridgeProtocol.NotifyPath))
+                {
+                    var status = BridgeProtocol.RefuseGuide(head, current.PairingCode, current.Secret)
+                                 ?? await onNotify(body);
+
+                    await WriteAsync(stream, status, status == 204 ? string.Empty : "Not shown in the game", timeout.Token);
                     return;
                 }
 

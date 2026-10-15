@@ -113,6 +113,45 @@ public class GuideWireTests
     }
 
     [Fact]
+    public void The_objective_travels_with_its_name()
+    {
+        var read = GuideWire.Parse(GuideWire.Write(Trail().Named("Kammer der Bündnisse")), out _)!;
+
+        Assert.Equal("Kammer der Bündnisse", read.Name);
+        Assert.Equal(3, read.Points.Count);
+    }
+
+    [Fact]
+    public void A_trail_without_a_name_says_nothing_about_one()
+    {
+        Assert.DoesNotContain("name", GuideWire.Write(Trail()));
+        Assert.Null(GuideWire.Parse(GuideWire.Write(Trail()), out _)!.Name);
+    }
+
+    [Fact]
+    public void A_name_cannot_smuggle_in_a_line_of_its_own()
+    {
+        // A newline in a name would otherwise be a point of the trail.
+        var text = GuideWire.Write(Trail().Named("Chest\np 9 9 9"));
+        var read = GuideWire.Parse(text, out _)!;
+
+        Assert.Equal("Chest p 9 9 9", read.Name);
+        Assert.Equal(3, read.Points.Count);
+    }
+
+    [Fact]
+    public void A_long_name_is_cut_on_the_way_out_and_refused_on_the_way_in()
+    {
+        var written = GuideWire.Parse(GuideWire.Write(Trail().Named(new string('a', 200))), out _)!;
+
+        Assert.Equal(GuideWire.LongestName, written.Name!.Length);
+        Assert.EndsWith("…", written.Name);
+
+        var sent = $"{GuideWire.Header}\nmap 1015\nname {new string('a', GuideWire.LongestName + 1)}\ntarget 1 2 3\n";
+        Assert.Null(GuideWire.Parse(sent, out _));
+    }
+
+    [Fact]
     public void The_module_link_marks_where_a_trail_starts_and_ends()
     {
         Assert.Equal(ModuleLineKind.Trail, ModuleWire.Parse(ModuleWire.Trail)!.Kind);
@@ -194,10 +233,10 @@ public class TrailForGameTests
     private static CompassTarget Target(double x = 300, double y = -100) =>
         new("Picaroon Scratch", TargetKind.Landmark, 1015, "The Silverwastes", x, y);
 
-    private static (TrailShare Share, FakeNetwork Network) Build()
+    private static (TrailShare Share, FakeNetwork Network) Build(bool refusesNames = false)
     {
         var secret = BridgeProtocol.NewPairingSecret();
-        var desk = new FakePc("DESKID", "Desktop", secret, "192.168.1.20:47623");
+        var desk = new FakePc("DESKID", "Desktop", secret, "192.168.1.20:47623") { RefusesNames = refusesNames };
         var network = new FakeNetwork().With(desk);
         var known = new KnownBridges(new MemoryBridgeStore());
         var journal = new Journal(Path.Combine(Path.GetTempPath(), "gw2-bridge-tests.log"));
@@ -288,6 +327,31 @@ public class TrailForGameTests
 
             return at < 0 ? null : GuideWire.Parse(network.Bodies[at], out _);
         }
+    }
+
+    [Fact]
+    public void The_trail_goes_out_with_the_objectives_name()
+    {
+        var (share, network) = Build();
+
+        share.Share(TrailGuide.Find([Around([400, 399, 398, 397, 380])], 300, -100), Target(), Silverwastes, (0, 0));
+
+        Assert.Equal("Picaroon Scratch", LastGuide(network)!.Name);
+    }
+
+    [Fact]
+    public void A_bridge_from_before_names_still_gets_the_trail()
+    {
+        var (share, network) = Build(refusesNames: true);
+
+        share.Share(TrailGuide.Find([Around([400, 399, 398, 397, 380])], 300, -100), Target(), Silverwastes, (0, 0));
+
+        var sent = LastGuide(network)!;
+
+        // The same trail, asked twice: once with its name, refused, and once without.
+        Assert.Null(sent.Name);
+        Assert.NotEmpty(sent.Points);
+        Assert.Equal(2, Sent(network));
     }
 
     [Fact]

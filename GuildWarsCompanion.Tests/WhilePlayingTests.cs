@@ -45,14 +45,6 @@ public class WhilePlayingTests
     }
 
     [Fact]
-    public void The_bridge_is_asked_only_when_its_answer_could_hold_something_back()
-    {
-        Assert.False(WhilePlaying.NeedsAsking([Boss, Price]));
-        Assert.False(WhilePlaying.NeedsAsking([]));
-        Assert.True(WhilePlaying.NeedsAsking([Boss, Sale]));
-    }
-
-    [Fact]
     public void An_alert_says_nothing_about_the_game_unless_marked()
     {
         // The flag is copied from the watcher by the service; a watcher's own alert starts false,

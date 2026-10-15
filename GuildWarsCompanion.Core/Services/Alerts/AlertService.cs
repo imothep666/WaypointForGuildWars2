@@ -84,7 +84,9 @@ public sealed class AlertService(
     /// gone is worse than silence, and everything else is still on its own screen in the app.
     ///
     /// While a character is in the game, what the game already says is held back too; see
-    /// <see cref="WhilePlaying"/>.
+    /// <see cref="WhilePlaying"/>. The rest goes to the game itself when the PC's Blish HUD
+    /// module takes it, and to the phone only when it does not: the player is looking at the
+    /// monitor, and a buzz in a pocket for the same news is noise.
     /// </summary>
     public async Task<AlertRun> CheckAndNotifyAsync(CancellationToken ct = default)
     {
@@ -94,7 +96,9 @@ public sealed class AlertService(
         // something was due and withheld.
         if (!QuietHours.Allows(schedule.Current, DateTimeOffset.Now)) return new AlertRun(0, 0, null, news.Count);
 
-        var live = WhilePlaying.NeedsAsking(news) ? await PlayingNowAsync(ct) : LiveReading.Unknown;
+        // Anything new is reason to ask: what the game says itself is held back, and the rest may
+        // be shown in the game instead.
+        var live = news.Count > 0 ? await PlayingNowAsync(ct) : LiveReading.Unknown;
         var shown = WhilePlaying.Keep(news, live);
         var held = news.Count - shown.Count;
 
@@ -103,14 +107,44 @@ public sealed class AlertService(
             journal.Write("alerts", $"held {held} back while {live.Name} is in the game");
         }
 
+        var inGame = 0;
+
         foreach (var alert in shown)
         {
-            await notifier.NotifyAsync(alert, ct);
+            if (live.Name is not null && await InGameAsync(alert, ct))
+            {
+                inGame++;
+                evidence.Saw("alert-in-game");
+            }
+            else
+            {
+                await notifier.NotifyAsync(alert, ct);
+            }
 
             if (alert.Watcher is { } name && Checks.TryGetValue(name, out var check)) evidence.Saw(check);
         }
 
-        return new AlertRun(shown.Count, held, live.Name);
+        return new AlertRun(shown.Count, held, live.Name, InGame: inGame);
+    }
+
+    /// <summary>
+    /// The alert shown in the game, on the same short leash as asking who plays: a PC that stops
+    /// answering mid-run must not cost the poll its two minutes, and an alert not confirmed shown
+    /// there goes to the phone.
+    /// </summary>
+    private async Task<bool> InGameAsync(AccountAlert alert, CancellationToken ct)
+    {
+        using var leash = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        leash.CancelAfter(TimeSpan.FromSeconds(10));
+
+        try
+        {
+            return await bridge.NotifyAsync(alert.Title, alert.Body, leash.Token);
+        }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            return false;
+        }
     }
 
     /// <summary>
@@ -135,6 +169,8 @@ public sealed class AlertService(
 }
 
 /// <summary>What one poll put on the shade, and what it held back because the game said it.</summary>
+/// <param name="Sent">Every alert said, on the phone or in the game.</param>
 /// <param name="Player">The character in the game when anything was held back; null otherwise.</param>
 /// <param name="Quiet">What was due but withheld because the hour is outside the player's window.</param>
-public sealed record AlertRun(int Sent, int Held, string? Player, int Quiet = 0);
+/// <param name="InGame">How many of <paramref name="Sent"/> the game showed instead of the phone.</param>
+public sealed record AlertRun(int Sent, int Held, string? Player, int Quiet = 0, int InGame = 0);

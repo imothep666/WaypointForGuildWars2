@@ -15,7 +15,7 @@ public sealed record TestCheck(string Id, string Area, string Do, string Expect,
 /// </summary>
 public static class TestPlan
 {
-    public const string Built = "built 5–12 October";
+    public const string Built = "built 5–15 October";
 
     public static readonly IReadOnlyList<TestCheck> Checks =
     [
@@ -63,6 +63,13 @@ public static class TestPlan
         new("tekkit-chests", "Marker packs",
             "In a map like Dragon's End or Silverwastes, open the compass list and the map.",
             "Tekkit's chests and jumping puzzles show up beside the other packs', without doubles."),
+
+        new("objective-card", "Compass and trail",
+            "With Blish HUD started by the bridge, choose an objective on the compass and walk towards it.",
+            "A card in the game names it and counts the metres down, with an arrow and the metres up or down; it says Arrived when you get there. Drag it somewhere else and it stays there."),
+        new("alert-in-game", "Compass and trail",
+            "While playing, with Blish HUD started by the bridge, let a price watch or a world boss reminder come due.",
+            "It appears in the game at the top of the screen, and not on the phone.", Auto: true),
 
         new("objective-boss", "Compass and trail",
             "Choose a world boss as the objective.",

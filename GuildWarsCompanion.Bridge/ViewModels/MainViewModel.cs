@@ -70,7 +70,7 @@ public sealed partial class MainViewModel : ObservableObject
         Updates = new GuildWarsCompanion.Ava.Desktop.VelopackUpdates(new BridgeMainThread(), _journal, Program.Args,
             exit: () => Dispatcher.UIThread.Post(() => QuitRequested?.Invoke()));
         _server = new BridgeServer(
-            () => _config, OnRequestAsync, RequestShow, () => _game.Json, OnContact, OnGuideAsync);
+            () => _config, OnRequestAsync, RequestShow, () => _game.Json, OnContact, OnGuideAsync, OnNotifyAsync);
         _beacon = new BridgeBeacon(() => _config);
         _stream = new GameStreamHost(() => _config, () => _game.Report);
 
@@ -256,9 +256,20 @@ public sealed partial class MainViewModel : ObservableObject
         // older than the lead can still be pending, so anything beyond a day is spent.
         if (_said.Count > 64) _said.Clear();
 
-        _journal.Write("boss", $"{due.Title} — {due.Where}");
+        _ = RemindAsync(due);
+    }
 
-        ReminderRequested?.Invoke(due);
+    /// <summary>
+    /// In the game when the Blish HUD module shows alerts, where the player is looking; in the
+    /// bridge's own small window otherwise, which a game in full screen may well cover.
+    /// </summary>
+    private async Task RemindAsync(BossDue due)
+    {
+        var inGame = await _module.NotifyAsync(due.Title, due.Where);
+
+        _journal.Write("boss", $"{due.Title} — {due.Where}" + (inGame ? " — shown in the game" : string.Empty));
+
+        if (!inGame) ReminderRequested?.Invoke(due);
     }
 
     /// <summary>
@@ -980,6 +991,22 @@ public sealed partial class MainViewModel : ObservableObject
                                 (delivered ? " — sent to the Blish HUD module" : " — kept for the module"));
 
         return 204;
+    }
+
+    /// <summary>
+    /// An alert the phone found while the game is being played, shown in it by the Blish HUD module.
+    /// 204 only when the module took it: otherwise the phone puts it on its own screen, which is
+    /// the point of answering honestly — an alert said nowhere is worse than one said twice.
+    /// </summary>
+    private async Task<int> OnNotifyAsync(string? body)
+    {
+        if (BridgeProtocol.ParseNotify(body) is not { } alert) return 400;
+
+        var shown = await _module.NotifyAsync(alert.Title, alert.Detail);
+
+        _journal.Write("alert", $"{alert.Title} — " + (shown ? "shown in the game" : "no module to show it, left to the phone"));
+
+        return shown ? 204 : 409;
     }
 
     /// <summary>"Emotes from the phone: done in game", or why they are copied instead.</summary>

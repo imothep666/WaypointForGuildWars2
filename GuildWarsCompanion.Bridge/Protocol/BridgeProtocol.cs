@@ -225,6 +225,36 @@ public static class BridgeProtocol
     /// </summary>
     public const string GuidePath = "/guide";
 
+    /// <summary>
+    /// An alert the phone found while somebody is playing, to be shown in the game by the Blish HUD
+    /// module instead of on the phone. The body is the title on its first line and what goes under
+    /// it on the rest. 204 means the module took it; anything else — no module, alerts switched off
+    /// in it, a bridge from before this path — and the phone shows it itself.
+    /// </summary>
+    public const string NotifyPath = "/notify";
+
+    /// <summary>The longest alert body a phone sends, in characters. The module cuts it shorter.</summary>
+    public const int LongestNotify = 2000;
+
+    /// <summary>
+    /// The title and the line under it, from a /notify body; null when there is no title or the
+    /// body is too long to be an alert.
+    /// </summary>
+    public static (string Title, string Detail)? ParseNotify(string? body)
+    {
+        if (string.IsNullOrWhiteSpace(body) || body.Length > LongestNotify) return null;
+
+        var lines = body.Replace("\r", string.Empty).Split('\n');
+        var title = lines[0].Trim();
+
+        if (title.Length == 0) return null;
+
+        return (title, string.Join(" ", lines.Skip(1).Select(line => line.Trim()).Where(line => line.Length > 0)));
+    }
+
+    /// <summary>The body a /notify carries: the title, then the line under it.</summary>
+    public static string NotifyBody(string title, string detail) => $"{title}\n{detail}";
+
     public const string HelloPath = "/hello";
 
     /// <summary>
