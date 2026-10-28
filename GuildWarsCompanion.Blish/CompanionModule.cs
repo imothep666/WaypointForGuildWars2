@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Net;
@@ -29,8 +30,8 @@ namespace GuildWarsCompanion.Blish;
 /// and drawing the line.
 ///
 /// Its only window is the objective card — the name, distance and height of what the trail leads
-/// to — and its only icon the corner one, which says whether the bridge is there and shows or hides
-/// the card.
+/// to — besides the boxes the phone's alerts come up in, and its only icon the corner one, which
+/// says whether the bridge is there and shows or hides the card.
 /// </summary>
 [Export(typeof(Module))]
 public sealed class CompanionModule : Module
@@ -48,6 +49,9 @@ public sealed class CompanionModule : Module
     /// select — before it is dropped. A boss due in five minutes is no news ten minutes on.
     /// </summary>
     private static readonly TimeSpan AlertsKeep = TimeSpan.FromMinutes(3);
+
+    /// <summary>How long an alert stays on screen once shown, before it fades.</summary>
+    private const float AlertSeconds = 8;
 
     private readonly object _writing = new object();
 
@@ -73,6 +77,9 @@ public sealed class CompanionModule : Module
     private SettingEntry<int>? _cardY;
 
     private ObjectiveCard? _card;
+
+    /// <summary>The alerts on screen, oldest first; each takes itself out once it has faded.</summary>
+    private readonly List<AlertBox> _alertBoxes = new List<AlertBox>();
     private CornerIcon? _icon;
     private bool _iconSaysConnected;
     private bool _cardPlaced;
@@ -291,11 +298,14 @@ public sealed class CompanionModule : Module
     }
 
     /// <summary>
-    /// Puts waiting alerts on screen in Blish HUD's own way, once the game is in view. They wait
-    /// through a loading screen; past <see cref="AlertsKeep"/> they are dropped.
+    /// Puts waiting alerts on screen, once the game is in view, in an <see cref="AlertBox"/> that
+    /// breaks them to fit. They wait through a loading screen; past <see cref="AlertsKeep"/> they
+    /// are dropped.
     /// </summary>
     private void ShowAlerts()
     {
+        AlertBox.Arrange(_alertBoxes);
+
         if (_alerts.IsEmpty) return;
 
         var gw2 = GameService.GameIntegration.Gw2Instance;
@@ -313,11 +323,10 @@ public sealed class CompanionModule : Module
 
             _alerts.TryDequeue(out _);
 
-            var text = waiting.Line.Detail.Length == 0
-                ? waiting.Line.Text
-                : $"{waiting.Line.Text} · {waiting.Line.Detail}";
-
-            ScreenNotification.ShowNotification(text, ScreenNotification.NotificationType.Info, _icon?.Icon?.Texture, 6);
+            var box = new AlertBox(waiting.Line.Text, waiting.Line.Detail) { Parent = GameService.Graphics.SpriteScreen };
+            _alertBoxes.Add(box);
+            AlertBox.Arrange(_alertBoxes);
+            box.Show(AlertSeconds, () => _alertBoxes.Remove(box));
         }
     }
 
@@ -420,6 +429,9 @@ public sealed class CompanionModule : Module
 
         _card?.Dispose();
         _card = null;
+
+        foreach (var box in _alertBoxes.ToArray()) box.Dispose();
+        _alertBoxes.Clear();
         _icon?.Dispose();
         _icon = null;
 
