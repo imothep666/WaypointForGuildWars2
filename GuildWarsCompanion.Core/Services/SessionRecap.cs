@@ -47,6 +47,79 @@ public static class SessionRecap
         var first = last;
         while (first >= 2 && Played(points[first - 2], points[first - 1]) > 0) first--;
 
+        return Between(points, first, last);
+    }
+
+    /// <summary>Every session the ledger holds, oldest first; only the last can be ongoing.</summary>
+    public static IReadOnlyList<Session> All(IReadOnlyList<LedgerPoint> points)
+    {
+        var sessions = new List<Session>();
+
+        for (var i = 1; i < points.Count; i++)
+        {
+            if (Played(points[i - 1], points[i]) == 0) continue;
+
+            var last = i;
+            while (last + 1 < points.Count && Played(points[last], points[last + 1]) > 0) last++;
+
+            sessions.Add(Between(points, i, last));
+            i = last;
+        }
+
+        return sessions;
+    }
+
+    /// <summary>
+    /// Whether anything the cheap half of a point reads moved between two points: playtime,
+    /// a level, the wallet. Nothing in the game moves none of them for long, so an account
+    /// that did not change by these did not change at all, and its last detail still holds.
+    /// </summary>
+    public static bool Changed(LedgerPoint from, LedgerPoint to) =>
+        from.Characters.Count != to.Characters.Count ||
+        to.Characters.Any(pair => !from.Characters.TryGetValue(pair.Key, out var was) || was != pair.Value) ||
+        from.Wallet.Count != to.Wallet.Count ||
+        to.Wallet.Any(pair => !from.Wallet.TryGetValue(pair.Key, out var was) || was != pair.Value);
+
+    /// <summary>
+    /// The point whose detail stands for <paramref name="at"/>: the latest one with a detail at or
+    /// before it, provided the account did not change in between. Null when there is none, which
+    /// is every session from before details were kept.
+    /// </summary>
+    public static LedgerPoint? DetailFor(IReadOnlyList<LedgerPoint> points, LedgerPoint at)
+    {
+        for (var i = points.Count - 1; i >= 0; i--)
+        {
+            var point = points[i];
+            if (point.At > at.At) continue;
+
+            if (point.HasDetail) return Changed(point, at) ? null : point;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// The details worth keeping: those each session is measured from and to, and the latest,
+    /// which the next session may start from. The rest are never read again.
+    /// </summary>
+    public static IReadOnlyCollection<DateTimeOffset> DetailsToKeep(IReadOnlyList<LedgerPoint> points)
+    {
+        var keep = new HashSet<DateTimeOffset>();
+
+        foreach (var session in All(points))
+        {
+            if (DetailFor(points, session.Before) is { } before) keep.Add(before.At);
+            if (DetailFor(points, session.End) is { } end) keep.Add(end.At);
+        }
+
+        if (points.LastOrDefault(point => point.HasDetail) is { } latest) keep.Add(latest.At);
+
+        return keep;
+    }
+
+    /// <summary>The session over the rises from <paramref name="first"/> to <paramref name="last"/>.</summary>
+    private static Session Between(IReadOnlyList<LedgerPoint> points, int first, int last)
+    {
         var before = points[first - 1];
         var lastSeen = points[last];
         var after = last + 1 < points.Count ? points[last + 1] : null;
@@ -106,6 +179,31 @@ public static class SessionRecap
         character.LevelTo > character.LevelFrom
             ? L.F("{0} · {1} · level {2} → {3}", character.Name, Duration(character.Seconds), character.LevelFrom, character.LevelTo)
             : $"{character.Name} · {Duration(character.Seconds)}";
+
+    /// <summary>"Sweet Child O Night", or "Sweet Child O Night and 2 more".</summary>
+    public static string Who(Session played) => played.Characters.Count switch
+    {
+        0 => L.T("No character named"),
+        1 => played.Characters[0].Name,
+        _ => L.F("{0} and {1} more", played.Characters[0].Name, played.Characters.Count - 1)
+    };
+
+    /// <summary>
+    /// Copper an hour of play, or null for a session too short for a rate to mean anything: ten
+    /// minutes spent selling would otherwise read as a fortune an hour.
+    /// </summary>
+    public static long? PerHour(long copper, long seconds) =>
+        seconds < 15 * 60 ? null : (long)Math.Round(copper * 3600.0 / seconds);
+
+    /// <summary>"+34g 20s in all · 15g 40s an hour": coin and items together.</summary>
+    public static string Worth(long copper, long seconds)
+    {
+        var all = L.F("{0} in all", Signed(copper));
+
+        return PerHour(copper, seconds) is { } hourly ? L.F("{0} · {1} an hour", all, Signed(hourly)) : all;
+    }
+
+    private static string Signed(long copper) => (copper < 0 ? "−" : "+") + Services.Coin.Format(Math.Abs(copper));
 
     /// <summary>The coin shown before every currency and as coin; then the rest by size.</summary>
     private const int Coin = 1;

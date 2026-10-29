@@ -12,7 +12,7 @@ namespace GuildWarsCompanion.Services;
 /// </summary>
 public sealed class TodayService(
     Gw2Client client, SnapshotStore snapshots, OfflineReader offline, VaultSignal vaultSignal,
-    FractalService fractals, TestEvidence evidence, Gw2Cache cache, ItemLookup items)
+    FractalService fractals, TestEvidence evidence, Gw2Cache cache, ItemLookup items, FestivalService festivals)
 {
     /// <summary>Dailies roll over at 00:00 UTC; the weekly vault at Monday 07:30 UTC.</summary>
     public static DateTimeOffset NextDailyReset(DateTimeOffset utcNow) =>
@@ -108,6 +108,11 @@ public sealed class TodayService(
         if (week.Count > 0)
             sections.Add(new TodaySection(
                 L.T("This week"), TodaySummary.Of(week), week.OrderBy(r => r.IsComplete)));
+
+        // After the week: a festival runs for weeks, and what resets tonight comes first.
+        var festive = await festivals.SectionsAsync(ct);
+        sections.AddRange(festive);
+        if (festive.Count > 0) evidence.Saw("festival-today");
 
         return sections;
     }
@@ -336,7 +341,7 @@ public sealed class TodayService(
     };
 
     /// <summary>A few names are useful; a wall of thirty is not.</summary>
-    private static string? Join(IReadOnlyList<string> remaining) => remaining.Count switch
+    internal static string? Join(IReadOnlyList<string> remaining) => remaining.Count switch
     {
         0 => null,
         <= 3 => string.Join(" · ", remaining),

@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.Data.Sqlite;
 
 namespace GuildWarsCompanion.Data;
@@ -12,7 +14,38 @@ public sealed record LedgerPoint(
     IReadOnlyDictionary<int, long> Wallet)
 {
     public long TotalAge => Characters.Values.Sum(character => character.Age);
+
+    /// <summary>Whether a <see cref="LedgerDetail"/> was kept with this point.</summary>
+    public bool HasDetail { get; init; }
 }
+
+/// <summary>
+/// The rest of the account at a point: what it held and what it had done. Several requests, one
+/// of them every character in full, so it is read only when the account changed since the last
+/// one; see <see cref="Services.LedgerService.RecordAsync"/>. A part the key cannot read is null.
+/// </summary>
+/// <param name="Items">How many of each item: material storage, bank, shared slots, bags and
+/// worn gear.</param>
+/// <param name="Achievements">Every achievement done or repeated at least once.</param>
+/// <param name="MasteryPoints">Mastery points earned, by the API's English region name.</param>
+/// <param name="Masteries">Levels trained on each mastery track.</param>
+/// <param name="Crafting">Each character's crafting rating, by discipline id.</param>
+public sealed record LedgerDetail(
+    IReadOnlyDictionary<int, int>? Items,
+    IReadOnlyDictionary<int, AchievementMark>? Achievements,
+    IReadOnlyList<VaultMark>? Vault,
+    IReadOnlyDictionary<string, int>? MasteryPoints,
+    IReadOnlyDictionary<int, int>? Masteries,
+    IReadOnlyDictionary<string, IReadOnlyDictionary<string, int>>? Crafting);
+
+/// <summary>An achievement's state: done, and how often a repeatable one was finished.</summary>
+public sealed record AchievementMark(bool Done, int Repeated);
+
+/// <summary>A Wizard's Vault objective, with its title as it was read: they change with the day.</summary>
+public sealed record VaultMark(string Track, int Id, string Title, bool Done);
+
+[JsonSerializable(typeof(LedgerDetail))]
+internal partial class LedgerJson : JsonSerializerContext;
 
 /// <summary>
 /// Ledger points, a fortnight of them. Wiped with the key like the activity store: another
@@ -47,6 +80,7 @@ public sealed class LedgerStore(string databasePath)
                             point_id INTEGER NOT NULL, name TEXT NOT NULL, age INTEGER NOT NULL, level INTEGER NOT NULL);
                         CREATE TABLE IF NOT EXISTS point_wallet (
                             point_id INTEGER NOT NULL, currency_id INTEGER NOT NULL, value INTEGER NOT NULL);
+                        CREATE TABLE IF NOT EXISTS point_details (point_id INTEGER PRIMARY KEY, json TEXT NOT NULL);
                         CREATE INDEX IF NOT EXISTS ix_points_at ON points (at);
                         """;
                     await command.ExecuteNonQueryAsync(ct);
@@ -73,7 +107,7 @@ public sealed class LedgerStore(string databasePath)
         return await command.ExecuteScalarAsync(ct) is long at ? DateTimeOffset.FromUnixTimeSeconds(at) : null;
     }
 
-    public async Task SaveAsync(LedgerPoint point, CancellationToken ct = default)
+    public async Task SaveAsync(LedgerPoint point, LedgerDetail? detail = null, CancellationToken ct = default)
     {
         await using var connection = await OpenAsync(ct);
         await using var transaction = await connection.BeginTransactionAsync(ct);
@@ -109,11 +143,21 @@ public sealed class LedgerStore(string databasePath)
             await command.ExecuteNonQueryAsync(ct);
         }
 
+        if (detail is not null)
+        {
+            await using var command = connection.CreateCommand();
+            command.CommandText = "INSERT INTO point_details (point_id, json) VALUES ($id, $json)";
+            command.Parameters.AddWithValue("$id", id);
+            command.Parameters.AddWithValue("$json", JsonSerializer.Serialize(detail, LedgerJson.Default.LedgerDetail));
+            await command.ExecuteNonQueryAsync(ct);
+        }
+
         // What is older than a fortnight goes with each new point, so the file never grows past it.
         await using (var prune = connection.CreateCommand())
         {
             prune.CommandText =
                 """
+                DELETE FROM point_details WHERE point_id IN (SELECT id FROM points WHERE at < $cut);
                 DELETE FROM point_characters WHERE point_id IN (SELECT id FROM points WHERE at < $cut);
                 DELETE FROM point_wallet WHERE point_id IN (SELECT id FROM points WHERE at < $cut);
                 DELETE FROM points WHERE at < $cut;
@@ -131,6 +175,7 @@ public sealed class LedgerStore(string databasePath)
         var times = new Dictionary<long, DateTimeOffset>();
         var characters = new Dictionary<long, Dictionary<string, (long, int)>>();
         var wallets = new Dictionary<long, Dictionary<int, long>>();
+        var detailed = new HashSet<long>();
 
         await using var connection = await OpenAsync(ct);
 
@@ -165,17 +210,69 @@ public sealed class LedgerStore(string databasePath)
                     into[reader.GetInt32(1)] = reader.GetInt64(2);
         }
 
+        await using (var command = connection.CreateCommand())
+        {
+            command.CommandText = "SELECT point_id FROM point_details";
+            await using var reader = await command.ExecuteReaderAsync(ct);
+            while (await reader.ReadAsync(ct))
+                detailed.Add(reader.GetInt64(0));
+        }
+
         return times
             .OrderBy(pair => pair.Value).ThenBy(pair => pair.Key)
-            .Select(pair => new LedgerPoint(pair.Value, characters[pair.Key], wallets[pair.Key]))
+            .Select(pair => new LedgerPoint(pair.Value, characters[pair.Key], wallets[pair.Key])
+            {
+                HasDetail = detailed.Contains(pair.Key)
+            })
             .ToList();
+    }
+
+    /// <summary>The detail kept with the point taken at <paramref name="at"/>, or null.</summary>
+    public async Task<LedgerDetail?> DetailAsync(DateTimeOffset at, CancellationToken ct = default)
+    {
+        await using var connection = await OpenAsync(ct);
+        await using var command = connection.CreateCommand();
+        command.CommandText =
+            """
+            SELECT d.json FROM point_details d JOIN points p ON p.id = d.point_id
+            WHERE p.at = $at ORDER BY p.id DESC LIMIT 1
+            """;
+        command.Parameters.AddWithValue("$at", at.ToUnixTimeSeconds());
+
+        return await command.ExecuteScalarAsync(ct) is string json
+            ? JsonSerializer.Deserialize(json, LedgerJson.Default.LedgerDetail)
+            : null;
+    }
+
+    /// <summary>
+    /// Drops every detail but those taken at <paramref name="keep"/>. A detail is tens of
+    /// kilobytes, and only the ones sessions are measured from and to are ever read again.
+    /// </summary>
+    public async Task KeepDetailsAsync(IReadOnlyCollection<DateTimeOffset> keep, CancellationToken ct = default)
+    {
+        await using var connection = await OpenAsync(ct);
+        await using var command = connection.CreateCommand();
+
+        var names = keep.Select((at, i) =>
+        {
+            command.Parameters.AddWithValue($"$k{i}", at.ToUnixTimeSeconds());
+            return $"$k{i}";
+        }).ToList();
+
+        command.CommandText = names.Count == 0
+            ? "DELETE FROM point_details"
+            : "DELETE FROM point_details WHERE point_id NOT IN " +
+              $"(SELECT id FROM points WHERE at IN ({string.Join(", ", names)}))";
+
+        await command.ExecuteNonQueryAsync(ct);
     }
 
     public async Task ClearAsync(CancellationToken ct = default)
     {
         await using var connection = await OpenAsync(ct);
         await using var command = connection.CreateCommand();
-        command.CommandText = "DELETE FROM point_characters; DELETE FROM point_wallet; DELETE FROM points;";
+        command.CommandText =
+            "DELETE FROM point_details; DELETE FROM point_characters; DELETE FROM point_wallet; DELETE FROM points;";
         await command.ExecuteNonQueryAsync(ct);
     }
 }

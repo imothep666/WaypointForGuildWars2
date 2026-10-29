@@ -1,0 +1,139 @@
+<shell:PageView xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:shell="using:GuildWarsCompanion.Ava.Shell"
+                xmlns:vm="using:GuildWarsCompanion.ViewModels"
+                xmlns:services="using:GuildWarsCompanion.Services"
+                xmlns:ui="using:GuildWarsCompanion.Ava.Ui"
+                x:Class="GuildWarsCompanion.Ava.Views.SessionView"
+                x:DataType="vm:SessionViewModel"
+                ShowsWash="True">
+
+    <!-- Coin, items, wallet: an icon if there is one, a name, the figure and what it is worth. -->
+    <shell:PageView.Resources>
+        <DataTemplate x:Key="Line" x:DataType="services:SessionLine">
+            <StackPanel>
+                <Grid ColumnDefinitions="4,Auto,*,Auto" MinHeight="46">
+                    <Border Background="{Binding RarityColor, Converter={x:Static ui:Paint.Brush}}"
+                            IsVisible="{Binding Rarity, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                    <Image Grid.Column="1" ui:WebImage.Url="{Binding IconUrl}" Width="26" Height="26"
+                           IsVisible="{Binding HasIcon}" VerticalAlignment="Center" Margin="10,0,0,0" />
+                    <TextBlock Grid.Column="2" Text="{Binding Name}" VerticalAlignment="Center"
+                               Margin="12,0,8,0" TextTrimming="CharacterEllipsis" />
+                    <StackPanel Grid.Column="3" Spacing="1" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Figure}" Classes="figure" HorizontalAlignment="Right" />
+                        <TextBlock Text="{Binding Note}" IsVisible="{Binding HasNote}" Classes="caption small"
+                                   HorizontalAlignment="Right" />
+                    </StackPanel>
+                </Grid>
+                <Border Classes="hairline" />
+            </StackPanel>
+        </DataTemplate>
+    </shell:PageView.Resources>
+
+    <RefreshContainer RefreshRequested="OnPullRefresh">
+        <ScrollViewer x:Name="Scroller">
+            <StackPanel Margin="20,6,20,32" Spacing="14">
+                <TextBlock Text="{Binding EmptyMessage}" Classes="caption" HorizontalAlignment="Center" Margin="0,32"
+                           IsVisible="{Binding Duration, Converter={x:Static ObjectConverters.IsNull}}" />
+                <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding HasError}" Classes="error" />
+
+                <!-- How long, as Today leads with the time to the reset; who played under it. -->
+                <StackPanel Spacing="2" IsVisible="{Binding Duration, Converter={x:Static ObjectConverters.IsNotNull}}">
+                    <TextBlock Text="{Binding Title}" Classes="caption" />
+                    <TextBlock Text="{Binding Duration}" FontFamily="{StaticResource BarlowSemiBold}" FontSize="48" />
+                    <TextBlock Text="{Binding When}" Classes="caption" />
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding Characters}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <TextBlock Text="{Binding}" Margin="0,2" TextWrapping="Wrap" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock Text="{Binding Missing}" IsVisible="{Binding HasMissing}" Classes="caption small"
+                           TextWrapping="Wrap" />
+
+                <StackPanel IsVisible="{Binding HasEarned}" Spacing="4">
+                    <Border Classes="rule" Margin="0,4,0,0" />
+                    <TextBlock Text="{ui:T 'EARNED'}" Classes="heading" Margin="0,0,0,4" />
+                    <ItemsControl ItemsSource="{Binding Earned}" ItemTemplate="{StaticResource Line}" />
+                </StackPanel>
+
+                <StackPanel IsVisible="{Binding HasWallet}" Spacing="4">
+                    <Border Classes="rule" Margin="0,4,0,0" />
+                    <TextBlock Text="{ui:T 'WALLET'}" Classes="heading" Margin="0,0,0,4" />
+                    <ItemsControl ItemsSource="{Binding Wallet}" ItemTemplate="{StaticResource Line}" />
+                </StackPanel>
+
+                <StackPanel IsVisible="{Binding HasProgress}" Spacing="4">
+                    <Border Classes="rule" Margin="0,4,0,0" />
+                    <TextBlock Text="{ui:T 'PROGRESS'}" Classes="heading" Margin="0,0,0,4" />
+                    <ItemsControl ItemsSource="{Binding Progress}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <TextBlock Text="{Binding}" Margin="0,4" TextWrapping="Wrap" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <StackPanel IsVisible="{Binding HasGained}" Spacing="4">
+                    <Border Classes="rule" Margin="0,4,0,0" />
+                    <TextBlock Text="{ui:T 'ITEMS GAINED'}" Classes="heading" Margin="0,0,0,4" />
+                    <ItemsControl ItemsSource="{Binding Gained}" ItemTemplate="{StaticResource Line}" />
+                </StackPanel>
+
+                <StackPanel IsVisible="{Binding HasSpent}" Spacing="4">
+                    <Border Classes="rule" Margin="0,4,0,0" />
+                    <TextBlock Text="{ui:T 'ITEMS USED, SALVAGED OR SOLD'}" Classes="heading" Margin="0,0,0,4" />
+                    <ItemsControl ItemsSource="{Binding Spent}" ItemTemplate="{StaticResource Line}" />
+                </StackPanel>
+
+                <!-- The fortnight the ledger keeps, a day at a time. A tap puts that session above. -->
+                <StackPanel IsVisible="{Binding HasDays}" Spacing="4">
+                    <Border Classes="rule" Margin="0,4,0,0" />
+                    <TextBlock Text="{ui:T 'SESSIONS'}" Classes="heading" />
+                    <TextBlock Text="{Binding Week}" Classes="caption" Margin="0,0,0,6" />
+                    <ItemsControl ItemsSource="{Binding Days}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="services:SessionDay">
+                                <StackPanel Margin="0,6,0,0">
+                                    <Grid ColumnDefinitions="*,Auto" Margin="0,4">
+                                        <TextBlock Text="{Binding Name}" Classes="caption" />
+                                        <TextBlock Grid.Column="1" Text="{Binding Total}" Classes="caption" />
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="services:SessionRow">
+                                                <Button Classes="row" Click="OnSessionClicked">
+                                                    <Grid ColumnDefinitions="4,*,Auto" RowDefinitions="Auto,Auto" MinHeight="56">
+                                                        <!-- Brass for the session on the page. -->
+                                                        <Border Grid.RowSpan="2" Background="{StaticResource BrassBrush}"
+                                                                IsVisible="{Binding IsShown}" />
+                                                        <Border Grid.RowSpan="2" Background="{StaticResource BankedBrush}"
+                                                                IsVisible="{Binding !IsShown}" />
+                                                        <TextBlock Grid.Column="1" Text="{Binding Title}" Margin="14,9,8,0"
+                                                                   TextTrimming="CharacterEllipsis" />
+                                                        <TextBlock Grid.Column="2" Text="{Binding Figure}" Classes="figure"
+                                                                   Margin="0,9,0,0" />
+                                                        <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                                                                   Text="{Binding Caption}" Classes="caption small"
+                                                                   TextTrimming="CharacterEllipsis" Margin="14,3,0,9" />
+                                                    </Grid>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <!-- What the figures above do not see. -->
+                <TextBlock Text="{ui:T 'Items are valued at what buyers offer today, account bound ones at nothing. Items listed on the trading post count as gone; coin from sales counts once it is collected. A session is noticed at the half-hourly check, so its edges are only as sharp as that.'}"
+                           IsVisible="{Binding HasEarned}" Classes="caption small" TextWrapping="Wrap" Margin="0,6,0,0" />
+            </StackPanel>
+        </ScrollViewer>
+    </RefreshContainer>
+</shell:PageView>

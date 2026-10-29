@@ -10,6 +10,10 @@ namespace GuildWarsCompanion.Services;
 /// rather than with the next build — Visions of Eternity is in it already. A week between fetches:
 /// the schedule changes with releases, not daily. With no connection the last copy is used however
 /// old; with no copy at all there is simply no meta timetable, and the screen says so.
+///
+/// A festival's events are in the same data all year. They are added to the maps only while
+/// <see cref="Festivals"/> says the festival is on, as one more map under the festival's name, so
+/// the timetable, its reminders and the alerts take them as they take any map's.
 /// </summary>
 public sealed class MetaSource(AppEnvironment environment)
 {
@@ -28,7 +32,37 @@ public sealed class MetaSource(AppEnvironment environment)
     /// <summary>Why there is no timetable, when there is none.</summary>
     public string? Problem { get; private set; }
 
-    public async Task<IReadOnlyList<MetaMap>> GetAsync(CancellationToken ct = default)
+    private IReadOnlyList<MetaMap> _festivals = [];
+
+    public async Task<IReadOnlyList<MetaMap>> GetAsync(CancellationToken ct = default) =>
+        WithFestivals(await MapsAsync(ct), _festivals, DateTimeOffset.UtcNow);
+
+    /// <summary>The festival entries whether or not they are on, by their timer keys.</summary>
+    public async Task<IReadOnlyList<MetaMap>> FestivalsAsync(CancellationToken ct = default)
+    {
+        await MapsAsync(ct);
+        return _festivals;
+    }
+
+    /// <summary>
+    /// Each festival on at <paramref name="utcNow"/> that has timer data, then the maps. A festival
+    /// keeps the data's name, and carries its own name and last day where a map has its expansion.
+    /// </summary>
+    public static IReadOnlyList<MetaMap> WithFestivals(
+        IReadOnlyList<MetaMap> maps, IReadOnlyList<MetaMap> festivals, DateTimeOffset utcNow)
+    {
+        var on = Festivals.On(Festivals.Announced, utcNow)
+            .Select(period => festivals.FirstOrDefault(entry => entry.Key == period.Festival.TimerKey) is { } entry
+                ? entry with { Category = $"{period.Festival.Name} · {period.Until}" }
+                : null)
+            .OfType<MetaMap>()
+            .ToList();
+
+        // First, so a festival event on now leads the many map metas that are too.
+        return on.Count == 0 ? maps : [.. on, .. maps];
+    }
+
+    private async Task<IReadOnlyList<MetaMap>> MapsAsync(CancellationToken ct)
     {
         if (_maps is not null && DateTimeOffset.UtcNow - _readAt < Fresh) return _maps;
 
@@ -41,7 +75,9 @@ public sealed class MetaSource(AppEnvironment environment)
 
         try
         {
-            _maps = MetaSchedule.Parse(await File.ReadAllTextAsync(FilePath, ct));
+            var json = await File.ReadAllTextAsync(FilePath, ct);
+            _maps = MetaSchedule.Parse(json);
+            _festivals = MetaSchedule.ParseFestivals(json);
             _readAt = DateTimeOffset.UtcNow;
             Problem = null;
         }
@@ -61,12 +97,13 @@ public sealed class MetaSource(AppEnvironment environment)
     /// </summary>
     public async Task<IReadOnlyList<MetaMap>> HeldAsync(CancellationToken ct = default)
     {
-        if (_maps is not null) return _maps;
+        if (_maps is not null) return WithFestivals(_maps, _festivals, DateTimeOffset.UtcNow);
         if (!File.Exists(FilePath)) return [];
 
         try
         {
-            return MetaSchedule.Parse(await File.ReadAllTextAsync(FilePath, ct));
+            var json = await File.ReadAllTextAsync(FilePath, ct);
+            return WithFestivals(MetaSchedule.Parse(json), MetaSchedule.ParseFestivals(json), DateTimeOffset.UtcNow);
         }
         catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException or IOException)
         {

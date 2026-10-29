@@ -404,6 +404,10 @@ public sealed class Gw2Client(HttpClient http)
     public Task<DailyCategory> GetDailyFractalsAsync(CancellationToken ct = default) =>
         GetAsync("achievements/categories/88", Gw2JsonContext.Default.DailyCategory, ct);
 
+    /// <summary>One achievement category, named in the phone's language. Unauthenticated.</summary>
+    public Task<DailyCategory> GetAchievementCategoryAsync(int id, CancellationToken ct = default) =>
+        GetAsync($"achievements/categories/{id}", Gw2JsonContext.Default.DailyCategory, ct);
+
     // --- crafting ----------------------------------------------------------
 
     /// <summary>

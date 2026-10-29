@@ -70,6 +70,7 @@ public static class Routes
         new("today", L.T("TODAY"), () => new TodayView(), typeof(TodayViewModel)),
         new("events", L.T("TIMETABLE"), () => new EventsView(), typeof(EventsViewModel)),
         new("fractals", L.T("FRACTALS"), () => new FractalsView(), typeof(FractalsViewModel)),
+        new("session", L.T("SESSION"), () => new SessionView(), typeof(SessionViewModel)),
         new("characters", L.T("CHARACTERS"), () => new CharactersView(), typeof(CharactersViewModel)),
         new("achievements", L.T("ACHIEVEMENTS"), () => new AchievementsView(), typeof(AchievementsViewModel)),
         new("collection", L.T("COLLECTION"), () => new CollectionView(), typeof(CollectionViewModel)),

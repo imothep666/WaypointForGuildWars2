@@ -516,7 +516,8 @@ public sealed record Achievement(
 public sealed record DailyCategory(
     [property: JsonPropertyName("id")] int Id,
     [property: JsonPropertyName("achievements")] IReadOnlyList<CategoryEntry> Achievements,
-    [property: JsonPropertyName("tomorrow")] IReadOnlyList<CategoryEntry>? Tomorrow = null);
+    [property: JsonPropertyName("tomorrow")] IReadOnlyList<CategoryEntry>? Tomorrow = null,
+    [property: JsonPropertyName("name")] string? Name = null);
 
 public sealed record CategoryEntry([property: JsonPropertyName("id")] int Id);
 

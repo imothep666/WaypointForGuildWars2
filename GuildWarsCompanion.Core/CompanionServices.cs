@@ -62,6 +62,7 @@ public static class CompanionServices
         services.AddSingleton<EventService>();
         services.AddSingleton<TodayService>();
         services.AddSingleton<FractalService>();
+        services.AddSingleton<FestivalService>();
         services.AddSingleton<MapArt>();
         services.AddSingleton<Callings>();
         services.AddSingleton<GuideService>();
@@ -162,6 +163,7 @@ public static class CompanionServices
         services.AddSingleton<CraftingViewModel>();
         services.AddSingleton<StandingViewModel>();
         services.AddSingleton<FractalsViewModel>();
+        services.AddSingleton<SessionViewModel>();
         services.AddSingleton<EventsViewModel>();
         services.AddSingleton<OrdersViewModel>();
         services.AddSingleton<WatchViewModel>();

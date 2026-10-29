@@ -38,10 +38,19 @@ public static class MetaSchedule
     /// </summary>
     private static readonly HashSet<string> Skipped = new(StringComparer.Ordinal) { "t", "core-wb", "core-hwb" };
 
-    private const string Festivals = "Special Events";
+    private const string FestivalCategory = "Special Events";
 
     /// <summary>Every map the data describes, in the data's own order — release order.</summary>
-    public static IReadOnlyList<MetaMap> Parse(string json)
+    public static IReadOnlyList<MetaMap> Parse(string json) => Read(json, festivals: false);
+
+    /// <summary>
+    /// The festivals' entries alone, by their keys (festival-ha): which of them is on is not the
+    /// data's to say, so <see cref="MetaSource"/> adds those <see cref="Services.Festivals"/> says
+    /// are running.
+    /// </summary>
+    public static IReadOnlyList<MetaMap> ParseFestivals(string json) => Read(json, festivals: true);
+
+    private static List<MetaMap> Read(string json, bool festivals)
     {
         using var document = JsonDocument.Parse(json);
 
@@ -52,7 +61,7 @@ public static class MetaSchedule
             var meta = entry.Value;
             var category = Text(meta, "category");
 
-            if (Skipped.Contains(entry.Name) || category == Festivals) continue;
+            if (Skipped.Contains(entry.Name) || (category == FestivalCategory) != festivals) continue;
 
             var names = new Dictionary<string, string>();
 

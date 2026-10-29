@@ -77,6 +77,7 @@
                                                         <ProgressBar Grid.Row="1" Grid.Column="1"
                                                                      Grid.ColumnSpan="3" Minimum="0"
                                                                      Maximum="1" Value="{Binding Fraction}"
+                                                                     IsVisible="{Binding HasBar}"
                                                                      Margin="16,7,0,0" />
 
                                                         <!-- What is actually left, named. -->
@@ -96,18 +97,28 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <!-- The last session, from the ledger; see SessionRecap. -->
+                    <!-- The last session, from the ledger; see SessionRecap. A tap opens it in full. -->
                     <StackPanel IsVisible="{Binding HasSession}" Margin="0,0,0,24">
                         <controls:SectionBand Title="{Binding Session.Heading}" Summary="{Binding Session.When}" />
-                        <ItemsControl ItemsSource="{Binding Session.Characters}" Margin="20,10,20,0">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="x:String">
-                                    <TextBlock Text="{Binding}" Margin="0,2" TextWrapping="Wrap" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                        <TextBlock Text="{Binding Session.Wallet}" Classes="caption" Margin="20,6,20,0"
-                                   Foreground="{StaticResource BrassBrush}" TextWrapping="Wrap" />
+                        <Button Classes="row" Command="{Binding OpenSessionCommand}" HorizontalAlignment="Stretch">
+                            <Grid ColumnDefinitions="*,Auto" Margin="20,10,20,6">
+                                <StackPanel>
+                                    <ItemsControl ItemsSource="{Binding Session.Characters}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="x:String">
+                                                <TextBlock Text="{Binding}" Margin="0,2" TextWrapping="Wrap" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <!-- Coin and items together, when the items were recorded. -->
+                                    <TextBlock Text="{Binding Session.Worth}" Margin="0,6,0,0" TextWrapping="Wrap"
+                                               IsVisible="{Binding Session.Worth, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                                    <TextBlock Text="{Binding Session.Wallet}" Classes="caption" Margin="0,4,0,0"
+                                               Foreground="{StaticResource BrassBrush}" TextWrapping="Wrap" />
+                                </StackPanel>
+                                <TextBlock Grid.Column="1" Classes="chevron" Margin="10,0,0,0" VerticalAlignment="Center" />
+                            </Grid>
+                        </Button>
                     </StackPanel>
                 </StackPanel>
             </ScrollViewer>

@@ -32,19 +32,18 @@ public sealed class SessionWatcher(LedgerService ledger) : IAccountWatcher
 
         var text = await ledger.DescribeAsync(played, ct);
 
-        var who = played.Characters.Count switch
-        {
-            0 => null,
-            1 => played.Characters[0].Name,
-            _ => L.F("{0} and {1} more", played.Characters[0].Name, played.Characters.Count - 1)
-        };
+        var who = played.Characters.Count == 0 ? null : SessionRecap.Who(played);
+
+        // What it came to first, when the items were recorded: the wallet line alone counts a
+        // session of farming materials as nothing. One line: the game's alert box breaks at spaces.
+        var body = string.Join(" · ", new[] { who, text.Worth, text.Wallet }.OfType<string>());
 
         return
         [
             new AccountAlert(
                 $"session:{played.Before.At.ToUnixTimeSeconds()}",
                 L.F("Session recap · {0}", SessionRecap.Duration(played.PlayedSeconds)),
-                who is null ? text.Wallet : $"{who} · {text.Wallet}")
+                body)
         ];
     }
 }

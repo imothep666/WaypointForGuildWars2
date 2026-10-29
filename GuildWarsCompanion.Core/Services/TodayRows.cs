@@ -7,10 +7,14 @@ namespace GuildWarsCompanion.Services;
 /// That is what lets the reset trackers — including the "could not read" state, which is the
 /// easiest thing here to break silently — be tested without a UI framework.
 /// </summary>
+/// <param name="Figure">What stands in for the count on a row that is not one: the time of a
+/// festival's next event. Such a row has no bar.</param>
 public sealed record TodayRow(
     string Name, int Done, int Total, string? Remaining, bool IsStale = false,
-    string? Route = null, bool Unread = false)
+    string? Route = null, bool Unread = false, string? Figure = null)
 {
+    public bool HasBar => Figure is null;
+
     public bool IsComplete => !Unread && Total > 0 && Done >= Total;
 
     /// <summary>Whether tapping the row leads anywhere.</summary>
@@ -22,7 +26,7 @@ public sealed record TodayRow(
     /// </summary>
     public bool IsQuiet => Unread || IsComplete;
 
-    public string Progress => Unread ? "—" : $"{Done} / {Total}";
+    public string Progress => Unread ? "—" : Figure ?? $"{Done} / {Total}";
 
     public double Fraction => Unread || Total <= 0 ? 0 : Math.Clamp((double)Done / Total, 0, 1);
 

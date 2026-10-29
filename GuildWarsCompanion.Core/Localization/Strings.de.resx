@@ -3521,4 +3521,127 @@
   <data name="raid|Ura" xml:space="preserve">
     <value>Ura</value>
   </data>
+  <data name="and {0} more" xml:space="preserve">
+    <value>und {0} weitere</value>
+  </data>
+  <data name="at what buyers offer now" xml:space="preserve">
+    <value>zum aktuellen Gebot der Käufer</value>
+  </data>
+  <data name="In all" xml:space="preserve">
+    <value>Insgesamt</value>
+  </data>
+  <data name="An hour" xml:space="preserve">
+    <value>Pro Stunde</value>
+  </data>
+  <data name="What this session gained in items and progress was not recorded: the ledger keeps that only for sessions since this version, starting from a point before them." xml:space="preserve">
+    <value>Was diese Sitzung an Gegenständen und Fortschritt gebracht hat, wurde nicht erfasst: Das gibt es erst für Sitzungen ab dieser Version, und nur, wenn vor der Sitzung schon ein Stand gespeichert war.</value>
+  </data>
+  <data name="items need the 'inventories' permission" xml:space="preserve">
+    <value>Gegenstände brauchen die Berechtigung „inventories“</value>
+  </data>
+  <data name="achievements and masteries need the 'progression' permission" xml:space="preserve">
+    <value>Erfolge und Beherrschungen brauchen die Berechtigung „progression“</value>
+  </data>
+  <data name="Not shown: {0}." xml:space="preserve">
+    <value>Nicht angezeigt: {0}.</value>
+  </data>
+  <data name="Wizard's Vault · {0}" xml:space="preserve">
+    <value>Gewölbe des Zauberers · {0}</value>
+  </data>
+  <data name="Achievement · {0}" xml:space="preserve">
+    <value>Erfolg · {0}</value>
+  </data>
+  <data name="number {0}" xml:space="preserve">
+    <value>Nummer {0}</value>
+  </data>
+  <data name="+{0} mastery points · {1}" xml:space="preserve">
+    <value>+{0} Beherrschungspunkte · {1}</value>
+  </data>
+  <data name="Mastery · {0} · level {1} → {2}" xml:space="preserve">
+    <value>Beherrschung · {0} · Stufe {1} → {2}</value>
+  </data>
+  <data name="{0} · {1} {2} → {3}" xml:space="preserve">
+    <value>{0} · {1} {2} → {3}</value>
+  </data>
+  <data name="{0:dddd d MMMM}" xml:space="preserve">
+    <value>{0:dddd, d. MMMM}</value>
+  </data>
+  <data name="last seen playing {0:HH:mm}" xml:space="preserve">
+    <value>zuletzt gespielt {0:HH:mm}</value>
+  </data>
+  <data name="No character named" xml:space="preserve">
+    <value>Kein Charakter genannt</value>
+  </data>
+  <data name="{0} in all" xml:space="preserve">
+    <value>{0} insgesamt</value>
+  </data>
+  <data name="{0} · {1} an hour" xml:space="preserve">
+    <value>{0} · {1} pro Stunde</value>
+  </data>
+  <data name="No session yet: the recap starts with the next time you play." xml:space="preserve">
+    <value>Noch keine Sitzung: Der Rückblick beginnt, wenn du das nächste Mal spielst.</value>
+  </data>
+  <data name="A recap needs the 'characters' and 'wallet' permissions. Create a new key that includes them." xml:space="preserve">
+    <value>Ein Rückblick braucht die Berechtigungen „characters“ und „wallet“. Erstelle einen neuen Schlüssel, der sie enthält.</value>
+  </data>
+  <data name="This session" xml:space="preserve">
+    <value>Diese Sitzung</value>
+  </data>
+  <data name="Last session" xml:space="preserve">
+    <value>Letzte Sitzung</value>
+  </data>
+  <data name="Earlier session" xml:space="preserve">
+    <value>Frühere Sitzung</value>
+  </data>
+  <data name="Last 7 days · {0} in {1} sessions" xml:space="preserve">
+    <value>Letzte 7 Tage · {0} in {1} Sitzungen</value>
+  </data>
+  <data name="Earned" xml:space="preserve">
+    <value>Verdient</value>
+  </data>
+  <data name="Progress" xml:space="preserve">
+    <value>Fortschritt</value>
+  </data>
+  <data name="Items gained" xml:space="preserve">
+    <value>Erhaltene Gegenstände</value>
+  </data>
+  <data name="Items used, salvaged or sold" xml:space="preserve">
+    <value>Verbraucht, wiederverwertet oder verkauft</value>
+  </data>
+  <data name="Sessions" xml:space="preserve">
+    <value>Sitzungen</value>
+  </data>
+  <data name="Session" xml:space="preserve">
+    <value>Sitzung</value>
+  </data>
+  <data name="Items are valued at what buyers offer today, account bound ones at nothing. Items listed on the trading post count as gone; coin from sales counts once it is collected. A session is noticed at the half-hourly check, so its edges are only as sharp as that." xml:space="preserve">
+    <value>Gegenstände zählen zum heutigen Gebot der Käufer, accountgebundene gar nicht. Was im Handelsposten eingestellt ist, zählt als weg; Münzen aus Verkäufen zählen, sobald du sie abholst. Eine Sitzung wird bei der halbstündlichen Prüfung bemerkt, genauer sind ihre Ränder nicht.</value>
+  </data>
+  <data name="until {0:dddd d MMMM}" xml:space="preserve">
+    <value>bis {0:dddd, d. MMMM}</value>
+  </data>
+  <data name="next festival event" xml:space="preserve">
+    <value>nächstes Festival-Event</value>
+  </data>
+  <data name="Festival achievements" xml:space="preserve">
+    <value>Festival-Erfolge</value>
+  </data>
+  <data name="Lunar New Year" xml:space="preserve">
+    <value>Mondneujahr</value>
+  </data>
+  <data name="Super Adventure Festival" xml:space="preserve">
+    <value>Super Adventure Festival</value>
+  </data>
+  <data name="Dragon Bash" xml:space="preserve">
+    <value>Drachen-Gepolter</value>
+  </data>
+  <data name="Festival of the Four Winds" xml:space="preserve">
+    <value>Fest der Vier Winde</value>
+  </data>
+  <data name="Halloween" xml:space="preserve">
+    <value>Halloween</value>
+  </data>
+  <data name="Wintersday" xml:space="preserve">
+    <value>Wintertag</value>
+  </data>
 </root>

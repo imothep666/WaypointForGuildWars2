@@ -15,7 +15,11 @@ shortlist as it stands, with the reasoning, so the next session does not have to
 
 ### Could be built next
 
-Nothing small is waiting just now; what is left needs the game or a device (below).
+- **Festival dates from the wiki.** `Festivals.Announced` is a list typed in from ArenaNet's
+  announcement, holding only Halloween 2026. The wiki was under maintenance on 2026-10-29 (its
+  API too), so which page carries the dates in a readable shape is still to be found; the wiki's
+  semantic data, which the guide check already queries, is the first place to look. Kept on the
+  phone like the timer data, so a festival still shows offline.
 
 ### Smaller things, carried rather than forgotten
 
@@ -66,6 +70,49 @@ Nothing small is waiting just now; what is left needs the game or a device (belo
 ---
 
 ## Done
+
+### On the phone, 2026-10-29: festivals, while they are on
+
+- **A running festival's events join the timetable.** The wiki's timer data lists Halloween (Mad
+  King Says), Dragon Bash and the Festival of the Four Winds all year; `MetaSource` adds an entry to
+  the maps only while `Festivals` says it is on, ahead of the map metas, so its countdown,
+  reminders, alerts and the Here line come as any map's do.
+- **Today has a section per running festival**: its last day, the next festival event at a clock
+  time (the page is not redrawn each minute), and a row per achievement category it brings back,
+  with what is left named. The categories are the API's, picked by name on 2026-10-29: Halloween
+  Rituals and Shadow of the Mad King, Wintersday Traditions, Lunar New Year, Dragon Bash and its
+  Feats, Festival of the Four Winds and Four Winds Customs, and two Super Adventure Box ones.
+- **When a festival runs is the open part.** The API has no flag, and every festival daily
+  category still lists its achievements years after the dailies ended, so none is a sign. For now
+  `Festivals.Announced` holds this Halloween as ArenaNet announced it (13 October to 3 November);
+  the wiki is to be read for it once it is back from maintenance, and a festival not on the list
+  is not shown.
+- Seen on the phone: the Halloween section with Mad King Says on until 15:10, Halloween-Rituale
+  4/23 and Schatten des Verrückten Königs 7/29, and the Halloween row in the timetable. German
+  festival names are the game's, from the API's category names ("Drachen-Gepolter", "Mondneujahr").
+
+### On the phone, 2026-10-29: the session recap in full
+
+- **The ledger keeps a detail beside a point the account changed by.** Storage (material storage,
+  bank, shared slots, bags and worn gear), achievements done or repeated, the vault's objectives,
+  mastery points and levels, and each character's crafting: about ten requests, every character
+  in full among them. Only when playtime, a level or the wallet moved since the last detail
+  (`SessionRecap.Changed`), so an account at rest costs the half-hourly poll nothing more. A
+  session's start borrows the last detail before it, which still holds because nothing moved.
+  Only the details sessions are measured from and to, and the latest, are kept
+  (`DetailsToKeep`); each is about 20 KB. Gear drawn from the legendary armory is not counted, or
+  equipping a legendary would gain one.
+- **A page behind Today's recap.** What the session earned: coin, items at what buyers offer now,
+  the two together, and an hour's worth for a session of a quarter hour or more. The whole wallet
+  with icons, the items gained and the items used, salvaged or sold (forty each, most valuable
+  first), and progress: vault objectives, achievements, mastery points and levels, crafting
+  ratings. Under it every session the fortnight holds, a day at a time with the day's playtime
+  and the last seven days' total; a tap puts that session on the page. Today's recap gains the
+  "in all · an hour" line and opens the page; the notification leads with it.
+- Seen on the phone: the page, the wallet, the list and an earlier session selected. The first
+  detail was stored (930 items, 275 achievements, 20 vault objectives). Sessions from before it
+  say they were not recorded. What a recorded session shows needs the next evening of play; the
+  test plan has `session-loot`, `session-progress` and `session-notification`.
 
 ### On the phone, 2026-10-14: a guide held against a character
 

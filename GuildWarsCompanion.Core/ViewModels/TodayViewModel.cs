@@ -20,6 +20,11 @@ public sealed partial class TodayViewModel(
     private SessionText? _session;
 
     public bool HasSession => Session is not null;
+
+    /// <summary>The recap in full, with the sessions before it.</summary>
+    [RelayCommand]
+    public Task OpenSessionAsync() => navigator.GoToAsync("session");
+
     /// <summary>"14h 30m", "42 min": how long until the daily reset, the page's headline.</summary>
     [ObservableProperty] private string? _resetIn;
 
