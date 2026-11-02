@@ -213,6 +213,13 @@ public sealed class LedgerService(
             played, changes, changes?.Items is { } moved ? await PricesAsync(moved.Keys, ct) : null, ct);
     }
 
+    /// <summary>
+    /// The recap from what the ledger holds, without a request: no prices, so no worth line.
+    /// What Today shows while the network part is still on its way.
+    /// </summary>
+    public async Task<SessionText> DescribeKeptAsync(Session played, CancellationToken ct = default) =>
+        await DescribeAsync(played, await ChangesAsync(played, ct), null, ct);
+
     private async Task<SessionText> DescribeAsync(
         Session played, SessionChanges? changes, IReadOnlyDictionary<int, long>? prices, CancellationToken ct)
     {

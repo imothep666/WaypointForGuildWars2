@@ -75,13 +75,16 @@ public sealed partial class TodayViewModel(
 
         var loaded = await LoadSectionsAsync(ct);
 
+        // Beside the PC's answer rather than after it: the recap does not depend on it.
+        var reading = loaded ? ReadSessionAsync(ct) : null;
+
         var report = await playing;
         _loaded = loaded;
 
         // After the trackers, whose fresh lists it reads; see HereService.
         await ApplyGameAsync(report, ct);
 
-        if (loaded) Session = await ReadSessionAsync(ct);
+        if (reading is not null) Session = await reading;
     });
 
     /// <summary>Whether the last refresh read today's trackers, which the Here line builds on.</summary>
@@ -204,6 +207,12 @@ public sealed partial class TodayViewModel(
         if (await today.GetStoredAsync(ct) is { } kept)
             foreach (var section in kept)
                 Sections.Add(section);
+
+        // The recap as the ledger has it, with them: today's trackers, a new point and the prices
+        // take seconds, and the card used to turn up only after them all, below a list already
+        // scrolled to its end. ReadSessionAsync replaces it.
+        if (Session is null && await ledger.LatestAsync(ct) is { } played)
+            Session = await ledger.DescribeKeptAsync(played, ct);
 
         var fresh = await today.GetAsync(ct);
 

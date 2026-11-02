@@ -24,6 +24,11 @@ public sealed class FestivalService(Gw2Client client, OfflineReader offline, Met
 
             rows.AddRange(await AchievementsAsync(period.Festival, ct));
 
+            // The way to the calendar, saying what comes after this one.
+            if (Festivals.Calendar(Festivals.Announced, now).FirstOrDefault(entry => !entry.IsOn) is { } after)
+                rows.Add(new TodayRow(L.T("Festival calendar"), 0, 0, L.F("next: {0}, {1}", after.Name, after.When),
+                    Route: "//festivals", Figure: string.Empty));
+
             sections.Add(new TodaySection(period.Festival.Name, period.Until, rows, $"festival:{period.Festival.Key}"));
         }
 

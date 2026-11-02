@@ -3644,4 +3644,55 @@
   <data name="Wintersday" xml:space="preserve">
     <value>Wintertag</value>
   </data>
+  <data name="Festivals" xml:space="preserve">
+    <value>Festivals</value>
+  </data>
+  <data name="FESTIVALS" xml:space="preserve">
+    <value>FESTIVALS</value>
+  </data>
+  <data name="THE YEAR'S FESTIVALS" xml:space="preserve">
+    <value>FESTIVALS IM JAHR</value>
+  </data>
+  <data name="Festival calendar" xml:space="preserve">
+    <value>Festivalkalender</value>
+  </data>
+  <data name="next: {0}, {1}" xml:space="preserve">
+    <value>als Nächstes: {0}, {1}</value>
+  </data>
+  <data name="{0:d MMMM} to {1:d MMMM}" xml:space="preserve">
+    <value>{0:d. MMMM} bis {1:d. MMMM}</value>
+  </data>
+  <data name="starts today" xml:space="preserve">
+    <value>beginnt heute</value>
+  </data>
+  <data name="starts tomorrow" xml:space="preserve">
+    <value>beginnt morgen</value>
+  </data>
+  <data name="in {0} days" xml:space="preserve">
+    <value>in {0} Tagen</value>
+  </data>
+  <data name="not announced yet" xml:space="preserve">
+    <value>noch nicht angekündigt</value>
+  </data>
+  <data name="usually late January to mid-February" xml:space="preserve">
+    <value>meist Ende Januar bis Mitte Februar</value>
+  </data>
+  <data name="usually in April" xml:space="preserve">
+    <value>meist im April</value>
+  </data>
+  <data name="usually June into July" xml:space="preserve">
+    <value>meist Juni bis Juli</value>
+  </data>
+  <data name="usually July into August" xml:space="preserve">
+    <value>meist Juli bis August</value>
+  </data>
+  <data name="usually mid-October to early November" xml:space="preserve">
+    <value>meist Mitte Oktober bis Anfang November</value>
+  </data>
+  <data name="usually mid-December to early January" xml:space="preserve">
+    <value>meist Mitte Dezember bis Anfang Januar</value>
+  </data>
+  <data name="Dates come from ArenaNet's announcements, usually a week or two ahead. Until then a festival shows when it ran in past years." xml:space="preserve">
+    <value>Die Termine stammen aus den Ankündigungen von ArenaNet, meist ein, zwei Wochen vorher. Bis dahin zeigt ein Festival, wann es in den Vorjahren lief.</value>
+  </data>
 </root>

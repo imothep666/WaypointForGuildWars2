@@ -163,6 +163,7 @@ public static class CompanionServices
         services.AddSingleton<CraftingViewModel>();
         services.AddSingleton<StandingViewModel>();
         services.AddSingleton<FractalsViewModel>();
+        services.AddSingleton<FestivalsViewModel>();
         services.AddSingleton<SessionViewModel>();
         services.AddSingleton<EventsViewModel>();
         services.AddSingleton<OrdersViewModel>();

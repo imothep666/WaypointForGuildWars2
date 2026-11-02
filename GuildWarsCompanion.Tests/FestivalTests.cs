@@ -77,6 +77,49 @@ public class FestivalTests
     }
 
     [Fact]
+    public void The_calendar_puts_the_festival_on_first_and_the_rest_by_their_usual_start()
+    {
+        var calendar = Festivals.Calendar(Festivals.Announced, DuringHalloween);
+
+        Assert.Equal(
+            ["halloween", "wintersday", "lunar", "sab", "dragonbash", "fourwinds"],
+            calendar.Select(entry => entry.Festival.Key));
+
+        Assert.True(calendar[0].IsOn);
+        Assert.All(calendar.Skip(1), entry => Assert.False(entry.IsAnnounced));
+        Assert.Equal(new DateTime(2026, 12, 12), calendar[1].Next);
+        Assert.Equal(new DateTime(2027, 1, 25), calendar[2].Next);
+    }
+
+    [Fact]
+    public void An_announced_festival_shows_its_dates_and_moves_ahead_of_its_season()
+    {
+        // Noon UTC, so the days are the same in every time zone the tests run in.
+        var wintersday = new FestivalPeriod(Festivals.ByKey("wintersday")!,
+            new DateTimeOffset(2026, 12, 8, 12, 0, 0, TimeSpan.Zero),
+            new DateTimeOffset(2027, 1, 5, 12, 0, 0, TimeSpan.Zero));
+
+        var now = new DateTimeOffset(2026, 11, 28, 12, 0, 0, TimeSpan.Zero);
+        var entry = Festivals.Calendar([..Festivals.Announced, wintersday], now)[0];
+
+        Assert.Equal("wintersday", entry.Festival.Key);
+        Assert.True(entry.IsAnnounced);
+        Assert.False(entry.IsOn);
+        Assert.Equal(new DateTime(2026, 12, 8), entry.Next);
+        Assert.Equal(wintersday.Span, entry.When);
+    }
+
+    [Fact]
+    public void A_festival_that_ended_waits_for_next_year()
+    {
+        var calendar = Festivals.Calendar(Festivals.Announced, new DateTimeOffset(2026, 11, 10, 12, 0, 0, TimeSpan.Zero));
+
+        Assert.DoesNotContain(calendar, entry => entry.IsOn);
+        Assert.Equal("halloween", calendar[^1].Festival.Key);
+        Assert.Equal(new DateTime(2027, 10, 13), calendar[^1].Next);
+    }
+
+    [Fact]
     public void A_row_with_a_time_has_no_bar_and_shows_the_time()
     {
         var row = new TodayRow("Mad King Says", 0, 0, "next festival event", Figure: "18:00");

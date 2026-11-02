@@ -19,7 +19,9 @@ shortlist as it stands, with the reasoning, so the next session does not have to
   announcement, holding only Halloween 2026. The wiki was under maintenance on 2026-10-29 (its
   API too), so which page carries the dates in a readable shape is still to be found; the wiki's
   semantic data, which the guide check already queries, is the first place to look. Kept on the
-  phone like the timer data, so a festival still shows offline.
+  phone like the timer data, so a festival still shows offline. Still locked on 2026-11-02 (every
+  page, the API too, redirects to a Cognito login). The festival calendar reads the same list, so
+  dates from the wiki would turn its seasons into dates.
 
 ### Smaller things, carried rather than forgotten
 
@@ -70,6 +72,17 @@ shortlist as it stands, with the reasoning, so the next session does not have to
 ---
 
 ## Done
+
+### On the phone, 2026-11-02: the festival calendar
+
+- **A Festivals page** (under More, and a Festival calendar row at the end of a running
+  festival's section on Today, naming the next one) lists all six festivals: the one on first,
+  then by when each starts next. An announced festival shows its dates and "in 12 days"; the rest
+  show their usual season ("usually mid-December to early January") marked not announced yet.
+  The seasons and usual start days are typed into `Festivals.All` from past years. Nothing on the
+  page needs the network.
+- Seen on the phone: Halloween on until Tuesday 3 November, then Wintertag, Mondneujahr, Super
+  Adventure Festival, Drachen-Gepolter and Fest der Vier Winde, each "noch nicht angekündigt".
 
 ### On the phone, 2026-10-29: festivals, while they are on
 

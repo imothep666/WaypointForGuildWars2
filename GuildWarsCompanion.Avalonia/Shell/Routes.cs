@@ -51,6 +51,7 @@ public static class Routes
             Glyphs.TradingPost, "#C8A34E", Wash: "tradingpost"),
         new(L.T("Map"), "//map", Set("map"), Glyphs.Map, "#5E9FD0", Wash: "compass"),
         new(L.T("Timetable"), "//events", Set("events"), Glyphs.Timetable, "#C0453B"),
+        new(L.T("Festivals"), "//festivals", Set("festivals"), Glyphs.Festivals, "#E07B39"),
         new(L.T("Crafting"), "//crafting", Set("crafting"), Glyphs.Crafting, "#B4703C"),
         new(L.T("Achievements"), "//achievements", Set("achievements"), Glyphs.Achievements, "#C8A34E"),
         new(L.T("Unlocks"), "//unlocks", Set("unlocks"), Glyphs.Unlocks, "#9C7BC8"),
@@ -69,6 +70,7 @@ public static class Routes
     {
         new("today", L.T("TODAY"), () => new TodayView(), typeof(TodayViewModel)),
         new("events", L.T("TIMETABLE"), () => new EventsView(), typeof(EventsViewModel)),
+        new("festivals", L.T("FESTIVALS"), () => new FestivalsView(), typeof(FestivalsViewModel)),
         new("fractals", L.T("FRACTALS"), () => new FractalsView(), typeof(FractalsViewModel)),
         new("session", L.T("SESSION"), () => new SessionView(), typeof(SessionViewModel)),
         new("characters", L.T("CHARACTERS"), () => new CharactersView(), typeof(CharactersViewModel)),
@@ -133,6 +135,8 @@ public static class Glyphs
     public const string TradingPost = "M12,4 V20 M7,20 H17 M5,8 H19 M5,8 L2.5,14 A2.5,2.5 0 0 0 7.5,14 Z M19,8 L16.5,14 A2.5,2.5 0 0 0 21.5,14 Z";
     public const string Map = "M3,6 L9,4 L15,6 L21,4 V18 L15,20 L9,18 L3,20 Z M9,4 V18 M15,6 V20";
     public const string Timetable = "M20.5,12 A8.5,8.5 0 1 1 3.5,12 A8.5,8.5 0 1 1 20.5,12 Z M12,7.5 V12 L15,14";
+    /// <summary>A calendar sheet with a star on it.</summary>
+    public const string Festivals = "M4,6 H20 V20 H4 Z M4,10 H20 M8,3 V7 M16,3 V7 M12,12 L13.2,14.4 L15.8,14.7 L13.9,16.4 L14.4,19 L12,17.7 L9.6,19 L10.1,16.4 L8.2,14.7 L10.8,14.4 Z";
     public const string Crafting = "M4,14 H16 L14,17 H6 Z M8,17 V20 M12,17 V20 M6,20 H14 M14,4 L20,10 M17,7 L12,12";
     public const string Achievements = "M8,4 H16 V9 A4,4 0 0 1 8,9 Z M12,13 V17 M8.5,20 H15.5 M8,6 H5 A3,3 0 0 0 8,10 M16,6 H19 A3,3 0 0 1 16,10";
     public const string Unlocks = "M11.5,12 A3.5,3.5 0 1 1 4.5,12 A3.5,3.5 0 1 1 11.5,12 Z M11.5,12 H21 M17,12 V15 M20,12 V14";
