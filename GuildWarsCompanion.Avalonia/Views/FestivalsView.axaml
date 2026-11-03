@@ -29,8 +29,8 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <!-- Why most of the dates are seasons. -->
-            <TextBlock Text="{ui:T 'Dates come from ArenaNet\'s announcements, usually a week or two ahead. Until then a festival shows when it ran in past years.'}"
+            <!-- Where the dates come from, and why most of them are seasons. -->
+            <TextBlock Text="{ui:T 'Dates come from the Guild Wars 2 Wiki once ArenaNet has announced them, usually a week or two ahead. Until then a festival shows when it ran in past years.'}"
                        Classes="caption small" TextWrapping="Wrap" Margin="0,6,0,0" />
         </StackPanel>
     </ScrollViewer>

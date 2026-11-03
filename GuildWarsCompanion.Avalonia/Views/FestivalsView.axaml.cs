@@ -10,5 +10,5 @@ public partial class FestivalsView : PageView
     private FestivalsViewModel ViewModel => (FestivalsViewModel)DataContext!;
 
     /// <summary>Every time: "in 12 days" is a day older on each visit.</summary>
-    public override void OnAppearing() => ViewModel.Refresh();
+    public override async void OnAppearing() => await ViewModel.RefreshAsync();
 }

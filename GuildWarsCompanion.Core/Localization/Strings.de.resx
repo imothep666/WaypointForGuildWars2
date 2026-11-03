@@ -3647,9 +3647,6 @@
   <data name="Festivals" xml:space="preserve">
     <value>Festivals</value>
   </data>
-  <data name="FESTIVALS" xml:space="preserve">
-    <value>FESTIVALS</value>
-  </data>
   <data name="THE YEAR'S FESTIVALS" xml:space="preserve">
     <value>FESTIVALS IM JAHR</value>
   </data>
@@ -3680,8 +3677,8 @@
   <data name="usually in April" xml:space="preserve">
     <value>meist im April</value>
   </data>
-  <data name="usually June into July" xml:space="preserve">
-    <value>meist Juni bis Juli</value>
+  <data name="usually in June" xml:space="preserve">
+    <value>meist im Juni</value>
   </data>
   <data name="usually July into August" xml:space="preserve">
     <value>meist Juli bis August</value>
@@ -3692,7 +3689,7 @@
   <data name="usually mid-December to early January" xml:space="preserve">
     <value>meist Mitte Dezember bis Anfang Januar</value>
   </data>
-  <data name="Dates come from ArenaNet's announcements, usually a week or two ahead. Until then a festival shows when it ran in past years." xml:space="preserve">
-    <value>Die Termine stammen aus den Ankündigungen von ArenaNet, meist ein, zwei Wochen vorher. Bis dahin zeigt ein Festival, wann es in den Vorjahren lief.</value>
+  <data name="Dates come from the Guild Wars 2 Wiki once ArenaNet has announced them, usually a week or two ahead. Until then a festival shows when it ran in past years." xml:space="preserve">
+    <value>Die Termine stammen aus dem Guild Wars 2 Wiki, sobald ArenaNet sie angekündigt hat, meist ein, zwei Wochen vorher. Bis dahin zeigt ein Festival, wann es in den Vorjahren lief.</value>
   </data>
 </root>

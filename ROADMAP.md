@@ -15,13 +15,7 @@ shortlist as it stands, with the reasoning, so the next session does not have to
 
 ### Could be built next
 
-- **Festival dates from the wiki.** `Festivals.Announced` is a list typed in from ArenaNet's
-  announcement, holding only Halloween 2026. The wiki was under maintenance on 2026-10-29 (its
-  API too), so which page carries the dates in a readable shape is still to be found; the wiki's
-  semantic data, which the guide check already queries, is the first place to look. Kept on the
-  phone like the timer data, so a festival still shows offline. Still locked on 2026-11-02 (every
-  page, the API too, redirects to a Cognito login). The festival calendar reads the same list, so
-  dates from the wiki would turn its seasons into dates.
+Nothing queued. The festival dates were the last item; see the Done entry of 2026-11-03.
 
 ### Smaller things, carried rather than forgotten
 
@@ -73,6 +67,23 @@ shortlist as it stands, with the reasoning, so the next session does not have to
 
 ## Done
 
+### On the phone, 2026-11-03: festival dates from the wiki
+
+- **Each festival's wiki page lists every year's run** as `* [[A Very Merry Wintersday 2026]]
+  <small>(2026-12-08 – 2027-01-05)</small>`, the coming one as soon as ArenaNet announces it.
+  The semantic data was not needed: one `action=query` request reads the wikitext of all six
+  pages (about 77 KB). `FestivalSource` fetches it at most once a day, keeps it as
+  `festivals.json`, and tries again no sooner than 15 minutes after a failed fetch.
+- **What the app was built with is `Festivals.Shipped`**: Halloween 2026 and Wintersday 2026,
+  used until the pages have been read once, and for a festival and year the wiki does not list.
+  A copy that lists no runs (a read-only notice, a page rewritten) never replaces the kept one.
+- **Days, not hours.** A run is taken from midnight of its first day to the end of its last, in
+  Berlin time, summer time included. The release page says only "will end on November 3".
+- Today, the timetable, the Here widget and the calendar all read the same dates. Dragon Bash's
+  season is now "usually in June": four of the last five ran in June only.
+- Seen on the phone: the file fetched on first start, Today's calendar row "als Nächstes:
+  Wintertag, 8. Dezember bis 5. Januar", and Wintertag "in 35 Tagen" on the calendar.
+
 ### On the phone, 2026-11-02: the festival calendar
 
 - **A Festivals page** (under More, and a Festival calendar row at the end of a running
@@ -97,9 +108,8 @@ shortlist as it stands, with the reasoning, so the next session does not have to
   Feats, Festival of the Four Winds and Four Winds Customs, and two Super Adventure Box ones.
 - **When a festival runs is the open part.** The API has no flag, and every festival daily
   category still lists its achievements years after the dailies ended, so none is a sign. For now
-  `Festivals.Announced` holds this Halloween as ArenaNet announced it (13 October to 3 November);
-  the wiki is to be read for it once it is back from maintenance, and a festival not on the list
-  is not shown.
+  `Festivals.Announced` held this Halloween as ArenaNet announced it (13 October to 3 November);
+  since 2026-11-03 the dates come from the wiki.
 - Seen on the phone: the Halloween section with Mad King Says on until 15:10, Halloween-Rituale
   4/23 and Schatten des Verrückten Königs 7/29, and the Halloween row in the timetable. German
   festival names are the game's, from the API's category names ("Drachen-Gepolter", "Mondneujahr").

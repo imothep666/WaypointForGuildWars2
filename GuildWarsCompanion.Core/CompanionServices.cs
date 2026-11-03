@@ -68,6 +68,7 @@ public static class CompanionServices
         services.AddSingleton<GuideService>();
         services.AddSingleton<HereService>();
         services.AddSingleton<MetaSource>();
+        services.AddSingleton<FestivalSource>();
         services.AddSingleton<MetaReminderStore>();
         services.AddSingleton<AchievementService>();
         services.AddSingleton<CraftingService>();

@@ -1,3 +1,7 @@
+using System.Globalization;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+
 namespace GuildWarsCompanion.Services;
 
 /// <summary>
@@ -51,40 +55,122 @@ public sealed record FestivalEntry(Festival Festival, string When, string Note, 
 /// The API says nothing about either: there is no flag for a running festival, and every festival
 /// daily category still lists its achievements years after the dailies ended (checked 2026-10-29),
 /// so none of them is a sign. What a festival brings is known — the timer entries are in the wiki's
-/// data, the categories are the API's — but when it runs comes from ArenaNet's announcement.
+/// data, the categories are the API's — and when it runs is on the festival's wiki page, which
+/// lists every year's run by its first and last day once ArenaNet has announced it.
+/// <see cref="FestivalSource"/> reads those pages; <see cref="Shipped"/> is what the app was built with.
 /// </summary>
-public static class Festivals
+public static partial class Festivals
 {
     /// <summary>
     /// The timer keys are the wiki's (festival-ha, -db, -lc); the category ids are /v2's, by their
     /// names, read 2026-10-29. Lunar New Year and Wintersday have no timer entry. The seasons are
-    /// the pattern of past years, not a promise: Lunar New Year follows the lunar calendar, and a
-    /// festival has skipped a year before.
+    /// the pattern of the last five years on the wiki, not a promise: Lunar New Year follows the
+    /// lunar calendar, and a festival has skipped a year before. The English names are the titles
+    /// of the festivals' wiki pages.
     /// </summary>
     public static readonly IReadOnlyList<Festival> All =
     [
         new("lunar", "Lunar New Year", null, [202], "usually late January to mid-February", (1, 25)),
         new("sab", "Super Adventure Festival", null, [205, 351], "usually in April", (4, 1)),
-        new("dragonbash", "Dragon Bash", "festival-db", [231, 232], "usually June into July", (6, 20)),
+        new("dragonbash", "Dragon Bash", "festival-db", [231, 232], "usually in June", (6, 5)),
         new("fourwinds", "Festival of the Four Winds", "festival-lc", [210, 212], "usually July into August", (7, 25)),
         new("halloween", "Halloween", "festival-ha", [191, 193], "usually mid-October to early November", (10, 13)),
-        new("wintersday", "Wintersday", null, [197], "usually mid-December to early January", (12, 12))
+        new("wintersday", "Wintersday", null, [197], "usually mid-December to early January", (12, 9))
     ];
 
     public static Festival? ByKey(string key) => All.FirstOrDefault(festival => festival.Key == key);
 
     /// <summary>
-    /// When festivals run, as ArenaNet announced them. The announcements give days, not hours:
-    /// a festival is taken to run from the start of its first day to the end of its last, in
-    /// Central European time, which the German press gave. Read from the wiki once it can be;
-    /// until then this list is what there is, and a festival not on it is not shown.
+    /// When festivals run as the app was built, from the wiki on 2026-11-03: the one on and the one
+    /// announced. Used until the wiki's pages have been read once, and for a festival whose page
+    /// no longer lists the year.
     /// </summary>
-    public static readonly IReadOnlyList<FestivalPeriod> Announced =
+    public static readonly IReadOnlyList<FestivalPeriod> Shipped =
     [
-        // Shadow of the Mad King 2026: 13 October to 3 November (MassivelyOP, jeu.video).
-        new(ByKey("halloween")!,
-            new DateTimeOffset(2026, 10, 13, 0, 0, 0, TimeSpan.FromHours(2)),
-            new DateTimeOffset(2026, 11, 4, 0, 0, 0, TimeSpan.FromHours(1)))
+        Run(ByKey("halloween")!, new DateOnly(2026, 10, 13), new DateOnly(2026, 11, 3)),
+        Run(ByKey("wintersday")!, new DateOnly(2026, 12, 8), new DateOnly(2027, 1, 5))
+    ];
+
+    /// <summary>
+    /// The wiki gives days, not hours: a festival is taken to run from the start of its first day
+    /// to the end of its last, in Central European time, the game's European servers' own. That
+    /// shows it a few hours after the patch that ends it, never before the one that starts it.
+    /// </summary>
+    public static FestivalPeriod Run(Festival festival, DateOnly first, DateOnly last) =>
+        new(festival, Midnight(first), Midnight(last.AddDays(1)));
+
+    private static readonly TimeZoneInfo? Central = CentralEurope();
+
+    private static TimeZoneInfo? CentralEurope()
+    {
+        try
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin");
+        }
+        catch (Exception ex) when (ex is TimeZoneNotFoundException or InvalidTimeZoneException)
+        {
+            return null;
+        }
+    }
+
+    private static DateTimeOffset Midnight(DateOnly day)
+    {
+        var local = day.ToDateTime(TimeOnly.MinValue);
+
+        return new DateTimeOffset(local, Central?.GetUtcOffset(local) ?? TimeSpan.FromHours(1));
+    }
+
+    /// <summary>"* [[A Very Merry Wintersday 2026]] &lt;small&gt;(2026-12-08 – 2027-01-05)&lt;/small&gt;"</summary>
+    [GeneratedRegex(@"<small>\(\s*(\d{4}-\d{2}-\d{2})\s*[^\d)<]{1,3}\s*(\d{4}-\d{2}-\d{2})\s*\)</small>")]
+    private static partial Regex Edition();
+
+    /// <summary>
+    /// Every run the festivals' wiki pages list, from the wiki API's answer for their wikitext.
+    /// A page that cannot be found or lists nothing gives nothing; when none gives anything the
+    /// answer is not what was asked for, and that throws rather than say no festival ever runs.
+    /// </summary>
+    public static IReadOnlyList<FestivalPeriod> ParseWiki(string json)
+    {
+        using var document = JsonDocument.Parse(json);
+
+        var periods = new List<FestivalPeriod>();
+
+        foreach (var page in document.RootElement.GetProperty("query").GetProperty("pages").EnumerateArray())
+        {
+            var title = page.TryGetProperty("title", out var name) ? name.GetString() : null;
+
+            if (All.FirstOrDefault(festival => festival.English == title) is not { } festival) continue;
+            if (!page.TryGetProperty("revisions", out var revisions) || revisions.GetArrayLength() == 0) continue;
+
+            var text = revisions[0].GetProperty("slots").GetProperty("main").GetProperty("content").GetString() ?? string.Empty;
+
+            foreach (Match match in Edition().Matches(text))
+            {
+                if (Day(match.Groups[1].Value) is { } first && Day(match.Groups[2].Value) is { } last && last >= first)
+                    periods.Add(Run(festival, first, last));
+            }
+        }
+
+        if (periods.Count == 0)
+            throw new InvalidOperationException("The festivals' wiki pages list no runs.");
+
+        return periods;
+    }
+
+    private static DateOnly? Day(string text) =>
+        DateOnly.TryParseExact(text, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var day)
+            ? day
+            : null;
+
+    /// <summary>
+    /// The wiki's runs, and a shipped one only for a festival and year the wiki does not list:
+    /// the wiki is the later word, and may have moved a day.
+    /// </summary>
+    public static IReadOnlyList<FestivalPeriod> Merge(IReadOnlyList<FestivalPeriod> wiki, IReadOnlyList<FestivalPeriod> shipped) =>
+    [
+        .. wiki,
+        .. shipped.Where(own => !wiki.Any(period =>
+            period.Festival.Key == own.Festival.Key && period.Start.Year == own.Start.Year))
     ];
 
     /// <summary>

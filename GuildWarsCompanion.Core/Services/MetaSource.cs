@@ -12,10 +12,10 @@ namespace GuildWarsCompanion.Services;
 /// old; with no copy at all there is simply no meta timetable, and the screen says so.
 ///
 /// A festival's events are in the same data all year. They are added to the maps only while
-/// <see cref="Festivals"/> says the festival is on, as one more map under the festival's name, so
+/// <see cref="FestivalSource"/> says the festival is on, as one more map under the festival's name, so
 /// the timetable, its reminders and the alerts take them as they take any map's.
 /// </summary>
-public sealed class MetaSource(AppEnvironment environment)
+public sealed class MetaSource(AppEnvironment environment, FestivalSource festivalDates)
 {
     public const string Address =
         "https://wiki.guildwars2.com/index.php?title=Widget:Event_timer/data.json&action=raw";
@@ -35,7 +35,7 @@ public sealed class MetaSource(AppEnvironment environment)
     private IReadOnlyList<MetaMap> _festivals = [];
 
     public async Task<IReadOnlyList<MetaMap>> GetAsync(CancellationToken ct = default) =>
-        WithFestivals(await MapsAsync(ct), _festivals, DateTimeOffset.UtcNow);
+        WithFestivals(await MapsAsync(ct), _festivals, await festivalDates.GetAsync(ct), DateTimeOffset.UtcNow);
 
     /// <summary>The festival entries whether or not they are on, by their timer keys.</summary>
     public async Task<IReadOnlyList<MetaMap>> FestivalsAsync(CancellationToken ct = default)
@@ -45,13 +45,14 @@ public sealed class MetaSource(AppEnvironment environment)
     }
 
     /// <summary>
-    /// Each festival on at <paramref name="utcNow"/> that has timer data, then the maps. A festival
+    /// Each festival of <paramref name="periods"/> on at <paramref name="utcNow"/> that has timer data, then the maps. A festival
     /// keeps the data's name, and carries its own name and last day where a map has its expansion.
     /// </summary>
     public static IReadOnlyList<MetaMap> WithFestivals(
-        IReadOnlyList<MetaMap> maps, IReadOnlyList<MetaMap> festivals, DateTimeOffset utcNow)
+        IReadOnlyList<MetaMap> maps, IReadOnlyList<MetaMap> festivals, IEnumerable<FestivalPeriod> periods,
+        DateTimeOffset utcNow)
     {
-        var on = Festivals.On(Festivals.Announced, utcNow)
+        var on = Festivals.On(periods, utcNow)
             .Select(period => festivals.FirstOrDefault(entry => entry.Key == period.Festival.TimerKey) is { } entry
                 ? entry with { Category = $"{period.Festival.Name} · {period.Until}" }
                 : null)
@@ -97,13 +98,14 @@ public sealed class MetaSource(AppEnvironment environment)
     /// </summary>
     public async Task<IReadOnlyList<MetaMap>> HeldAsync(CancellationToken ct = default)
     {
-        if (_maps is not null) return WithFestivals(_maps, _festivals, DateTimeOffset.UtcNow);
+        if (_maps is not null) return WithFestivals(_maps, _festivals, festivalDates.Held(), DateTimeOffset.UtcNow);
         if (!File.Exists(FilePath)) return [];
 
         try
         {
             var json = await File.ReadAllTextAsync(FilePath, ct);
-            return WithFestivals(MetaSchedule.Parse(json), MetaSchedule.ParseFestivals(json), DateTimeOffset.UtcNow);
+            return WithFestivals(MetaSchedule.Parse(json), MetaSchedule.ParseFestivals(json), festivalDates.Held(),
+                DateTimeOffset.UtcNow);
         }
         catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException or IOException)
         {

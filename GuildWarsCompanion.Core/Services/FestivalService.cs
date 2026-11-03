@@ -9,14 +9,15 @@ namespace GuildWarsCompanion.Services;
 /// Every read goes through <see cref="OfflineReader"/>, so the page drawn from what was stored
 /// last time has the festival in it too.
 /// </summary>
-public sealed class FestivalService(Gw2Client client, OfflineReader offline, MetaSource metas)
+public sealed class FestivalService(Gw2Client client, OfflineReader offline, MetaSource metas, FestivalSource dates)
 {
     public async Task<IReadOnlyList<TodaySection>> SectionsAsync(CancellationToken ct = default)
     {
         var now = DateTimeOffset.UtcNow;
         var sections = new List<TodaySection>();
+        var periods = await dates.GetAsync(ct);
 
-        foreach (var period in Festivals.On(Festivals.Announced, now))
+        foreach (var period in Festivals.On(periods, now))
         {
             var rows = new List<TodayRow>();
 
@@ -25,7 +26,7 @@ public sealed class FestivalService(Gw2Client client, OfflineReader offline, Met
             rows.AddRange(await AchievementsAsync(period.Festival, ct));
 
             // The way to the calendar, saying what comes after this one.
-            if (Festivals.Calendar(Festivals.Announced, now).FirstOrDefault(entry => !entry.IsOn) is { } after)
+            if (Festivals.Calendar(periods, now).FirstOrDefault(entry => !entry.IsOn) is { } after)
                 rows.Add(new TodayRow(L.T("Festival calendar"), 0, 0, L.F("next: {0}, {1}", after.Name, after.When),
                     Route: "//festivals", Figure: string.Empty));
 
