@@ -50,11 +50,35 @@ public static class BlishHud
     /// </summary>
     public static bool IsRunning()
     {
-        var found = Process.GetProcessesByName(ProcessName);
+        var running = false;
 
-        foreach (var process in found) process.Dispose();
+        foreach (var process in Process.GetProcessesByName(ProcessName))
+            using (process)
+                running |= IsAlive(process);
 
-        return found.Length > 0;
+        return running;
+    }
+
+    /// <summary>
+    /// Whether a listed process has not exited. One just ended stays in the list for a second or
+    /// two while something — a virus scanner, say — still holds a handle to it, and counting it
+    /// made a restart refuse to start the new copy.
+    /// </summary>
+    private static bool IsAlive(Process process)
+    {
+        try
+        {
+            return !process.HasExited;
+        }
+        catch (System.ComponentModel.Win32Exception)
+        {
+            // Not ours to look at — an elevated one. Running, as far as can be told.
+            return true;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
     }
 
     /// <summary>What the game's process is called: the 64-bit client, the old 32-bit one, and
@@ -154,6 +178,20 @@ public static class BlishHud
                         // Minimised to the tray has no window to close, and a hung one will not
                         // answer. Either way, the game is gone and so is the reason to be here.
                         process.Kill();
+
+                        // Kill only asks. Until the process is really gone it is still listed,
+                        // and a restart looking straight after would take it for another copy.
+                        using var gone = new CancellationTokenSource(grace);
+
+                        try
+                        {
+                            await process.WaitForExitAsync(gone.Token).ConfigureAwait(false);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            problem ??= "it did not exit after being ended";
+                            continue;
+                        }
                     }
 
                     closed++;

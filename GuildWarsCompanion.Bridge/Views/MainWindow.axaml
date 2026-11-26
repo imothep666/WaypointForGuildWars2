@@ -278,6 +278,12 @@
                            IsVisible="{Binding OffersBlishHud}"
                            Text="{Binding BlishHudLine}" />
 
+                <!-- For when a module update asks for a restart: the bridge knows which copy and
+                     which command line, somebody quitting it from the tray does not. -->
+                <Button Content="Restart Blish HUD" Command="{Binding RestartBlishHudCommand}"
+                        IsVisible="{Binding OffersBlishHud}" HorizontalAlignment="Left"
+                        Margin="26,4,0,0" Padding="10,3" FontSize="12" />
+
                 <!-- Whether a tapped emote is done in the game or copied. Said even while the box is
                      off, because "why was that only copied?" is answered here either way. -->
                 <TextBlock Classes="caption" FontSize="11" TextWrapping="Wrap" Margin="26,0,0,0"

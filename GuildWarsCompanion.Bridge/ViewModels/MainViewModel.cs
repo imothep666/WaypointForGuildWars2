@@ -122,7 +122,14 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty] private bool _bossReminders;
 
     /// <summary>Whether Blish HUD is started when the game is. See <see cref="BlishHud"/>.</summary>
-    [ObservableProperty] private bool _startBlishHud;
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RestartBlishHudCommand))]
+    private bool _startBlishHud;
+
+    /// <summary>A restart under way. One at a time: two would each close the other's start.</summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RestartBlishHudCommand))]
+    private bool _isRestartingBlishHud;
 
     /// <summary>Windows only — see <see cref="BlishHud"/> for why Linux is left out.</summary>
     public bool OffersBlishHud => BlishHud.IsSupported;
@@ -510,20 +517,96 @@ public sealed partial class MainViewModel : ObservableObject
             ? path
             : null;
 
-    private void StartBlish(InstalledBlish installed)
+    /// <returns>Whether it was started: false when it was not due, already running, or failed.</returns>
+    private bool StartBlish(InstalledBlish installed)
     {
         _blishWanted = false;
 
-        if (!BlishHud.ShouldStart(StartBlishHud, installed.Exe, BlishHud.IsRunning)) return;
+        if (!BlishHud.ShouldStart(StartBlishHud, installed.Exe, BlishHud.IsRunning)) return false;
 
         if (BlishHud.Start(installed.Exe, BundledModule) is { } why)
         {
             Problem = $"Could not start Blish HUD — {why}";
             _journal.Write("blish", $"FAILED to start {installed.Exe}: {why}");
-            return;
+            return false;
         }
 
         _journal.Write("blish", $"started {installed.Version}");
+
+        return true;
+    }
+
+    private bool CanRestartBlishHud() => BlishHud.IsSupported && StartBlishHud && !IsRestartingBlishHud;
+
+    /// <summary>
+    /// Closes the bridge's Blish HUD and starts it again, for when a module update asks for a
+    /// restart. Done by hand otherwise, that means finding the tray icon, quitting, and starting
+    /// the right copy with the bridge's module on its command line — which only the bridge knows.
+    ///
+    /// Closed the same way the game closing does it, by folder: one started by hand from
+    /// somewhere else is left alone, and if it is still running, nothing new is started next to it.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanRestartBlishHud))]
+    private async Task RestartBlishHudAsync()
+    {
+        IsRestartingBlishHud = true;
+
+        try
+        {
+            // An update unpacks into the same folder this is about to start from.
+            if (_blishUpdate is { IsCompleted: false } pending) await pending;
+
+            if (_blish.Current() is not { } installed)
+            {
+                BlishHudLine = "Nothing to restart yet — Blish HUD has not been downloaded.";
+                return;
+            }
+
+            _journal.Write("blish", "restart asked for");
+            BlishHudLine = Ready(installed, "restarting…");
+
+            // Asked for by hand, so not closed again behind somebody's back by a game that
+            // exited moments ago.
+            _blishClosingUntil = DateTimeOffset.MinValue;
+
+            var (closed, problem) = await Task.Run(() => BlishHud.CloseFromAsync(_blish.Root, BlishGrace));
+
+            if (problem is not null)
+            {
+                BlishHudLine = Ready(installed, $"could not close it ({problem}).");
+                _journal.Write("blish", $"restart: could not close one: {problem}");
+                return;
+            }
+
+            if (BlishHud.IsRunning())
+            {
+                BlishHudLine = Ready(installed, "a Blish HUD started from another folder is still " +
+                                                "running; restart that one by hand.");
+                _journal.Write("blish", $"restart: closed {closed}, another copy still running");
+                return;
+            }
+
+            if (!StartBlish(installed))
+            {
+                BlishHudLine = Ready(installed, "closed, but could not be started again.");
+                return;
+            }
+
+            BlishHudLine = Ready(installed, closed > 0 ? "restarted." : "started.");
+
+            // Belongs to the game being played, so it closes with it like one started with it.
+            var processId = _game.Report.State?.ProcessId ?? 0;
+
+            if (BlishHud.IsGameRunning(processId))
+            {
+                _blishSession = processId;
+                _blishGame = processId;
+            }
+        }
+        finally
+        {
+            IsRestartingBlishHud = false;
+        }
     }
 
     /// <summary>

@@ -46,6 +46,7 @@ public partial class App : Application
             desktop.ShutdownRequested += (_, _) => _viewModel.Shutdown();
 
             ListenForStopSignals(desktop);
+            OfferBlishRestartInTray();
 
             _viewModel.Updates.Start();
         }
@@ -102,6 +103,33 @@ public partial class App : Application
                 // A platform without that signal has nothing to listen for.
             }
         }
+    }
+
+    /// <summary>
+    /// "Restart Blish HUD" in the tray menu, under "Show bridge". From the tray because that is
+    /// within reach while the game is open, which is when a module asks for a restart.
+    ///
+    /// Added here rather than in the markup because it is Windows only, like Blish HUD in the
+    /// bridge, and a native menu item cannot simply be hidden on every platform.
+    /// </summary>
+    private void OfferBlishRestartInTray()
+    {
+        if (!Protocol.BlishHud.IsSupported || _viewModel is not { } viewModel) return;
+
+        if (TrayIcon.GetIcons(this) is not [var icon, ..] || icon.Menu is not { } menu) return;
+
+        var item = new NativeMenuItem("Restart Blish HUD")
+        {
+            IsEnabled = viewModel.RestartBlishHudCommand.CanExecute(null)
+        };
+
+        item.Click += (_, _) => viewModel.RestartBlishHudCommand.Execute(null);
+
+        // Greyed out while it means nothing: the setting off, or a restart already under way.
+        viewModel.RestartBlishHudCommand.CanExecuteChanged += (_, _) =>
+            item.IsEnabled = viewModel.RestartBlishHudCommand.CanExecute(null);
+
+        menu.Items.Insert(1, item);
     }
 
     private void OnTrayClicked(object? sender, EventArgs e) => Reveal();
